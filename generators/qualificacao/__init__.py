@@ -1,0 +1,1 @@
+from .builder import gerar_documento_qualificacao
