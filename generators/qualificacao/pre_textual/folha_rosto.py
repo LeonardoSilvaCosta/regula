@@ -9,6 +9,32 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from ..titulo import escrever_titulo_e_subtitulo, nome_discente
 
+
+def _campo(paragrafo, rotulo, valor, italico=False):
+    r_rotulo = paragrafo.add_run(f"{rotulo}:")
+    r_rotulo.bold = True
+    r_rotulo.font.name = "Times New Roman"
+    r_rotulo.font.size = Pt(12)
+    r_val = paragrafo.add_run(f" {valor}")
+    r_val.bold = False
+    r_val.italic = italico
+    r_val.font.name = "Times New Roman"
+    r_val.font.size = Pt(12)
+    if italico:
+        r_val.font.color.rgb = RGBColor(120, 120, 120)
+
+
+def _paragrafo_campo(doc, rotulo, valor, italico=False, space_before=0):
+    """Uma linha por campo, como no modelo oficial (rótulo+':' em negrito)."""
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    p.paragraph_format.line_spacing = 1.15
+    p.paragraph_format.space_before = Pt(space_before)
+    p.paragraph_format.space_after = Pt(0)
+    p.paragraph_format.first_line_indent = Cm(0)
+    _campo(p, rotulo, valor, italico=italico)
+    return p
+
 def build_folha_rosto(doc, metadata, assets_dir="assets"):
     """
     Renderiza a Folha de Rosto segundo a ordem e especificações do Art. 1º, I, 2.
@@ -26,7 +52,7 @@ def build_folha_rosto(doc, metadata, assets_dir="assets"):
     """
     is_doutorado = metadata.get("nivel", "mestrado").strip().lower() in ["doutorado", "tese"]
     nivel_cabecalho = "DOUTORADO EM SEGURANÇA PÚBLICA" if is_doutorado else "MESTRADO EM SEGURANÇA PÚBLICA"
-    tipo_trabalho_artigo = "ao desenvolvimento da Tese" if is_doutorado else "ao desenvolvimento da Dissertação"
+    tipo_trabalho = "Tese" if is_doutorado else "Dissertação"
 
     # -------------------------------------------------------------
     # (i) Brasão da UFPA
@@ -113,14 +139,20 @@ def build_folha_rosto(doc, metadata, assets_dir="assets"):
     p_rec.paragraph_format.space_before = Pt(0)
     p_rec.paragraph_format.space_after = Pt(18)
 
-    texto_recuado = (
+    r_rec = p_rec.add_run(
         "Relatório de Qualificação apresentado ao Colegiado do Programa de Pós-Graduação em "
-        f"Segurança Pública, da Universidade Federal do Pará, como requisito parcial à qualificação "
-        f"{tipo_trabalho_artigo}."
+        "Segurança Pública, da Universidade Federal do Pará, como requisito parcial à qualificação "
+        "ao desenvolvimento da "
     )
-    r_rec = p_rec.add_run(texto_recuado)
     r_rec.font.name = "Times New Roman"
     r_rec.font.size = Pt(12)
+    r_tipo = p_rec.add_run(tipo_trabalho)
+    r_tipo.bold = True
+    r_tipo.font.name = "Times New Roman"
+    r_tipo.font.size = Pt(12)
+    r_fim = p_rec.add_run(".")
+    r_fim.font.name = "Times New Roman"
+    r_fim.font.size = Pt(12)
 
     # -------------------------------------------------------------
     # (ix) e (x) Área, Linha, Orientador e Coorientador à Margem Esquerda
@@ -130,66 +162,17 @@ def build_folha_rosto(doc, metadata, assets_dir="assets"):
     orientador = metadata.get("orientador", "").strip()
     coorientador = metadata.get("coorientador", "").strip()
 
-    p_info = doc.add_paragraph()
-    p_info.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    p_info.paragraph_format.line_spacing = 1.0
-    p_info.paragraph_format.space_before = Pt(0)
-    p_info.paragraph_format.space_after = Pt(36)
-
-    # Área de Concentração
-    r_area_rotulo = p_info.add_run("Área de Concentração: ")
-    r_area_rotulo.font.name = "Times New Roman"
-    r_area_rotulo.font.size = Pt(12)
-    r_area_val = p_info.add_run(f"{area}\n")
-    r_area_val.font.name = "Times New Roman"
-    r_area_val.font.size = Pt(12)
-
-    # Linha de Pesquisa
-    r_linha_rotulo = p_info.add_run("Linha de Pesquisa: ")
-    r_linha_rotulo.font.name = "Times New Roman"
-    r_linha_rotulo.font.size = Pt(12)
-    r_linha_val = p_info.add_run(f"{linha}\n")
-    r_linha_val.font.name = "Times New Roman"
-    r_linha_val.font.size = Pt(12)
-
-    # Orientador(a)
-    r_orient_rotulo = p_info.add_run("Orientador(a): ")
-    r_orient_rotulo.font.name = "Times New Roman"
-    r_orient_rotulo.font.size = Pt(12)
+    _paragrafo_campo(doc, "Área de Concentração", area, space_before=0)
+    _paragrafo_campo(doc, "Linha de Pesquisa", linha, space_before=12)
     if orientador:
-        r_orient_val = p_info.add_run(f"{orientador}\n")
+        _paragrafo_campo(doc, "Orientador(a)", orientador, space_before=10)
     else:
-        r_orient_val = p_info.add_run("[Nome Completo e Titulação do(a) Orientador(a)]\n")
-        r_orient_val.italic = True
-        r_orient_val.font.color.rgb = RGBColor(120, 120, 120)
-    r_orient_val.font.name = "Times New Roman"
-    r_orient_val.font.size = Pt(12)
-
-    # Coorientador(a) se houver
+        _paragrafo_campo(
+            doc,
+            "Orientador(a)",
+            "[Nome Completo e Titulação do(a) Orientador(a)]",
+            italico=True,
+            space_before=10,
+        )
     if coorientador:
-        r_coorient_rotulo = p_info.add_run("Coorientador(a): ")
-        r_coorient_rotulo.font.name = "Times New Roman"
-        r_coorient_rotulo.font.size = Pt(12)
-        r_coorient_val = p_info.add_run(f"{coorientador}\n")
-        r_coorient_val.font.name = "Times New Roman"
-        r_coorient_val.font.size = Pt(12)
-
-    # -------------------------------------------------------------
-    # (xi) e (xii) Local e Ano (Centralizado, Negrito, Espaço Simples)
-    # -------------------------------------------------------------
-    local = metadata.get("local", "Belém-Pará").strip()
-    ano = str(metadata.get("ano", "2026")).strip()
-
-    p_rodape = doc.add_paragraph()
-    p_rodape.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_rodape.paragraph_format.line_spacing = 1.0
-    p_rodape.paragraph_format.space_before = Pt(0)
-    p_rodape.paragraph_format.space_after = Pt(0)
-
-    r_loc = p_rodape.add_run(f"{local}\n{ano}")
-    r_loc.bold = True
-    r_loc.font.name = "Times New Roman"
-    r_loc.font.size = Pt(12)
-
-    # Quebra de página para o próximo elemento pré-textual
-    doc.add_page_break()
+        _paragrafo_campo(doc, "Coorientador(a)", coorientador, space_before=10)

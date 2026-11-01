@@ -3,7 +3,6 @@ from .capa import build_capa
 from .folha_rosto import build_folha_rosto
 from .folha_aprovacao import build_folha_aprovacao
 from .listas_ilustracoes import build_lista_ilustracoes
-from .listas_tabelas import build_lista_tabelas
 from .listas_siglas import build_lista_siglas
 from .listas_simbolos import build_lista_simbolos
 from .sumario import build_sumario
@@ -14,11 +13,10 @@ def build_todos_pre_textuais(doc, metadata, assets_dir="assets"):
       1. Capa
       2. Folha de Rosto
       3. Folha de Aprovação
-      4. Lista de Ilustrações / Quadros / Figuras
-      5. Lista de Tabelas
-      6. Lista de Abreviaturas e Siglas
-      7. Lista de Símbolos (se houver)
-      8. Sumário
+      4. Lista de Ilustrações (Figuras, Gráficos, Quadros e Tabelas)
+      5. Lista de Abreviaturas e Siglas
+      6. Lista de Símbolos (se houver)
+      7. Sumário
     O relatório completo, com corpo e campos de página, é montado por builder.py.
     """
     from ..legendas import (
@@ -40,8 +38,6 @@ def build_todos_pre_textuais(doc, metadata, assets_dir="assets"):
     build_lista_ilustracoes(doc, [
         (legenda_quadro_1(metadata), BM_QUADRO_1),
         (legenda_quadro_2(nivel, parte), BM_QUADRO_2),
-    ])
-    build_lista_tabelas(doc, [
         (LEGENDA_TABELA_1, BM_TABELA_1),
         (LEGENDA_TABELA_2, BM_TABELA_2),
     ])

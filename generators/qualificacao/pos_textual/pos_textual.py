@@ -10,7 +10,8 @@ Contempla:
 from docx.shared import Cm, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
-from core.campos import adicionar_bookmark, ancorar_paragrafo
+from core.campos import adicionar_bookmark
+from ..formato import adicionar_titulo
 from ..estrutura import rotulo_pos
 
 
@@ -80,16 +81,7 @@ def build_pos_textual(doc, referencias, apendices=None, anexos=None):
     # 1. REFERÊNCIAS (Obrigatório - Art. 1º, III, 1)
     # -------------------------------------------------------------------------
     doc.add_page_break()
-
-    p_rt = doc.add_paragraph()
-    p_rt.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_rt.paragraph_format.space_before = Pt(0)
-    p_rt.paragraph_format.space_after = Pt(18)
-    r_rt = p_rt.add_run("REFERÊNCIAS")
-    r_rt.bold = True
-    r_rt.font.name = "Times New Roman"
-    r_rt.font.size = Pt(12)
-    ancorar_paragrafo(p_rt, "REFERÊNCIAS")
+    adicionar_titulo(doc, "REFERÊNCIAS", bookmark="sec_referencias", primario=True)
 
     if referencias:
         refs_ordenadas = sorted(referencias, key=lambda x: str(x).strip().upper())

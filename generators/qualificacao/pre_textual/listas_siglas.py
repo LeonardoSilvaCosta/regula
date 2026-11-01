@@ -3,11 +3,9 @@ Lista de abreviaturas e siglas.
 Só é emitida quando o projeto informa ao menos um par.
 """
 
-from docx.shared import Cm, Pt
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-
+from core.campos import twips_coluna_rotulo
 from ..estrutura import BM_LISTA_SIGLAS
-from ..formato import adicionar_titulo_lista
+from ..formato import adicionar_linha_par_alinhado, adicionar_titulo_lista
 
 
 def normalizar_siglas(siglas_data):
@@ -46,24 +44,7 @@ def build_lista_siglas(doc, siglas_data, quebrar=True):
         doc.add_page_break()
 
     adicionar_titulo_lista(doc, "LISTA DE ABREVIATURAS E SIGLAS", BM_LISTA_SIGLAS)
+    pos_twips = twips_coluna_rotulo(sigla for sigla, _significado in pares)
     for sigla, significado in pares:
-        p = doc.add_paragraph()
-        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        p.paragraph_format.first_line_indent = Cm(0)
-        p.paragraph_format.line_spacing = 1.0
-        p.paragraph_format.space_before = Pt(0)
-        p.paragraph_format.space_after = Pt(0)
-
-        r_sigla = p.add_run(sigla)
-        r_sigla.bold = True
-        r_sigla.font.name = "Times New Roman"
-        r_sigla.font.size = Pt(12)
-
-        if significado:
-            r_sep = p.add_run(" – ")
-            r_sep.font.name = "Times New Roman"
-            r_sep.font.size = Pt(12)
-            r_sig = p.add_run(significado)
-            r_sig.font.name = "Times New Roman"
-            r_sig.font.size = Pt(12)
+        adicionar_linha_par_alinhado(doc, sigla, significado, pos_twips)
     return ("LISTA DE ABREVIATURAS E SIGLAS", BM_LISTA_SIGLAS)

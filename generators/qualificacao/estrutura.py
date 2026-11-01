@@ -4,19 +4,28 @@ import re
 from .legendas import titulo_produto
 
 
+BM_LISTA_ILUSTRACOES = "sec_lista_ilustracoes"
 BM_LISTA_TABELAS = "sec_lista_tabelas"
 BM_LISTA_SIGLAS = "sec_lista_siglas"
 BM_LISTA_SIMBOLOS = "sec_lista_simbolos"
 
+_SUBLISTAS_ILUSTRACAO = (
+    "LISTA DE FIGURAS",
+    "LISTA DE GRÁFICOS",
+    "LISTA DE QUADROS",
+    "LISTA DE TABELAS",
+)
+
 _TIPOS_ILUSTRACAO = (
-    ("quadro", "LISTA DE QUADROS", "sec_lista_quadros"),
     ("figura", "LISTA DE FIGURAS", "sec_lista_figuras"),
+    ("gráfico", "LISTA DE GRÁFICOS", "sec_lista_graficos"),
+    ("grafico", "LISTA DE GRÁFICOS", "sec_lista_graficos"),
+    ("quadro", "LISTA DE QUADROS", "sec_lista_quadros"),
+    ("tabela", "LISTA DE TABELAS", "sec_lista_tabelas"),
     ("desenho", "LISTA DE DESENHOS", "sec_lista_desenhos"),
     ("esquema", "LISTA DE ESQUEMAS", "sec_lista_esquemas"),
     ("fluxograma", "LISTA DE FLUXOGRAMAS", "sec_lista_fluxogramas"),
     ("fotografia", "LISTA DE FOTOGRAFIAS", "sec_lista_fotografias"),
-    ("gráfico", "LISTA DE GRÁFICOS", "sec_lista_graficos"),
-    ("grafico", "LISTA DE GRÁFICOS", "sec_lista_graficos"),
     ("mapa", "LISTA DE MAPAS", "sec_lista_mapas"),
     ("organograma", "LISTA DE ORGANOGRAMAS", "sec_lista_organogramas"),
     ("planta", "LISTA DE PLANTAS", "sec_lista_plantas"),
@@ -69,20 +78,17 @@ def tipo_ilustracao(rotulo):
     for chave, titulo, bookmark in _TIPOS_ILUSTRACAO:
         if primeira == chave:
             return titulo, bookmark
-    return "LISTA DE ILUSTRAÇÕES", "sec_lista_ilustracoes"
+    return "LISTA DE ILUSTRAÇÕES", BM_LISTA_ILUSTRACOES
 
 
 def agrupar_ilustracoes(entradas):
-    """Uma lista por designação. Só quadros viram LISTA DE QUADROS."""
-    grupos = {}
-    ordem = []
+    """Sublistas fixas do modelo: figuras, gráficos, quadros e tabelas."""
+    grupos = {titulo: [] for titulo in _SUBLISTAS_ILUSTRACAO}
     for rotulo, bookmark in entradas:
-        titulo, bookmark_lista = tipo_ilustracao(rotulo)
-        if titulo not in grupos:
-            grupos[titulo] = [bookmark_lista, []]
-            ordem.append(titulo)
-        grupos[titulo][1].append((rotulo, bookmark))
-    return [(titulo, grupos[titulo][0], grupos[titulo][1]) for titulo in ordem]
+        titulo, _bookmark_lista = tipo_ilustracao(rotulo)
+        if titulo in grupos:
+            grupos[titulo].append((rotulo, bookmark))
+    return [(titulo, grupos[titulo]) for titulo in _SUBLISTAS_ILUSTRACAO]
 
 
 def artigo_tem_conteudo(artigo):
@@ -169,11 +175,11 @@ def blocos_manuscrito(artigo):
         or _achar_secao(secoes, usados, ("resultado",))
     )
     referencias = _texto_referencias(artigo, secoes, usados)
-    extras = [
-        (titulo, texto)
-        for indice, (titulo, texto) in enumerate(secoes)
-        if indice not in usados and texto
-    ]
+    extras = []
+    for indice, (titulo, texto) in enumerate(secoes):
+        if indice in usados or not texto or _extra_omitido(titulo):
+            continue
+        extras.append((_sem_numero_de_artigo(titulo), texto))
     return {
         "topicos": topicos,
         "palavras_chave": str(artigo.get("palavras_chave") or "").strip(),
@@ -225,7 +231,7 @@ def itens_do_sumario(dados, apendices=None, anexos=None, listas=None):
         ("APRESENTAÇÃO", "sec_apresentacao"),
         (f"{n1}. CONSIDERAÇÕES GERAIS", "sec_1"),
         (f"{n1}.1. INTRODUÇÃO", "sec_1_1"),
-        (f"{n1}.2. JUSTIFICATIVA DA PESQUISA", "sec_1_2"),
+        (f"{n1}.2. JUSTIFICATIVA", "sec_1_2"),
         (f"{n1}.3. PROBLEMA DE PESQUISA", "sec_1_3"),
         (f"{n1}.4. REVISÃO DA LITERATURA / REFERENCIAL TEÓRICO", "sec_1_4"),
         (f"{n2}. OBJETIVOS", "sec_2"),
@@ -317,6 +323,18 @@ def _verbo_inicial(texto):
     if not palavras:
         return ""
     return palavras[0].lower()
+
+
+def _extra_omitido(titulo):
+    baixo = str(titulo or "").lower()
+    return any(
+        trecho in baixo
+        for trecho in ("conclus", "considerações finais", "consideracoes finais")
+    )
+
+
+def _sem_numero_de_artigo(titulo):
+    return re.sub(r"^\s*\d+(?:\.\d+)*\.?\s+", "", str(titulo or "")).strip()
 
 
 def citacoes_longas(texto):

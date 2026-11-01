@@ -83,7 +83,7 @@ def build_capa(doc, metadata, assets_dir="assets"):
     p_autor = doc.add_paragraph()
     p_autor.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_autor.paragraph_format.space_before = Pt(36)
-    p_autor.paragraph_format.space_after = Pt(72)
+    p_autor.paragraph_format.space_after = Pt(0)
 
     if autor_raw:
         r_aut = p_autor.add_run(autor_raw)
@@ -95,23 +95,3 @@ def build_capa(doc, metadata, assets_dir="assets"):
         r_aut.italic = True
         r_aut.font.size = Pt(14)
         r_aut.font.color.rgb = RGBColor(120, 120, 120)
-
-    # -------------------------------------------------------------
-    # (viii) e (ix) Local e Ano (Times 12 Negrito, Espaço Simples)
-    # -------------------------------------------------------------
-    local = metadata.get("local", "Belém-Pará").strip()
-    ano = str(metadata.get("ano", "2026")).strip()
-
-    p_rodape = doc.add_paragraph()
-    p_rodape.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_rodape.paragraph_format.line_spacing = 1.0
-    p_rodape.paragraph_format.space_before = Pt(0)
-    p_rodape.paragraph_format.space_after = Pt(0)
-
-    r_loc = p_rodape.add_run(f"{local}\n{ano}")
-    r_loc.bold = True
-    r_loc.font.name = "Times New Roman"
-    r_loc.font.size = Pt(12)
-
-    # Final da Capa: Quebra para a Folha de Rosto
-    doc.add_page_break()

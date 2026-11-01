@@ -328,7 +328,7 @@ def parse_projeto_docx(caminho_docx):
                 ("APRESENTAÇÃO", "vii", True),
                 ("1. CONSIDERAÇÕES GERAIS", "1", True),
                 ("   1.1 INTRODUÇÃO", "1", False),
-                ("   1.2 JUSTIFICATIVA DA PESQUISA", "3", False),
+                ("   1.2 JUSTIFICATIVA", "3", False),
                 ("   1.3 PROBLEMA DE PESQUISA", "4", False),
                 ("   1.4 REVISÃO DA LITERATURA / REFERENCIAL TEÓRICO", "4", False),
                 ("2. OBJETIVOS", "6", True),

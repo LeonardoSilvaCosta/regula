@@ -3,7 +3,7 @@ Módulo granular para geração exclusiva da SEÇÃO 1 (CONSIDERAÇÕES GERAIS)
 do Projeto de Qualificação conforme o Art. 1º, II, item 2 da Resolução nº 009/2025-PPGSP/UFPA.
 Subseções:
   1.1. INTRODUÇÃO
-  1.2. JUSTIFICATIVA DA PESQUISA
+  1.2. JUSTIFICATIVA
   1.3. PROBLEMA DE PESQUISA
   1.4. REVISÃO DA LITERATURA / REFERENCIAL TEÓRICO
 """
@@ -62,12 +62,12 @@ def build_consideracoes_gerais(doc, dados_secao):
     # -------------------------------------------------------------------------
     # 1. CONSIDERAÇÕES GERAIS (Título Primário)
     # -------------------------------------------------------------------------
-    add_sec_title("1. CONSIDERAÇÕES GERAIS")
+    add_sec_title("1. CONSIDERAÇÕES GERAIS", "sec_1")
 
     # -------------------------------------------------------------------------
     # 1.1. INTRODUÇÃO
     # -------------------------------------------------------------------------
-    add_sub_title("1.1. INTRODUÇÃO")
+    add_sub_title("1.1. INTRODUÇÃO", "sec_1_1")
     introducao_paragrafos = dados_secao.get("introducao", [])
     if introducao_paragrafos:
         for par in introducao_paragrafos:
@@ -81,9 +81,9 @@ def build_consideracoes_gerais(doc, dados_secao):
         )
 
     # -------------------------------------------------------------------------
-    # 1.2. JUSTIFICATIVA DA PESQUISA
+    # 1.2. JUSTIFICATIVA
     # -------------------------------------------------------------------------
-    add_sub_title("1.2. JUSTIFICATIVA DA PESQUISA")
+    add_sub_title("1.2. JUSTIFICATIVA", "sec_1_2")
     justificativa_paragrafos = dados_secao.get("justificativa", [])
     if justificativa_paragrafos:
         for par in justificativa_paragrafos:
@@ -100,7 +100,7 @@ def build_consideracoes_gerais(doc, dados_secao):
     # -------------------------------------------------------------------------
     # 1.3. PROBLEMA DE PESQUISA
     # -------------------------------------------------------------------------
-    add_sub_title("1.3. PROBLEMA DE PESQUISA")
+    add_sub_title("1.3. PROBLEMA DE PESQUISA", "sec_1_3")
     problema_dados = dados_secao.get("problema", [])
     if problema_dados:
         if isinstance(problema_dados, str):
@@ -118,7 +118,7 @@ def build_consideracoes_gerais(doc, dados_secao):
     # -------------------------------------------------------------------------
     # 1.4. REVISÃO DA LITERATURA / REFERENCIAL TEÓRICO
     # -------------------------------------------------------------------------
-    add_sub_title("1.4. REVISÃO DA LITERATURA / REFERENCIAL TEÓRICO")
+    add_sub_title("1.4. REVISÃO DA LITERATURA / REFERENCIAL TEÓRICO", "sec_1_4")
     revisao_paragrafos = dados_secao.get("revisao", [])
     if revisao_paragrafos:
         for par in revisao_paragrafos:

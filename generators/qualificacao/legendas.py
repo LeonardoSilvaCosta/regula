@@ -45,8 +45,20 @@ def legenda_quadro_2(nivel, parte=None):
 
 
 def titulo_produto(indice, ptt, secao=5):
-    """Título de subseção do produto, idêntico no corpo e no sumário."""
+    """Título de subseção: 5.1. PRODUTO 1. Tipo - Título."""
     ptt = ptt or {}
-    subtipo = ptt.get("subtipo", ptt.get("subtipo_producao", "Produto"))
-    titulo = ptt.get("titulo", "")
-    return f"{secao}.{indice}. PRODUTO {indice}. {subtipo} – {titulo}"
+    titulo = str(ptt.get("titulo") or "").strip()
+    tipo = str(
+        ptt.get("subtipo")
+        or ptt.get("subtipo_producao")
+        or ptt.get("tipo")
+        or ""
+    ).strip()
+    base = f"{secao}.{indice}. PRODUTO {indice}."
+    if tipo and titulo:
+        return f"{base} {tipo} - {titulo}"
+    if titulo:
+        return f"{base} {titulo}"
+    if tipo:
+        return f"{base} {tipo}"
+    return base

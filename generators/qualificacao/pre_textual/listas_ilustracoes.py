@@ -1,37 +1,31 @@
 """
-Lista de ilustrações, uma por designação.
-As páginas são campos PAGEREF apontando para as legendas do corpo.
+Lista de ilustrações com as sublistas do modelo oficial:
+LISTA DE FIGURAS, LISTA DE GRÁFICOS, LISTA DE QUADROS e LISTA DE TABELAS.
 """
 
 from core.campos import adicionar_linha_indice
-from ..estrutura import agrupar_ilustracoes
-from ..formato import adicionar_titulo_lista
+from ..estrutura import BM_LISTA_ILUSTRACOES, agrupar_ilustracoes
+from ..formato import adicionar_subtitulo_lista, adicionar_titulo_lista
 
 
 def build_lista_ilustracoes(doc, ilustracoes_data, quebrar=False):
-    """
-    ilustracoes_data: lista de (legenda, bookmark).
-    Devolve os títulos emitidos, na ordem, para o sumário.
-    """
     grupos = agrupar_ilustracoes(_extrair_entradas(ilustracoes_data))
-    if not grupos:
-        return []
-
-    emitidos = []
-    for indice, (titulo, bookmark, entradas) in enumerate(grupos):
-        if indice > 0 or quebrar:
-            doc.add_page_break()
-        adicionar_titulo_lista(doc, titulo, bookmark)
+    if quebrar:
+        doc.add_page_break()
+    adicionar_titulo_lista(doc, "LISTA DE ILUSTRAÇÕES", BM_LISTA_ILUSTRACOES)
+    for titulo, entradas in grupos:
+        adicionar_subtitulo_lista(doc, titulo)
         for rotulo, ref in entradas:
             adicionar_linha_indice(doc, rotulo, ref)
-        emitidos.append((titulo, bookmark))
-    return emitidos
+    return [("LISTA DE ILUSTRAÇÕES", BM_LISTA_ILUSTRACOES)]
 
 
 def _extrair_entradas(ilustracoes_data):
     bruto = ilustracoes_data
     if isinstance(ilustracoes_data, dict):
-        bruto = ilustracoes_data.get("quadros", ilustracoes_data.get("lista_quadros", []))
+        bruto = []
+        for chave in ("figuras", "graficos", "quadros", "tabelas", "ilustracoes", "lista_quadros", "lista_tabelas"):
+            bruto.extend(ilustracoes_data.get(chave) or [])
     entradas = []
     for item in bruto or []:
         if isinstance(item, (tuple, list)) and len(item) >= 2:

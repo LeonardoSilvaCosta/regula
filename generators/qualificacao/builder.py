@@ -8,9 +8,10 @@ from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.section import WD_SECTION
 
-from core.styles import apply_base_styles, set_page_margins
+from core.styles import apply_base_styles, aplicar_idioma_pt_br, aplicar_rodape_local_ano, limpar_rodape, set_page_margins
 from core.xml_utils import configure_section_page_numbers, add_page_number_field
 from core.campos import habilitar_atualizacao_de_campos
+from core.atualizar_campos import atualizar_campos_word
 
 from .parser import parse_projeto_docx
 from .legendas import (
@@ -29,7 +30,6 @@ from .pre_textual.capa import build_capa
 from .pre_textual.folha_rosto import build_folha_rosto
 from .pre_textual.folha_aprovacao import build_folha_aprovacao
 from .pre_textual.listas_ilustracoes import build_lista_ilustracoes
-from .pre_textual.listas_tabelas import build_lista_tabelas
 from .pre_textual.listas_siglas import build_lista_siglas, normalizar_siglas
 from .pre_textual.listas_simbolos import build_lista_simbolos
 from .pre_textual.sumario import build_sumario
@@ -40,9 +40,19 @@ from .textual.resultados_preliminares import build_resultados_preliminares
 from .pos_textual.pos_textual import build_pos_textual, itens_com_corpo
 
 
+def _secao_sem_numero(doc, primeira=False):
+    section = doc.sections[0] if primeira else doc.add_section(WD_SECTION.NEW_PAGE)
+    set_page_margins(section)
+    section.header.is_linked_to_previous = False
+    section.footer.is_linked_to_previous = False
+    return section
+
+
 def _paginar(section, formato, inicio):
     set_page_margins(section)
     section.header.is_linked_to_previous = False
+    section.footer.is_linked_to_previous = False
+    limpar_rodape(section)
     configure_section_page_numbers(section, num_format=formato, start_at=inicio)
     header = section.header.paragraphs[0]
     header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
@@ -77,14 +87,22 @@ def gerar_documento_qualificacao(caminho_entrada, caminho_saida, nivel="mestrado
     apply_base_styles(doc)
 
     # =========================================================================
-    # SEÇÃO 1: Capa, folha de rosto e folha de aprovação, sem número visível
+    # Capa e folha de rosto: local e ano no extremo inferior (rodapé da seção)
+    # Folha de aprovação segue sem esse rodapé e sem número visível
     # =========================================================================
-    sec_1 = doc.sections[0]
-    set_page_margins(sec_1)
-    sec_1.header.is_linked_to_previous = False
+    local = dados["metadata"].get("local", "Belém-Pará")
+    ano = dados["metadata"].get("ano", "2026")
 
+    sec_capa = _secao_sem_numero(doc, primeira=True)
     build_capa(doc, dados["metadata"], assets_dir=assets_dir)
+    aplicar_rodape_local_ano(sec_capa, local, ano)
+
+    sec_rosto = _secao_sem_numero(doc)
     build_folha_rosto(doc, dados["metadata"], assets_dir=assets_dir)
+    aplicar_rodape_local_ano(sec_rosto, local, ano)
+
+    sec_aprov = _secao_sem_numero(doc)
+    limpar_rodape(sec_aprov)
     build_folha_aprovacao(doc, dados["metadata"], assets_dir=assets_dir)
 
     # =========================================================================
@@ -102,14 +120,10 @@ def gerar_documento_qualificacao(caminho_entrada, caminho_saida, nivel="mestrado
             doc.add_page_break()
         iniciado = True
 
-    if quadros:
+    ilustracoes = list(quadros) + list(tabelas)
+    if ilustracoes:
         abrir_elemento()
-        listas_sumario.extend(build_lista_ilustracoes(doc, quadros, quebrar=False))
-    if tabelas:
-        abrir_elemento()
-        entrada = build_lista_tabelas(doc, tabelas, quebrar=False)
-        if entrada:
-            listas_sumario.append(entrada)
+        listas_sumario.extend(build_lista_ilustracoes(doc, ilustracoes, quebrar=False))
     if normalizar_siglas(siglas):
         abrir_elemento()
         entrada = build_lista_siglas(doc, siglas, quebrar=False)
@@ -143,8 +157,10 @@ def gerar_documento_qualificacao(caminho_entrada, caminho_saida, nivel="mestrado
     build_resultados_preliminares(doc, dados["resultados"], numero=numeros["resultados"])
     build_pos_textual(doc, dados["referencias"], apendices=apendices, anexos=anexos)
 
+    aplicar_idioma_pt_br(doc)
     habilitar_atualizacao_de_campos(doc)
     doc.save(caminho_saida)
+    atualizar_campos_word(caminho_saida)
     print(f"[CONCLUÍDO]: Relatório de Qualificação gerado em {caminho_saida}")
     emitir_lacunas(
         caminho_saida,

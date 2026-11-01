@@ -9,7 +9,7 @@ BOOKMARKS_TITULO = {
     "APRESENTAÇÃO": "sec_apresentacao",
     "1. CONSIDERAÇÕES GERAIS": "sec_1",
     "1.1. INTRODUÇÃO": "sec_1_1",
-    "1.2. JUSTIFICATIVA DA PESQUISA": "sec_1_2",
+    "1.2. JUSTIFICATIVA": "sec_1_2",
     "1.3. PROBLEMA DE PESQUISA": "sec_1_3",
     "1.4. REVISÃO DA LITERATURA / REFERENCIAL TEÓRICO": "sec_1_4",
     "2. OBJETIVOS": "sec_2",
@@ -105,6 +105,23 @@ def adicionar_campo_pageref(paragraph, bookmark):
 
     for elemento in (r_inicio, r_instr, r_sep, r_texto, r_fim):
         paragraph._p.append(elemento)
+
+
+def aplicar_tabulacao_coluna(paragraph, pos_twips):
+    """Tabulação à esquerda, sem líder, para alinhar o texto por extenso."""
+    p_pr = paragraph._p.get_or_add_pPr()
+    tabs = OxmlElement("w:tabs")
+    tab = OxmlElement("w:tab")
+    tab.set(qn("w:val"), "left")
+    tab.set(qn("w:pos"), str(int(pos_twips)))
+    tabs.append(tab)
+    p_pr.append(tabs)
+
+
+def twips_coluna_rotulo(rotulos):
+    """Coluna larga o bastante para o maior rótulo + cerca de quatro espaços."""
+    n = max((len(str(rotulo or "")) for rotulo in rotulos), default=4)
+    return n * 160 + 240
 
 
 def aplicar_tabulacao_pontilhada(paragraph, pos_twips="9072"):

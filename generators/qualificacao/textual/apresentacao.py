@@ -67,7 +67,10 @@ def build_apresentacao(doc, dados_apresentacao, metadata):
 
 
 def _preparar_linhas(linhas, metadata):
-    titulo_pesquisa = ((metadata or {}).get("titulo_curto") or (metadata or {}).get("titulo") or "").strip()
+    titulo_mesclado = (
+        ((metadata or {}).get("titulo_curto") or "").strip()
+        or ((metadata or {}).get("titulo") or "").strip()
+    )
     prontas = []
     for linha in linhas:
         if not isinstance(linha, (list, tuple)):
@@ -76,10 +79,8 @@ def _preparar_linhas(linhas, metadata):
         while len(cols) < 7:
             cols.append("")
         cols = cols[:7]
-        titulo_linha = cols[0]
-        if titulo_pesquisa and titulo_linha and titulo_linha != titulo_pesquisa and titulo_linha not in cols[3]:
-            cols[3] = f"{titulo_linha}: {cols[3]}".strip(": ").strip() if cols[3] else titulo_linha
-        cols[0] = titulo_pesquisa or titulo_linha
+        if titulo_mesclado:
+            cols[0] = titulo_mesclado
         if any(cols):
             prontas.append(cols)
     return prontas

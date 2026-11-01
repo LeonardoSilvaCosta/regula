@@ -1,5 +1,12 @@
 """Separação de título e subtítulo conforme a Resolução nº 009/2025."""
+import re
 from docx.shared import Pt
+
+_STOPWORDS_SUB = {
+    "a", "ao", "aos", "as", "com", "da", "das", "de", "do", "dos",
+    "e", "em", "na", "nas", "no", "nos", "o", "os", "ou", "para",
+    "por", "que", "se", "um", "uma",
+}
 
 
 _PREFIXOS_TITULACAO = (
@@ -29,10 +36,44 @@ def separar_titulo_subtitulo(titulo_completo):
         return texto.upper(), ""
     principal, sub = texto.split(":", 1)
     principal = principal.strip().upper()
-    sub = sub.strip()
-    if sub:
-        sub = sub[0].upper() + sub[1:]
+    sub = _subtitulo_frase(sub.strip())
     return principal, sub
+
+
+def _subtitulo_frase(sub):
+    """Estilo frase. Se veio em caixa alta, desce o restante e preserva siglas."""
+    if not sub:
+        return ""
+    letras = [c for c in sub if c.isalpha()]
+    if not letras or any(c.islower() for c in letras):
+        return sub[0].upper() + sub[1:]
+    partes = []
+    primeira = True
+    for token in re.split(r"(\s+)", sub):
+        if not token.strip():
+            partes.append(token)
+            continue
+        pedacos = []
+        for pedaco in token.split("/"):
+            pedacos.append(_token_subtitulo(pedaco, primeira and not pedacos))
+        primeira = False
+        partes.append("/".join(pedacos))
+    return "".join(partes)
+
+
+def _token_subtitulo(token, inicio):
+    if not token:
+        return token
+    nucleo = token.strip(".,;:()[]")
+    if re.fullmatch(r"[A-Z]{2,}(?:-[A-Z0-9]+)+", nucleo):
+        return token
+    if nucleo.isascii() and nucleo.isalpha() and 2 <= len(nucleo) <= 5 and nucleo.lower() not in _STOPWORDS_SUB:
+        return token
+    if nucleo.upper() == "PARÁ":
+        return token.replace(nucleo, "Pará", 1)
+    baixo = nucleo.lower()
+    convertido = baixo[:1].upper() + baixo[1:] if inicio else baixo
+    return token.replace(nucleo, convertido, 1)
 
 
 def escrever_titulo_e_subtitulo(paragraph, titulo_completo, tamanho=14):

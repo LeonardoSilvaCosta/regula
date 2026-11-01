@@ -58,12 +58,12 @@ def build_objetivos(doc, dados_projeto):
     # -------------------------------------------------------------------------
     # 2. OBJETIVOS (Título Primário)
     # -------------------------------------------------------------------------
-    add_sec_title("2. OBJETIVOS")
+    add_sec_title("2. OBJETIVOS", "sec_2")
 
     # -------------------------------------------------------------------------
     # 2.1. OBJETIVO GERAL
     # -------------------------------------------------------------------------
-    add_sub_title("2.1. OBJETIVO GERAL")
+    add_sub_title("2.1. OBJETIVO GERAL", "sec_2_1")
     objetivo_geral = dados_projeto.get("objetivo_geral", "")
     if objetivo_geral and str(objetivo_geral).strip():
         add_body_p(str(objetivo_geral).strip())
@@ -77,7 +77,7 @@ def build_objetivos(doc, dados_projeto):
     # -------------------------------------------------------------------------
     # 2.2. OBJETIVOS ESPECÍFICOS
     # -------------------------------------------------------------------------
-    add_sub_title("2.2. OBJETIVOS ESPECÍFICOS")
+    add_sub_title("2.2. OBJETIVOS ESPECÍFICOS", "sec_2_2")
     objetivos_especificos = dados_projeto.get("objetivos_especificos", [])
     if objetivos_especificos:
         for oe in objetivos_especificos:

@@ -8,7 +8,7 @@ from docx.shared import Cm, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from core.ptt_schema import formatar_ficha_22_itens
-from ..formato import adicionar_titulo
+from ..formato import adicionar_titulo, adicionar_titulo_produto
 from ..legendas import titulo_produto
 
 
@@ -67,7 +67,12 @@ def build_produtos(doc, dados_projeto, numero=5):
 
     if ptts:
         for idx_p, ptt in enumerate(ptts, start=1):
-            add_sub_title(titulo_produto(idx_p, ptt, numero), bookmark=f"sec_prod_{idx_p}")
+            adicionar_titulo_produto(
+                doc,
+                titulo_produto(idx_p, ptt, numero),
+                numero,
+                bookmark=f"sec_prod_{idx_p}",
+            )
 
             ficha = formatar_ficha_22_itens(ptt)
             for campo, valor in ficha:
@@ -78,34 +83,21 @@ def build_produtos(doc, dados_projeto, numero=5):
                 p_item.paragraph_format.space_before = Pt(2)
                 p_item.paragraph_format.space_after = Pt(2)
 
-                # Justificativas de até 50 palavras e coautoria com quebra de linha após o rótulo
                 if "Justificativa" in campo:
-                    r_c = p_item.add_run(f"{campo}\n")
-                    r_c.bold = True
-                    r_c.font.name = "Times New Roman"
-                    r_c.font.size = Pt(12)
-
-                    r_v = p_item.add_run(f"{valor}")
-                    r_v.font.name = "Times New Roman"
-                    r_v.font.size = Pt(12)
-                elif "Co-autoria e Categoria" in campo:
-                    r_c = p_item.add_run(f"{campo}:\n")
-                    r_c.bold = True
-                    r_c.font.name = "Times New Roman"
-                    r_c.font.size = Pt(12)
-
-                    r_v = p_item.add_run(f"{valor}")
-                    r_v.font.name = "Times New Roman"
-                    r_v.font.size = Pt(12)
+                    rotulo = f"{campo}\n"
+                elif "Coautoria" in campo or "Co-autoria" in campo:
+                    rotulo = f"{campo}:\n"
                 else:
-                    r_c = p_item.add_run(f"{campo}: ")
-                    r_c.bold = True
-                    r_c.font.name = "Times New Roman"
-                    r_c.font.size = Pt(12)
+                    rotulo = f"{campo}: "
+                r_c = p_item.add_run(rotulo)
+                r_c.bold = False
+                r_c.font.name = "Times New Roman"
+                r_c.font.size = Pt(12)
 
-                    r_v = p_item.add_run(f"{valor}")
-                    r_v.font.name = "Times New Roman"
-                    r_v.font.size = Pt(12)
+                r_v = p_item.add_run(f"{valor}")
+                r_v.bold = True
+                r_v.font.name = "Times New Roman"
+                r_v.font.size = Pt(12)
 
             p_esp = doc.add_paragraph()
             p_esp.paragraph_format.space_before = Pt(0)
