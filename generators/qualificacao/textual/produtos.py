@@ -77,8 +77,9 @@ def build_produtos(doc, dados_projeto, numero=5):
             ficha = formatar_ficha_22_itens(ptt)
             for campo, valor in ficha:
                 p_item = doc.add_paragraph()
-                p_item.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-                p_item.paragraph_format.first_line_indent = Pt(0)
+                p_item.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                p_item.paragraph_format.left_indent = Cm(0)
+                p_item.paragraph_format.first_line_indent = Cm(0)
                 p_item.paragraph_format.line_spacing = 1.0
                 p_item.paragraph_format.space_before = Pt(2)
                 p_item.paragraph_format.space_after = Pt(2)

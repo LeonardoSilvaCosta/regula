@@ -9,7 +9,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.section import WD_ORIENT, WD_SECTION
 
 from core.styles import apply_base_styles, aplicar_idioma_pt_br, aplicar_rodape_local_ano, limpar_rodape, set_page_margins
-from core.xml_utils import configure_section_page_numbers, add_page_number_field
+from core.xml_utils import configure_section_page_numbers, add_page_number_field, continuar_numeracao
 from core.campos import habilitar_atualizacao_de_campos
 from core.atualizar_campos import atualizar_campos_word
 
@@ -57,6 +57,7 @@ def _secao_paisagem(doc):
     section.page_height = Cm(21.0)
     section.header.is_linked_to_previous = True
     section.footer.is_linked_to_previous = True
+    continuar_numeracao(section)
     return section
 
 
@@ -66,6 +67,7 @@ def _secao_retrato_continua(doc):
     set_page_margins(section)
     section.header.is_linked_to_previous = True
     section.footer.is_linked_to_previous = True
+    continuar_numeracao(section)
     return section
 
 

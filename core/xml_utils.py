@@ -2,6 +2,46 @@
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
+def aplicar_estilo_tabela_ibge(tabela):
+    """Tabela aberta (IBGE/ABNT): topo, base do cabeçalho e fecho. Sem verticais nem grades internas."""
+    tblPr = tabela._tbl.tblPr
+    for filho in list(tblPr):
+        if filho.tag == qn("w:tblBorders"):
+            tblPr.remove(filho)
+
+    bordas = OxmlElement("w:tblBorders")
+    for aresta, valor in (
+        ("top", "single"),
+        ("left", "nil"),
+        ("bottom", "single"),
+        ("right", "nil"),
+        ("insideH", "nil"),
+        ("insideV", "nil"),
+    ):
+        elemento = OxmlElement(f"w:{aresta}")
+        elemento.set(qn("w:val"), valor)
+        if valor == "single":
+            elemento.set(qn("w:sz"), "8")
+            elemento.set(qn("w:space"), "0")
+            elemento.set(qn("w:color"), "000000")
+        bordas.append(elemento)
+    tblPr.append(bordas)
+
+    for celula in tabela.rows[0].cells:
+        tcPr = celula._tc.get_or_add_tcPr()
+        for filho in list(tcPr):
+            if filho.tag == qn("w:tcBorders"):
+                tcPr.remove(filho)
+        tcBorders = OxmlElement("w:tcBorders")
+        inferior = OxmlElement("w:bottom")
+        inferior.set(qn("w:val"), "single")
+        inferior.set(qn("w:sz"), "8")
+        inferior.set(qn("w:space"), "0")
+        inferior.set(qn("w:color"), "000000")
+        tcBorders.append(inferior)
+        tcPr.append(tcBorders)
+
+
 def set_cell_border(cell, **kwargs):
     """Configura bordas finas para tabelas e quadros ABNT."""
     tcPr = cell._tc.get_or_add_tcPr()
@@ -34,3 +74,18 @@ def configure_section_page_numbers(section, num_format='roman', start_at=None):
     pgNumType.set(qn('w:fmt'), 'lowerRoman' if num_format == 'roman' else 'decimal')
     if start_at is not None:
         pgNumType.set(qn('w:start'), str(start_at))
+    else:
+        start = pgNumType.get(qn('w:start'))
+        if start is not None:
+            del pgNumType.attrib[qn('w:start')]
+
+
+def continuar_numeracao(section):
+    """Mantém o formato da seção anterior e deixa a numeração seguir, sem reiniciar."""
+    sectPr = section._sectPr
+    pgNumType = sectPr.find(qn('w:pgNumType'))
+    if pgNumType is None:
+        return
+    start = pgNumType.get(qn('w:start'))
+    if start is not None:
+        del pgNumType.attrib[qn('w:start')]
