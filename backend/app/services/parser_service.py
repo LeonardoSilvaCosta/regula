@@ -19,6 +19,7 @@ from app.schemas.document import (
 )
 from app.schemas.ptt import PTTItem
 from app.services.builder_service import validar_ptts
+from app.services.upload_store import guardar
 
 
 def _coorientador(metadata: dict[str, Any], banca: list[dict[str, Any]]) -> str:
@@ -54,7 +55,11 @@ def _banca(metadata: dict[str, Any]) -> list[BancaMember]:
     return membros
 
 
-def estruturar_parse(dados: dict[str, Any], nivel: AcademicLevel) -> ParseResponse:
+def estruturar_parse(
+    dados: dict[str, Any],
+    nivel: AcademicLevel,
+    documento_id: str = "",
+) -> ParseResponse:
     metadata = dict(dados.get("metadata") or {})
     ptts_brutos = list((dados.get("projeto") or {}).get("ptts") or [])
     ptts = [PTTItem.model_validate(item) for item in ptts_brutos]
@@ -63,6 +68,7 @@ def estruturar_parse(dados: dict[str, Any], nivel: AcademicLevel) -> ParseRespon
     conformidade = validar_ptts(ptts, nivel)
     lacunas_brutas = coletar_lacunas(dados, siglas, [], [])
     return ParseResponse(
+        documento_id=documento_id,
         tipo_documento=DocumentType.qualificacao,
         nivel=nivel,
         metadata=DocumentMetadata(
@@ -95,4 +101,4 @@ def parse_upload(conteudo: bytes, nivel: AcademicLevel) -> ParseResponse:
         temporario.close()
         if os.path.exists(temporario.name):
             os.remove(temporario.name)
-    return estruturar_parse(dados, nivel)
+    return estruturar_parse(dados, nivel, documento_id=guardar(conteudo))

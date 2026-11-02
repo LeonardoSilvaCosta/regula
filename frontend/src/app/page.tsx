@@ -105,7 +105,10 @@ export default function Home() {
   }
 
   async function gerar() {
-    if (!parsedData) return;
+    if (!parsedData?.documento_id) {
+      setError("Analise novamente o arquivo em Documento de origem antes de gerar.");
+      return;
+    }
     setIsGenerating(true);
     setError(null);
     try {
@@ -116,6 +119,7 @@ export default function Home() {
           ? `${tituloBase}${tituloBase ? ": " : ""}${complemento}`
           : tituloBase;
       const blob = await generateDocument({
+        documento_id: parsedData.documento_id,
         tipo_documento: tipoDocumento,
         nivel,
         metadata: { ...parsedData.metadata, titulo },

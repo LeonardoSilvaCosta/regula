@@ -163,6 +163,8 @@ export interface components {
          * @description JSON completo ajustável no frontend antes da geração do DOCX.
          */
         GenerateRequest: {
+            /** Identificador do .docx enviado em Documento de origem. */
+            documento_id: string;
             /** @default qualificacao */
             tipo_documento: components["schemas"]["DocumentType"];
             /** @default mestrado */
@@ -348,6 +350,8 @@ export interface components {
         };
         /** ParseResponse */
         ParseResponse: {
+            /** Identificador do .docx enviado em Documento de origem. */
+            documento_id: string;
             tipo_documento: components["schemas"]["DocumentType"];
             nivel: components["schemas"]["AcademicLevel"];
             metadata: components["schemas"]["DocumentMetadata"];

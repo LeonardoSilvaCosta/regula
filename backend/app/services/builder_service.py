@@ -14,6 +14,7 @@ from generators.tese.builder import gerar_documento_tese
 
 from app.schemas.document import AcademicLevel, DocumentType, GenerateRequest
 from app.schemas.ptt import PTTItem, PTTValidationResult
+from app.services.upload_store import caminho as caminho_upload
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
 _MIN_PRODUTOS = {
@@ -46,10 +47,6 @@ def validar_ptts(ptts: list[PTTItem], nivel: AcademicLevel) -> PTTValidationResu
     )
 
 
-def _entrada_canonica(tipo: DocumentType) -> Path:
-    return BACKEND_DIR / "inputs" / tipo.value / "projeto.docx"
-
-
 def _revisao(pedido: GenerateRequest) -> dict:
     """Metadados, banca, siglas e PTTs confirmados no Passo 3."""
     return {
@@ -64,12 +61,12 @@ def gerar_buffer(pedido: GenerateRequest) -> BytesIO:
     """
     Aciona o builder do tipo pedido e devolve o DOCX em memória.
 
-    O corpo segue o projeto canônico em inputs/. Capa, folha de rosto, folha de
-    aprovação, siglas e fichas de PTT usam os dados revisados no Passo 3.
+    O corpo segue o .docx enviado no campo Documento de origem. Capa, folha de
+    rosto, folha de aprovação, siglas e fichas de PTT usam os dados revisados no Passo 3.
     """
-    entrada = _entrada_canonica(pedido.tipo_documento)
-    if not entrada.is_file():
-        raise FileNotFoundError(f"Arquivo de entrada não encontrado: {entrada}")
+    if not pedido.documento_id.strip():
+        raise FileNotFoundError("Documento de origem não encontrado. Analise o arquivo novamente.")
+    entrada = caminho_upload(pedido.documento_id)
 
     assets = BACKEND_DIR / "assets"
     revisao = _revisao(pedido)

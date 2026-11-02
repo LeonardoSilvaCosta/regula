@@ -22,6 +22,14 @@ type Aba = (typeof ABAS)[number]["id"];
 const campo =
   "mt-1 w-full rounded-md border border-[#d9d1c3] bg-white px-3 py-2 text-sm outline-none focus:border-[#0f3d32]";
 
+const TITULO_PLACEHOLDER = "ESTEIRA PREDITIVA MULTIMODAL DE SUPORTE À DECISÃO CLÍNICA NO CIAP/PMPA";
+const SUBTITULO_PLACEHOLDER =
+  "Modelos de aprendizado de máquina para predição de desfechos relacionados à saúde mental de policiais militares do Pará a partir de prontuários psicossociais";
+const AUTOR_PLACEHOLDER = "Leonardo da Silva Costa";
+const ANO_PLACEHOLDER = "2026";
+const AREA_PLACEHOLDER = "Segurança Pública, Justiça, Conflitos e Cidadania";
+const LINHA_PLACEHOLDER = "Políticas, Gestão, Direitos Humanos, Criminalidade e Tecnologia da Informação";
+const INSTITUICAO_ORIENTADOR_PLACEHOLDER = "Universidade Federal do Pará";
 const COORDENADOR_PLACEHOLDER = "Prof. Dr. Edson Marcos Leal Soares Ramos";
 const ORIENTADOR_PLACEHOLDER = "Prof. Dr. Renato Hidaka Torres";
 const IMPACTOS = ["Alto", "Médio", "Baixo"] as const;
@@ -171,47 +179,69 @@ export function Step3MetadataReview({
         <Card title="Dados gerais">
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="text-sm sm:col-span-2">
-              Título
+              Título <span className="text-red-800">*</span>
               <input
+                required
                 className={campo}
+                placeholder={TITULO_PLACEHOLDER}
                 value={data.metadata.titulo}
                 onChange={(event) => patchMetadata({ titulo: event.target.value })}
               />
             </label>
             <label className="text-sm sm:col-span-2">
               Subtítulo
-              <input className={campo} value={subtitulo} onChange={(event) => onSubtitulo(event.target.value)} />
-            </label>
-            <label className="text-sm">
-              Autor
               <input
                 className={campo}
+                placeholder={SUBTITULO_PLACEHOLDER}
+                value={subtitulo}
+                onChange={(event) => onSubtitulo(event.target.value)}
+              />
+            </label>
+            <label className="text-sm">
+              Autor <span className="text-red-800">*</span>
+              <input
+                required
+                className={campo}
+                placeholder={AUTOR_PLACEHOLDER}
                 value={data.metadata.autor}
                 onChange={(event) => patchMetadata({ autor: event.target.value })}
               />
             </label>
             <label className="text-sm">
-              Local
+              Local <span className="text-red-800">*</span>
               <input
+                required
                 className={campo}
                 value={data.metadata.local}
                 onChange={(event) => patchMetadata({ local: event.target.value })}
               />
             </label>
             <label className="text-sm">
-              Ano
+              Ano <span className="text-red-800">*</span>
               <input
+                required
                 className={campo}
+                placeholder={ANO_PLACEHOLDER}
                 value={data.metadata.ano}
                 onChange={(event) => patchMetadata({ ano: event.target.value })}
               />
             </label>
             <label className="text-sm">
-              Área de concentração
+              Área de concentração <span className="text-[#6b645a]">(opcional)</span>
               <input
                 className={campo}
+                placeholder={AREA_PLACEHOLDER}
                 value={data.metadata.area_concentracao}
                 onChange={(event) => patchMetadata({ area_concentracao: event.target.value })}
+              />
+            </label>
+            <label className="text-sm">
+              Linha de pesquisa <span className="text-[#6b645a]">(opcional)</span>
+              <input
+                className={campo}
+                placeholder={LINHA_PLACEHOLDER}
+                value={data.metadata.linha_pesquisa}
+                onChange={(event) => patchMetadata({ linha_pesquisa: event.target.value })}
               />
             </label>
           </div>
@@ -250,7 +280,7 @@ export function Step3MetadataReview({
                 Instituição do orientador(a)
                 <input
                   className={campo}
-                  placeholder="Instituição"
+                  placeholder={INSTITUICAO_ORIENTADOR_PLACEHOLDER}
                   value={orientadorBanca?.instituicao ?? ""}
                   onChange={(event) => {
                     if (indiceOrientador >= 0) {
@@ -374,7 +404,7 @@ export function Step3MetadataReview({
           ) : (
             <ul className="flex flex-col gap-3">
               {data.ptts.map((item, index) => (
-                <li key={`${item.num}-${index}`} className="grid gap-2 rounded-lg border border-[#efe8dc] p-3 sm:grid-cols-[1fr_9rem]">
+                <li key={`${item.num}-${index}`} className="grid gap-2 rounded-lg border border-[#efe8dc] p-3 sm:grid-cols-[1fr_9rem_auto]">
                   <div>
                     <p className="text-xs text-[#6b645a]">{item.num || `PTT ${index + 1}`}</p>
                     <input
@@ -402,6 +432,13 @@ export function Step3MetadataReview({
                       ))}
                     </select>
                   </label>
+                  <button
+                    type="button"
+                    className="self-end pb-1.5 text-sm text-red-800"
+                    onClick={() => onChange({ ...data, ptts: data.ptts.filter((_, i) => i !== index) })}
+                  >
+                    Remover
+                  </button>
                 </li>
               ))}
             </ul>
@@ -475,6 +512,11 @@ export function Step3MetadataReview({
         <button
           type="button"
           onClick={() => {
+            if (!data.metadata.titulo.trim() || !data.metadata.autor.trim() || !data.metadata.ano.trim() || !data.metadata.local.trim()) {
+              setAba("gerais");
+              setAviso("Informe título, autor, ano e local.");
+              return;
+            }
             if (!data.metadata.orientador.trim()) {
               setAba("banca");
               setAviso("Informe o orientador.");

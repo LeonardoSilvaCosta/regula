@@ -4,6 +4,7 @@ from docx.shared import Cm, Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from core.styles import apply_base_styles, set_page_margins, insert_brasao, insert_cabecalho_institucional
+from generators.qualificacao.parser import parse_projeto_docx
 from core.xml_utils import add_page_number_field, configure_section_page_numbers
 
 def gerar_documento_tese(caminho_entrada, caminho_saida, assets_dir="assets", metadata=None):
@@ -16,21 +17,21 @@ def gerar_documento_tese(caminho_entrada, caminho_saida, assets_dir="assets", me
     doc = docx.Document()
     apply_base_styles(doc)
 
-    metadata = metadata or {}
-    titulo_trabalho = (metadata.get("titulo") or "").strip() or (
-        "TESE DE DOUTORADO EM SEGURANÇA PÚBLICA: FUSÃO MULTIMODAL AVANÇADA E MODELOS PREDITIVOS"
-    )
-    autor = (metadata.get("autor") or "").strip() or "Leonardo da Silva Costa"
-    orientador = (metadata.get("orientador") or "").strip() or "Prof. Dr. Edson Marcos Leal Soares Ramos"
-    coorientador = (metadata.get("coorientador") or "").strip()
-    ano = (metadata.get("ano") or "").strip() or "2026"
-    local = (metadata.get("local") or "").strip() or "Belém-Pará"
-    area = (metadata.get("area_concentracao") or "").strip() or (
-        "Segurança Pública, Justiça, Conflitos e Cidadania"
-    )
-    linha = (metadata.get("linha_pesquisa") or "").strip() or (
-        "Políticas, Gestão, Direitos Humanos, Criminalidade e Tecnologia da Informação"
-    )
+    dados = parse_projeto_docx(caminho_entrada)
+    revisado = metadata or {}
+    extraido = dados.get("metadata") or {}
+
+    def campo(chave):
+        return (revisado.get(chave) or extraido.get(chave) or "").strip()
+
+    titulo_trabalho = campo("titulo")
+    autor = campo("autor")
+    orientador = campo("orientador")
+    coorientador = campo("coorientador")
+    ano = campo("ano")
+    local = campo("local")
+    area = campo("area_concentracao")
+    linha = campo("linha_pesquisa")
     linha_orientacao = f"Orientador(a): {orientador}\n"
     if coorientador:
         linha_orientacao += f"Coorientador(a): {coorientador}\n"
@@ -122,28 +123,30 @@ def gerar_documento_tese(caminho_entrada, caminho_saida, assets_dir="assets", me
     r_hdr.font.size = Pt(11)
     add_page_number_field(r_hdr)
 
-    p_c1 = doc.add_paragraph()
-    p_c1.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_c1.paragraph_format.space_before = Pt(24)
-    r1 = p_c1.add_run("CAPÍTULO 1 – CONSIDERAÇÕES GERAIS\n")
-    r1.bold = True
+    def add_sec_title(txt):
+        p = doc.add_paragraph()
+        p.paragraph_format.space_before = Pt(14)
+        p.paragraph_format.space_after = Pt(6)
+        r = p.add_run(txt)
+        r.bold = True
+        r.font.size = Pt(12)
 
-    p_c2 = doc.add_paragraph()
-    p_c2.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_c2.paragraph_format.space_before = Pt(24)
-    r2 = p_c2.add_run("CAPÍTULO 2 – ARTIGOS CIENTÍFICOS (04 ARTIGOS)\n")
-    r2.bold = True
+    def add_body_p(txt):
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p.paragraph_format.first_line_indent = Cm(1.27)
+        p.paragraph_format.line_spacing = 1.5
+        p.add_run(txt)
 
-    p_c3 = doc.add_paragraph()
-    p_c3.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_c3.paragraph_format.space_before = Pt(24)
-    r3 = p_c3.add_run("CAPÍTULO 3 – PRODUTOS E PROPOSTAS DE INTERVENÇÃO (>= 08 PTTS)\n")
-    r3.bold = True
-
-    p_c4 = doc.add_paragraph()
-    p_c4.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_c4.paragraph_format.space_before = Pt(24)
-    r4 = p_c4.add_run("CAPÍTULO 4 – CONSIDERAÇÕES FINAIS E RECOMENDAÇÕES\n")
-    r4.bold = True
+    secoes = list(dados.get("secoes") or [])
+    if not secoes:
+        for paragrafo in (dados.get("apresentacao") or {}).get("texto_percurso") or []:
+            add_body_p(paragrafo)
+    for secao in secoes:
+        add_sec_title(secao.get("titulo") or "Seção")
+        for paragrafo in secao.get("paragrafos") or []:
+            add_body_p(paragrafo)
+    for referencia in dados.get("referencias") or []:
+        add_body_p(referencia)
 
     doc.save(caminho_saida)

@@ -13,6 +13,7 @@ from core.xml_utils import configure_section_page_numbers, add_page_number_field
 from core.campos import habilitar_atualizacao_de_campos
 from core.atualizar_campos import atualizar_campos_word
 
+from .formato import adicionar_paragrafo, adicionar_titulo
 from .parser import parse_projeto_docx
 from .legendas import (
     BM_QUADRO_1,
@@ -223,6 +224,10 @@ def gerar_documento_qualificacao(
     _secao_retrato_continua(doc)
     build_projeto_secoes(doc, dados["projeto"], nivel=nivel, numeros=numeros)
     build_resultados_preliminares(doc, dados["resultados"], numero=numeros["resultados"])
+    for secao in dados.get("secoes_nao_mapeadas") or []:
+        adicionar_titulo(doc, secao.get("titulo") or "Seção", primario=True, marcar=False)
+        for paragrafo in secao.get("paragrafos") or []:
+            adicionar_paragrafo(doc, paragrafo)
     build_pos_textual(doc, dados["referencias"], apendices=apendices, anexos=anexos)
 
     aplicar_idioma_pt_br(doc)

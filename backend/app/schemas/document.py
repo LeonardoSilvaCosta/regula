@@ -47,6 +47,7 @@ class LacunaItem(BaseModel):
 
 
 class ParseResponse(BaseModel):
+    documento_id: str = ""
     tipo_documento: DocumentType
     nivel: AcademicLevel
     metadata: DocumentMetadata
@@ -60,6 +61,7 @@ class ParseResponse(BaseModel):
 class GenerateRequest(BaseModel):
     """JSON completo ajustável no frontend antes da geração do DOCX."""
 
+    documento_id: str = ""
     tipo_documento: DocumentType = DocumentType.qualificacao
     nivel: AcademicLevel = AcademicLevel.mestrado
     metadata: DocumentMetadata = Field(default_factory=DocumentMetadata)
