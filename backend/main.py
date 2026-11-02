@@ -2,10 +2,24 @@
 import argparse
 import sys
 import os
+from pathlib import Path
+
+# Raiz do backend: independe do diretório de trabalho (raiz do monorepo ou backend/).
+BACKEND_DIR = Path(__file__).resolve().parent
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
 
 from generators.qualificacao.builder import gerar_documento_qualificacao
 from generators.dissertacao.builder import gerar_documento_dissertacao
 from generators.tese.builder import gerar_documento_tese
+
+def resolver_caminho(caminho):
+    """Resolve caminhos relativos a partir de backend/, preservando caminhos absolutos."""
+    caminho = os.path.expanduser(str(caminho))
+    if os.path.isabs(caminho):
+        return os.path.normpath(caminho)
+    return os.path.normpath(str(BACKEND_DIR / caminho))
+
 
 def normalizar_nivel(valor):
     """Normaliza o nível para 'mestrado' ou 'doutorado'."""
@@ -53,6 +67,10 @@ def main():
     if not args.comando:
         parser.print_help()
         sys.exit(1)
+
+    args.input = resolver_caminho(args.input)
+    args.output = resolver_caminho(args.output)
+    args.assets = resolver_caminho(args.assets)
 
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     nivel_normalizado = normalizar_nivel(getattr(args, "nivel", "mestrado"))

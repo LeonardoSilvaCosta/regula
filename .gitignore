@@ -1,18 +1,35 @@
+# Python
 .venv/
 __pycache__/
+*.pyc
 *.py[cod]
 *.pyo
 .Python
-.env
-.env.*
 *.egg-info/
-dist/
 build/
 .pytest_cache/
 .mypy_cache/
+outputs/*.docx
+outputs/*.pdf
+outputs/**/*.docx
+outputs/**/*.pdf
+backend/outputs/**/*.docx
+backend/outputs/**/*.pdf
+*.lacunas.txt
+
+# Node (frontend)
+node_modules/
+.next/
+out/
+dist/
+.env*.local
+
+# Ambiente e ferramentas locais
+.env
+.env.*
+!.env.example
 .cursor/
 agent-tools/
-*.lacunas.txt
 
 # Arquivos temporários do Microsoft Word (documento aberto)
 ~$*
