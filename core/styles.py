@@ -7,6 +7,10 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 IDIOMA_PT_BR = "pt-BR"
 
+# Modelo PPGSP/UFPA — brasão na capa e folhas pré-textuais
+BRASAO_UFPA_LARGURA = Cm(2.11)
+BRASAO_UFPA_ALTURA = Cm(2.52)
+
 
 def _elemento_idioma(elemento_rpr, idioma=IDIOMA_PT_BR):
     lang = elemento_rpr.find(qn("w:lang"))
@@ -127,7 +131,9 @@ def insert_brasao(doc, assets_dir="assets"):
     p.paragraph_format.space_before = Pt(0)
     p.paragraph_format.space_after = Pt(6)
     if os.path.exists(caminho):
-        p.add_run().add_picture(caminho, width=Cm(2.5))
+        p.add_run().add_picture(
+            caminho, width=BRASAO_UFPA_LARGURA, height=BRASAO_UFPA_ALTURA
+        )
     else:
         r = p.add_run("[BRASÃO DA UFPA]\n")
         r.font.size = Pt(10)

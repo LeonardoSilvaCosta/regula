@@ -10,6 +10,7 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import parse_xml
 from docx.oxml.ns import nsdecls
 
+from core.styles import BRASAO_UFPA_ALTURA, BRASAO_UFPA_LARGURA
 from ..titulo import escrever_titulo_e_subtitulo, nome_discente, separar_titulacao
 
 
@@ -115,7 +116,9 @@ def build_folha_aprovacao(doc, metadata, assets_dir="assets"):
         p_img.paragraph_format.space_before = Pt(0)
         p_img.paragraph_format.space_after = Pt(4)
         run_img = p_img.add_run()
-        run_img.add_picture(brasao_path, width=Cm(2.2))
+        run_img.add_picture(
+            brasao_path, width=BRASAO_UFPA_LARGURA, height=BRASAO_UFPA_ALTURA
+        )
 
     # 2. Cabeçalho Institucional
     is_doutorado = metadata.get("nivel", "mestrado").lower() in ["doutorado", "tese"]

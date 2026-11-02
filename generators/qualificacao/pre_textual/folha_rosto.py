@@ -7,6 +7,7 @@ import os
 from docx.shared import Cm, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
+from core.styles import BRASAO_UFPA_ALTURA, BRASAO_UFPA_LARGURA
 from ..titulo import escrever_titulo_e_subtitulo, nome_discente
 
 
@@ -65,7 +66,9 @@ def build_folha_rosto(doc, metadata, assets_dir="assets"):
 
     if os.path.exists(caminho_brasao):
         run_brasao = p_brasao.add_run()
-        run_brasao.add_picture(caminho_brasao, width=Cm(2.5))
+        run_brasao.add_picture(
+            caminho_brasao, width=BRASAO_UFPA_LARGURA, height=BRASAO_UFPA_ALTURA
+        )
     else:
         run_brasao = p_brasao.add_run("[BRASÃO DA UFPA]")
         run_brasao.italic = True
