@@ -13,3 +13,6 @@ build/
 .cursor/
 agent-tools/
 *.lacunas.txt
+
+# Arquivos temporários do Microsoft Word (documento aberto)
+~$*
