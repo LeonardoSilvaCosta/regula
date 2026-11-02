@@ -6,7 +6,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from core.styles import apply_base_styles, set_page_margins, insert_brasao, insert_cabecalho_institucional
 from core.xml_utils import add_page_number_field, configure_section_page_numbers
 
-def gerar_documento_tese(caminho_entrada, caminho_saida, assets_dir="assets"):
+def gerar_documento_tese(caminho_entrada, caminho_saida, assets_dir="assets", metadata=None):
     """
     Estrutura de Tese de Doutorado:
     - Mesma estrutura de 4 capítulos da dissertação.
@@ -16,10 +16,24 @@ def gerar_documento_tese(caminho_entrada, caminho_saida, assets_dir="assets"):
     doc = docx.Document()
     apply_base_styles(doc)
 
-    titulo_trabalho = "TESE DE DOUTORADO EM SEGURANÇA PÚBLICA: FUSÃO MULTIMODAL AVANÇADA E MODELOS PREDITIVOS"
-    autor = "Leonardo da Silva Costa"
-    orientador = "Prof. Dr. Edson Marcos Leal Soares Ramos"
-    ano = "2026"
+    metadata = metadata or {}
+    titulo_trabalho = (metadata.get("titulo") or "").strip() or (
+        "TESE DE DOUTORADO EM SEGURANÇA PÚBLICA: FUSÃO MULTIMODAL AVANÇADA E MODELOS PREDITIVOS"
+    )
+    autor = (metadata.get("autor") or "").strip() or "Leonardo da Silva Costa"
+    orientador = (metadata.get("orientador") or "").strip() or "Prof. Dr. Edson Marcos Leal Soares Ramos"
+    coorientador = (metadata.get("coorientador") or "").strip()
+    ano = (metadata.get("ano") or "").strip() or "2026"
+    local = (metadata.get("local") or "").strip() or "Belém-Pará"
+    area = (metadata.get("area_concentracao") or "").strip() or (
+        "Segurança Pública, Justiça, Conflitos e Cidadania"
+    )
+    linha = (metadata.get("linha_pesquisa") or "").strip() or (
+        "Políticas, Gestão, Direitos Humanos, Criminalidade e Tecnologia da Informação"
+    )
+    linha_orientacao = f"Orientador(a): {orientador}\n"
+    if coorientador:
+        linha_orientacao += f"Coorientador(a): {coorientador}\n"
 
     sec_pre = doc.sections[0]
     set_page_margins(sec_pre)
@@ -48,7 +62,7 @@ def gerar_documento_tese(caminho_entrada, caminho_saida, assets_dir="assets"):
 
     p_loc = doc.add_paragraph()
     p_loc.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r_loc = p_loc.add_run(f"Belém-Pará\n{ano}")
+    r_loc = p_loc.add_run(f"{local}\n{ano}")
     r_loc.bold = True
     r_loc.font.size = Pt(12)
 
@@ -88,9 +102,9 @@ def gerar_documento_tese(caminho_entrada, caminho_saida, assets_dir="assets"):
     p_info.paragraph_format.line_spacing = 1.0
     p_info.paragraph_format.space_after = Pt(36)
     p_info.add_run(
-        "Área de Concentração: Segurança Pública, Justiça, Conflitos e Cidadania.\n"
-        "Linha de Pesquisa: Políticas, Gestão, Direitos Humanos, Criminalidade e Tecnologia da Informação.\n"
-        f"Orientador(a): {orientador}\n"
+        f"Área de Concentração: {area}.\n"
+        f"Linha de Pesquisa: {linha}.\n"
+        f"{linha_orientacao}"
     )
 
     doc.add_page_break()

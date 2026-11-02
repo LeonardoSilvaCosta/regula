@@ -70,6 +70,7 @@ def estruturar_parse(dados: dict[str, Any], nivel: AcademicLevel) -> ParseRespon
             autor=str(metadata.get("autor") or ""),
             orientador=str(metadata.get("orientador") or ""),
             coorientador=_coorientador(metadata, banca_bruta),
+            coordenador=str(metadata.get("coordenador") or ""),
             ano=str(metadata.get("ano") or ""),
             local=str(metadata.get("local") or ""),
             area_concentracao=str(metadata.get("area_concentracao") or ""),

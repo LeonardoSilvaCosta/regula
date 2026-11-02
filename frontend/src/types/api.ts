@@ -94,7 +94,7 @@ export interface components {
             instituicao: string;
             /**
              * Funcao
-             * @description Papel na banca: Orientador, Coorientador ou Avaliador.
+             * @description Papel na banca: Orientador(a), Coorientador(a), Avaliador(a) Interno(a) ou Avaliador(a) Externo(a).
              */
             funcao: string;
         };
@@ -127,6 +127,11 @@ export interface components {
              * @default
              */
             coorientador: string;
+            /**
+             * Coordenador
+             * @default
+             */
+            coordenador: string;
             /**
              * Ano
              * @default

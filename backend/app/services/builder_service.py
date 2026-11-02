@@ -50,19 +50,29 @@ def _entrada_canonica(tipo: DocumentType) -> Path:
     return BACKEND_DIR / "inputs" / tipo.value / "projeto.docx"
 
 
+def _revisao(pedido: GenerateRequest) -> dict:
+    """Metadados, banca, siglas e PTTs confirmados no Passo 3."""
+    return {
+        "metadata": pedido.metadata.model_dump(),
+        "banca": [membro.model_dump() for membro in pedido.banca],
+        "siglas": [list(par) for par in pedido.siglas],
+        "ptts": [item.model_dump() for item in pedido.ptts],
+    }
+
+
 def gerar_buffer(pedido: GenerateRequest) -> BytesIO:
     """
     Aciona o builder do tipo pedido e devolve o DOCX em memória.
 
-    Os geradores atuais leem o projeto .docx canônico em inputs/ e aplicam o
-    nível informado. O JSON do pedido permanece o contrato do frontend para
-    metadados já revisados; a montagem normativa continua nos builders.
+    O corpo segue o projeto canônico em inputs/. Capa, folha de rosto, folha de
+    aprovação, siglas e fichas de PTT usam os dados revisados no Passo 3.
     """
     entrada = _entrada_canonica(pedido.tipo_documento)
     if not entrada.is_file():
         raise FileNotFoundError(f"Arquivo de entrada não encontrado: {entrada}")
 
     assets = BACKEND_DIR / "assets"
+    revisao = _revisao(pedido)
     temporario = tempfile.NamedTemporaryFile(suffix=".docx", delete=False)
     temporario.close()
     saida = temporario.name
@@ -73,11 +83,22 @@ def gerar_buffer(pedido: GenerateRequest) -> BytesIO:
                 saida,
                 nivel=pedido.nivel.value,
                 assets_dir=str(assets),
+                revisao=revisao,
             )
         elif pedido.tipo_documento == DocumentType.dissertacao:
-            gerar_documento_dissertacao(str(entrada), saida, assets_dir=str(assets))
+            gerar_documento_dissertacao(
+                str(entrada),
+                saida,
+                assets_dir=str(assets),
+                metadata=revisao["metadata"],
+            )
         else:
-            gerar_documento_tese(str(entrada), saida, assets_dir=str(assets))
+            gerar_documento_tese(
+                str(entrada),
+                saida,
+                assets_dir=str(assets),
+                metadata=revisao["metadata"],
+            )
         buffer = BytesIO(Path(saida).read_bytes())
     finally:
         if os.path.exists(saida):

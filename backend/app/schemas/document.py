@@ -21,7 +21,7 @@ class BancaMember(BaseModel):
     titulacao: str | None = None
     instituicao: str = ""
     funcao: str = Field(
-        description="Papel na banca: Orientador, Coorientador ou Avaliador."
+        description="Papel na banca: Orientador(a), Coorientador(a), Avaliador(a) Interno(a) ou Avaliador(a) Externo(a)."
     )
 
 
@@ -30,6 +30,7 @@ class DocumentMetadata(BaseModel):
     autor: str = ""
     orientador: str = ""
     coorientador: str = ""
+    coordenador: str = ""
     ano: str = ""
     local: str = ""
     area_concentracao: str = ""

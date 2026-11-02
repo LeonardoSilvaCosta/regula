@@ -8,18 +8,30 @@ from core.styles import apply_base_styles, set_page_margins, insert_brasao, inse
 from core.xml_utils import set_cell_border, add_page_number_field, configure_section_page_numbers
 from core.ptt_schema import formatar_ficha_22_itens
 
-def gerar_documento_dissertacao(caminho_entrada, caminho_saida, assets_dir="assets"):
+def gerar_documento_dissertacao(caminho_entrada, caminho_saida, assets_dir="assets", metadata=None):
     doc = docx.Document()
     apply_base_styles(doc)
 
-    titulo_trabalho = (
+    metadata = metadata or {}
+    titulo_trabalho = (metadata.get("titulo") or "").strip() or (
         "ESTEIRA PREDITIVA MULTIMODAL DE SUPORTE À DECISÃO CLÍNICA NO CIAP/PMPA: "
         "MODELOS DE APRENDIZADO DE MÁQUINA PARA PREDIÇÃO DE DESFECHOS RELACIONADOS "
         "À SAÚDE MENTAL DE POLICIAIS MILITARES DO PARÁ A PARTIR DE PRONTUÁRIOS PSICOSSOCIAIS"
     )
-    autor = "Leonardo da Silva Costa"
-    orientador = "Prof. Dr. Edson Marcos Leal Soares Ramos"
-    ano = "2026"
+    autor = (metadata.get("autor") or "").strip() or "Leonardo da Silva Costa"
+    orientador = (metadata.get("orientador") or "").strip() or "Prof. Dr. Edson Marcos Leal Soares Ramos"
+    coorientador = (metadata.get("coorientador") or "").strip()
+    ano = (metadata.get("ano") or "").strip() or "2026"
+    local = (metadata.get("local") or "").strip() or "Belém-Pará"
+    area = (metadata.get("area_concentracao") or "").strip() or (
+        "Segurança Pública, Justiça, Conflitos e Cidadania"
+    )
+    linha = (metadata.get("linha_pesquisa") or "").strip() or (
+        "Políticas, Gestão, Direitos Humanos, Criminalidade e Tecnologia da Informação"
+    )
+    linha_orientacao = f"Orientador(a): {orientador}\n"
+    if coorientador:
+        linha_orientacao += f"Coorientador(a): {coorientador}\n"
 
     # SEÇÃO 1: PRÉ-TEXTUAL (Paginação Romana Minúscula Itálico 11)
     sec_pre = doc.sections[0]
@@ -59,7 +71,7 @@ def gerar_documento_dissertacao(caminho_entrada, caminho_saida, assets_dir="asse
     p_loc = doc.add_paragraph()
     p_loc.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_loc.paragraph_format.line_spacing = 1.0
-    r_loc = p_loc.add_run(f"Belém-Pará\n{ano}")
+    r_loc = p_loc.add_run(f"{local}\n{ano}")
     r_loc.bold = True
     r_loc.font.size = Pt(12)
 
@@ -102,16 +114,16 @@ def gerar_documento_dissertacao(caminho_entrada, caminho_saida, assets_dir="asse
     p_info.paragraph_format.line_spacing = 1.0
     p_info.paragraph_format.space_after = Pt(36)
     r_info = p_info.add_run(
-        "Área de Concentração: Segurança Pública, Justiça, Conflitos e Cidadania.\n"
-        "Linha de Pesquisa: Políticas, Gestão, Direitos Humanos, Criminalidade e Tecnologia da Informação.\n"
-        f"Orientador(a): {orientador}\n"
+        f"Área de Concentração: {area}.\n"
+        f"Linha de Pesquisa: {linha}.\n"
+        f"{linha_orientacao}"
     )
     r_info.font.size = Pt(12)
 
     p_loc2 = doc.add_paragraph()
     p_loc2.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_loc2.paragraph_format.line_spacing = 1.0
-    r_loc2 = p_loc2.add_run(f"Belém-Pará\n{ano}")
+    r_loc2 = p_loc2.add_run(f"{local}\n{ano}")
     r_loc2.bold = True
     r_loc2.font.size = Pt(12)
 

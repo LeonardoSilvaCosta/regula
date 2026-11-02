@@ -85,8 +85,45 @@ def _paginar(section, formato, inicio):
     add_page_number_field(run)
 
 
-def gerar_documento_qualificacao(caminho_entrada, caminho_saida, nivel="mestrado", assets_dir="assets"):
+def _mesclar_revisao(dados, revisao):
+    """Sobrepõe no documento os metadados confirmados no Passo 3."""
+    if not revisao:
+        return
+    meta = dados.setdefault("metadata", {})
+    for chave, valor in (revisao.get("metadata") or {}).items():
+        if valor is None:
+            continue
+        meta[chave] = valor
+    if "banca" in revisao:
+        meta["banca"] = list(revisao.get("banca") or [])
+    if "siglas" in revisao:
+        meta["siglas"] = [list(par) for par in (revisao.get("siglas") or [])]
+    if "ptts" not in revisao:
+        return
+    projeto = dados.setdefault("projeto", {})
+    atuais = list(projeto.get("ptts") or [])
+    fundidos = []
+    for indice, item in enumerate(revisao.get("ptts") or []):
+        base = dict(atuais[indice]) if indice < len(atuais) else {}
+        for chave, valor in item.items():
+            if valor is None or valor == "":
+                continue
+            base[chave] = valor
+        if item.get("titulo"):
+            base["titulo"] = item["titulo"]
+        fundidos.append(base)
+    projeto["ptts"] = fundidos
+
+
+def gerar_documento_qualificacao(
+    caminho_entrada,
+    caminho_saida,
+    nivel="mestrado",
+    assets_dir="assets",
+    revisao=None,
+):
     dados = parse_projeto_docx(caminho_entrada)
+    _mesclar_revisao(dados, revisao)
     nivel_norm = nivel.lower()
     dados["metadata"]["nivel"] = nivel_norm
     parte_quadro = "continua" if nivel_norm in ("doutorado", "tese") else None

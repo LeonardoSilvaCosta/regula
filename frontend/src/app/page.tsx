@@ -80,7 +80,20 @@ export default function Home() {
     setFileHint(null);
     try {
       const data = await parseDocument(file, nivel);
-      setParsedData({ ...data, tipo_documento: tipoDocumento, nivel });
+      setParsedData({
+        ...data,
+        tipo_documento: tipoDocumento,
+        nivel,
+        banca: data.banca.map((membro) => {
+          const papel = membro.funcao.toLowerCase();
+          const avaliador =
+            papel.includes("avali") ||
+            papel.includes("extern") ||
+            (papel.includes("intern") && !papel.includes("orient"));
+          if (!avaliador) return membro;
+          return { ...membro, nome: "", instituicao: "" };
+        }),
+      });
       setSubtitulo("");
       setDownloaded(false);
       setStep(2);
