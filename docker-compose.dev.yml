@@ -1,0 +1,21 @@
+# Overlay de desenvolvimento: hot-reload local.
+# Uso: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+services:
+  backend:
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/core:/app/core
+      - ./backend/generators:/app/generators
+      - ./backend/main.py:/app/main.py
+
+  frontend:
+    build:
+      target: deps
+    command: ["npm", "run", "dev", "--", "--hostname", "0.0.0.0", "--port", "3000"]
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
