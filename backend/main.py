@@ -1,25 +1,11 @@
-"""CLI Unificada do Padronizador PPGSP/UFPA."""
+"""CLI Unificada do Regula."""
 import argparse
 import sys
 import os
-from pathlib import Path
-
-# Raiz do backend: independe do diretório de trabalho (raiz do monorepo ou backend/).
-BACKEND_DIR = Path(__file__).resolve().parent
-if str(BACKEND_DIR) not in sys.path:
-    sys.path.insert(0, str(BACKEND_DIR))
 
 from generators.qualificacao.builder import gerar_documento_qualificacao
 from generators.dissertacao.builder import gerar_documento_dissertacao
 from generators.tese.builder import gerar_documento_tese
-
-def resolver_caminho(caminho):
-    """Resolve caminhos relativos a partir de backend/, preservando caminhos absolutos."""
-    caminho = os.path.expanduser(str(caminho))
-    if os.path.isabs(caminho):
-        return os.path.normpath(caminho)
-    return os.path.normpath(str(BACKEND_DIR / caminho))
-
 
 def normalizar_nivel(valor):
     """Normaliza o nível para 'mestrado' ou 'doutorado'."""
@@ -32,8 +18,8 @@ def normalizar_nivel(valor):
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="padronizador-ppgsp",
-        description="Padronizador Automatizado de Documentos do PPGSP/UFPA (Resoluções 007, 009 e 010)."
+        prog="regula",
+        description="Regula - Motor de Conformidade e Estruturação Acadêmica (Resoluções 007, 009 e 010 do PPGSP/UFPA)."
     )
 
     subparsers = parser.add_subparsers(dest="comando", help="Tipo de documento acadêmico a ser gerado")
@@ -68,15 +54,11 @@ def main():
         parser.print_help()
         sys.exit(1)
 
-    args.input = resolver_caminho(args.input)
-    args.output = resolver_caminho(args.output)
-    args.assets = resolver_caminho(args.assets)
-
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     nivel_normalizado = normalizar_nivel(getattr(args, "nivel", "mestrado"))
 
     print("=" * 70)
-    print(f"[*] INICIANDO PADRONIZAÇÃO: {args.comando.upper()}")
+    print(f"[*] INICIANDO REGULA:       {args.comando.upper()}")
     print(f"[*] NÍVEL DEFINIDO:        {nivel_normalizado.upper()} ({'Tese' if nivel_normalizado == 'doutorado' else 'Dissertação'})")
     print(f"[*] ARQUIVO DE ENTRADA:    {args.input}")
     print(f"[*] ARQUIVO DE SAÍDA:      {args.output}")

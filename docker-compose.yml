@@ -1,20 +1,30 @@
 services:
   backend:
     build: ./backend
+    container_name: regula_backend
     ports:
-      - "8000:8000"
+      - "8150:8000"
     environment:
       - PORT=8000
-      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      - CORS_ORIGINS=${CORS_ORIGINS:-https://regula.leadcode.com.br,http://localhost:3000,http://127.0.0.1:3000}
     restart: unless-stopped
+    networks:
+      - regula_net
 
   frontend:
     build:
       context: ./frontend
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8150}
+    container_name: regula_frontend
     ports:
-      - "3000:3000"
+      - "3050:3000"
     depends_on:
       - backend
     restart: unless-stopped
+    networks:
+      - regula_net
+
+networks:
+  regula_net:
+    driver: bridge

@@ -1,123 +1,139 @@
-# Padronizador PPGSP/UFPA
+# Regula
 
-Monorepo que padroniza documentos acadêmicos do PPGSP (Resoluções 007, 009 e 010). O **backend** (FastAPI) expõe a API e a CLI que geram os `.docx`. O **frontend** (Next.js) é o assistente web de upload, revisão e exportação.
+> **Motor de Conformidade e Estruturação de Documentos Acadêmicos**  
+> *Da auditoria de regras à geração canônica de Relatórios de Qualificação, Dissertações e Teses.*
 
-## Estrutura
+[![Production](https://img.shields.io/badge/Production-regula.leadcode.com.br-0f3d32?style=flat-square)](https://regula.leadcode.com.br)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Next.js](https://img.shields.io/badge/Next.js-16_App_Router-black?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-Woodpecker-orange?style=flat-square)](https://woodpecker-ci.org)
+[![Docker](https://img.shields.io/badge/Deploy-Docker_Compose-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
 
-| Pasta | Conteúdo |
-|-------|----------|
-| `backend/` | API FastAPI (`app/`), CLI (`main.py`), geradores, `inputs/`, `outputs/`, `assets/` |
-| `frontend/` | Interface Next.js |
-| `docker-compose.yml` | Backend na porta 8000 e frontend na porta 3000 |
-| `Makefile` | Atalhos `build`, `up`, `down`, `logs`, `gen-types`, `cli-test` |
+---
 
-A raiz concentra a orquestração. O ponto de entrada da CLI continua em `backend/main.py`. A API sobe com `uvicorn app.main:app`.
+## Visão Geral
 
-## Docker (recomendado)
+O **Regula** é uma plataforma de engenharia documental e compliance normativo para a pós-graduação *stricto sensu*. Desenvolvido sob uma arquitetura desacoplada e escalável, o sistema audita manuscritos brutos, identifica inconformidades regulamentares e compila documentos canônicos em formato `.docx` (Microsoft Word) rigorosamente alinhados aos manuais institucionais e às normas ABNT/IBGE.
 
-Na raiz do repositório, com Docker em execução:
+Projetado inicialmente como motor normativo do **Programa de Pós-Graduação em Segurança Pública da Universidade Federal do Pará (PPGSP/UFPA)**, sua arquitetura modular foi pensada para receber catálogos de regras de outros programas e áreas de avaliação.
 
-```bash
-make up
+### Resoluções Atendidas (Ruleset PPGSP/UFPA)
+
+- **Resolução nº 007/2025:** Auditoria automática da Carteira de Produtos Técnicos e Tecnológicos (PTTs). Validação de cotas de impacto ($\ge 50\%$ Alto, $\le 25\%$ Médio, $\le 25\%$ Baixo, mínimo de 4 para mestrado e 8 para doutorado) e conformidade dos 22 campos da ficha técnica.
+- **Resolução nº 009/2025:** Estruturação completa do Relatório de Qualificação com paginação romana preliminar, paginação arábica contínua no corpo textual, Quadro 1 da Apresentação em página paisagem, tabelas abertas no padrão IBGE/ABNT e campos dinâmicos `PAGEREF`.
+- **Resolução nº 010/2025 (Revisão 2026):** Montagem canônica da Dissertação de Mestrado e Tese de Doutorado em 4 capítulos estruturados (Considerações Gerais, Artigos Científicos, Produtos Técnicos e Considerações Finais).
+
+---
+
+## Funcionalidades Principais
+
+- **Wizard Interativo em 4 Passos:**
+  1. **Upload & Seleção:** Leitura do `.docx` bruto com suporte a Mestrado e Doutorado.
+  2. **Diagnóstico Normativo:** Painel visual com checklist de lacunas e barra métrica da carteira de PTTs.
+  3. **Revisão de Metadados:** Edição antes da compilação (autor, banca examinadora, coorientador, siglas e produtos).
+  4. **Compilação & Download:** Geração do `.docx` padronizado via streaming da API.
+- **Engine OpenXML de Alta Fidelidade:** Construção de tabelas abertas IBGE, controle de quebras de seção contínuas e campos nativos do Word (`PAGE`, `PAGEREF`, `updateFields`).
+- **Contrato de Dados Type-Safe:** Especificação OpenAPI gerada pela FastAPI e sincronizada automaticamente no frontend via `openapi-typescript`.
+- **Pipeline de Entrega Contínua:** Integração com Woodpecker CI para validação de código, publicação de imagens imutáveis no GHCR e deploy automatizado na VPS.
+
+---
+
+## Arquitetura do Monorepo
+
+```text
+regula/
+├── .woodpecker/                  # Workflows de CI e Deploy automatizado
+│   ├── ci.yml                   # Gates de qualidade em push e pull_request
+│   └── deploy.yml               # Buildx, GHCR e rollout na VPS (push na main)
+├── backend/                      # API REST e Motor de Documentos (Python 3.11)
+│   ├── app/
+│   │   ├── api/v1/endpoints/    # Rotas FastAPI (/parse, /validate-ptts, /generate)
+│   │   ├── schemas/             # Modelos Pydantic v2 (metadados, PTTs, bancas)
+│   │   └── services/            # Serviços de parsing e compilação em memória
+│   ├── core/                    # Estilos ABNT, paginação OpenXML e validador PTT
+│   ├── generators/              # Construtores específicos (qualificação, dissertação, tese)
+│   ├── assets/                  # Brasão institucional da UFPA
+│   ├── Dockerfile               # Imagem slim de produção
+│   └── main.py                  # CLI unificada (terminal local)
+├── frontend/                     # Interface do Usuário (Next.js 16 + Tailwind CSS)
+│   ├── src/
+│   │   ├── app/                 # App Router e landing page
+│   │   ├── components/wizard/   # Componentes do Stepper (Passos 1 a 4)
+│   │   ├── lib/api.ts           # Cliente HTTP desacoplado
+│   │   └── types/api.ts         # Tipos TypeScript sincronizados via OpenAPI
+│   └── Dockerfile               # Build multi-stage standalone
+├── deploy/                       # Artefatos de infraestrutura de produção
+│   ├── docker-compose.prod.yml  # Compose de produção com imagens do GHCR
+│   └── nginx.conf.example       # Virtual Host Nginx com proxy e SSL Let's Encrypt
+├── docker-compose.yml            # Orquestração local de desenvolvimento
+├── docker-compose.dev.yml        # Overlay de desenvolvimento com hot-reload
+├── Makefile                      # Automação de tarefas locais (up, down, gen-types)
+└── README.md
 ```
 
-Equivalente: `docker compose up --build -d`.
+---
 
-- Interface: [http://localhost:3000](http://localhost:3000)
-- API: [http://localhost:8000](http://localhost:8000) (`/health`, `/docs`)
+## Como Executar
 
-O navegador chama a API em `http://localhost:8000` (variável `NEXT_PUBLIC_API_URL`, gravada na imagem no build). Para outro endereço público, defina a variável e reconstrua o frontend:
+### 1. Via Docker Compose (Recomendado)
 
-```bash
-NEXT_PUBLIC_API_URL=https://api.exemplo.edu.br docker compose up --build -d
-```
-
-Outros atalhos:
-
-| Comando | Efeito |
-|---------|--------|
-| `make build` | `docker compose build` |
-| `make logs` | Logs em tempo real |
-| `make down` | Para e remove os containers |
-| `make gen-types` | Regenera `frontend/src/types/api.ts` (API em `127.0.0.1:8000`) |
-| `make cli-test` | `python main.py --help` dentro da imagem do backend |
-
-Hot-reload local (opcional):
+Suba o backend (porta 8150) e o frontend (porta 3050) com um único comando:
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+docker compose up -d --build
 ```
 
-## Desenvolvimento nativo
+Acesse no navegador: **`http://localhost:3050`** (ou `http://localhost:3000` em desenvolvimento).
 
-Backend:
+### 2. Desenvolvimento Nativo
 
-```powershell
+#### Backend (Terminal 1)
+```bash
 cd backend
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+source .venv/bin/activate  # ou .venv\Scripts\activate no Windows
 pip install -r requirements.txt
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+uvicorn app.main:app --reload --port 8000
 ```
+Swagger interativo disponível em: `http://localhost:8000/docs`
 
-CLI (caminhos relativos a `backend/`):
-
-```powershell
-cd backend
-python main.py qualificacao -i inputs/qualificacao/projeto.docx -o outputs/qualificacao/Relatorio_Qualificacao_Final.docx -n mestrado
-```
-
-Comandos: `qualificacao`, `dissertacao`, `tese`. Use `python main.py --help` para as opções.
-
-Frontend (com a API já no ar):
-
-```powershell
+#### Frontend (Terminal 2)
+```bash
 cd frontend
-npm ci
+npm install
 npm run dev
 ```
 
-A interface fica em [http://localhost:3000](http://localhost:3000). Para regenerar os tipos a partir do OpenAPI:
-
-```powershell
+#### Sincronização de Tipos
+Sempre que alterar schemas Pydantic no backend, sincronize os contratos no frontend com:
+```bash
 cd frontend
 npm run gen:types
 ```
 
-## Pipeline Woodpecker
+### 3. Modo CLI (Terminal)
 
-Dois workflows em `.woodpecker/`:
+O backend também funciona como utilitário de linha de comando:
 
-| Arquivo | Quando | O que faz |
-|---------|--------|-----------|
-| `ci.yml` | `push` e `pull_request` | Instala o backend, compila os módulos Python e gera um `.docx` de qualificação. No frontend, `npm ci`, `tsc --noEmit` e `npm run lint`. Sem secrets. |
-| `deploy.yml` | `push` em `main` | Publica as imagens no GHCR com as tags `latest` e o SHA do commit, copia `deploy/docker-compose.prod.yml` para `/opt/padronizador-ppgsp` e faz `docker compose pull` e `up -d`. |
+```bash
+cd backend
+python main.py qualificacao -i inputs/qualificacao/projeto.docx -o outputs/qualificacao/Relatorio.docx -n mestrado
+```
 
-Imagens:
+---
 
-- `ghcr.io/leonardosilvacosta/padronizador-ppgsp-backend`
-- `ghcr.io/leonardosilvacosta/padronizador-ppgsp-frontend`
+## Deploy e Produção
 
-O frontend é buildado com `NEXT_PUBLIC_API_URL=https://padronizador.leadcode.com.br`. O cliente já prefixa `/health` e `/api/v1`; o Nginx no mesmo host encaminha esses caminhos ao backend, então o navegador não cruza origem.
+A aplicação de produção está hospedada na VPS sob o domínio **`https://regula.leadcode.com.br`**, operando atrás do Nginx com certificado SSL Let's Encrypt e os containers vinculados estritamente à interface de loopback (`127.0.0.1:8150` para API e `127.0.0.1:3050` para o Web):
 
-### Secrets no Woodpecker
+- **Push na branch `main`:** O Woodpecker CI compila e publica as imagens no GitHub Container Registry (`ghcr.io/leonardosilvacosta/regula-*`), envia o compose via SCP e realiza o rollout na VPS com verificação de healthcheck em tempo real.
 
-Em **Settings > Secrets** do repositório:
+---
 
-| Secret | Conteúdo |
-|--------|----------|
-| `ghcr_user` | Usuário do GitHub (`LeonardoSilvaCosta`) |
-| `ghcr_token` | PAT clássico com `write:packages` e `read:packages` |
-| `vps_host` | IP ou hostname da VPS |
-| `vps_ssh_port` | Porta SSH (padrão esperado: `2222`) |
-| `vps_user` | Usuário com permissão de Docker |
-| `vps_ssh_key` | Chave privada autorizada na VPS |
+## Autor
 
-### Primeira vez na VPS
-
-1. O passo `sync-compose` envia `deploy/docker-compose.prod.yml` para `/opt/padronizador-ppgsp` antes do `pull`. O diretório é criado no deploy.
-2. Instale o virtual host a partir de `deploy/nginx.conf.example` (porta 80 com desafio ACME, 443 com `client_max_body_size 100M`). O Nginx fica fora do Compose.
-3. Emita o certificado: `sudo certbot certonly --webroot -w /var/www/letsencrypt -d padronizador.leadcode.com.br` e recarregue o Nginx. Ajuste o método se o Certbot já estiver no plugin nginx.
-4. Os containers escutam só em loopback: backend `127.0.0.1:8150`, frontend `127.0.0.1:3050`. Essas portas não ficam na interface pública. Na VPS atual as duas estão livres.
-
-`deploy/.env.prod.example` documenta `CORS_ORIGINS` e a URL pública. Os valores equivalentes já estão no compose de produção.
+Desenvolvido por **Leonardo Silva Costa**  
+*Capitão QCOPM (Oficial Psicólogo) / Engenheiro de Software / Mestrando no PPGSP/UFPA*  
+Belém, Pará, Brasil.

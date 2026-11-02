@@ -1,13 +1,13 @@
 services:
   backend:
-    image: ghcr.io/leonardosilvacosta/padronizador-ppgsp-backend:latest
-    container_name: padronizador_backend
+    image: ghcr.io/leonardosilvacosta/regula-backend:latest
+    container_name: regula_backend
     restart: unless-stopped
     ports:
       - "127.0.0.1:8150:8000"
     environment:
       - PORT=8000
-      - CORS_ORIGINS=https://padronizador.leadcode.com.br,http://localhost:3000
+      - CORS_ORIGINS=https://regula.leadcode.com.br,http://localhost:3000
     healthcheck:
       test:
         [
@@ -21,25 +21,25 @@ services:
     mem_limit: 512m
     cpus: 1.0
     networks:
-      - padronizador_net
+      - regula_net
 
   frontend:
-    image: ghcr.io/leonardosilvacosta/padronizador-ppgsp-frontend:latest
-    container_name: padronizador_frontend
+    image: ghcr.io/leonardosilvacosta/regula-frontend:latest
+    container_name: regula_frontend
     restart: unless-stopped
     ports:
       - "127.0.0.1:3050:3000"
     environment:
       - PORT=3000
-      - NEXT_PUBLIC_API_URL=https://padronizador.leadcode.com.br
+      - NEXT_PUBLIC_API_URL=https://regula.leadcode.com.br
     depends_on:
       backend:
         condition: service_healthy
     mem_limit: 512m
     cpus: 1.0
     networks:
-      - padronizador_net
+      - regula_net
 
 networks:
-  padronizador_net:
+  regula_net:
     driver: bridge

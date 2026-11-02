@@ -13,7 +13,7 @@ steps:
         from_secret: ghcr_token
       context: ./backend
       dockerfile: ./backend/Dockerfile
-      repo: ghcr.io/leonardosilvacosta/padronizador-ppgsp-backend
+      repo: ghcr.io/leonardosilvacosta/regula-backend
       tags:
         - latest
         - ${CI_COMMIT_SHA}
@@ -28,12 +28,12 @@ steps:
         from_secret: ghcr_token
       context: ./frontend
       dockerfile: ./frontend/Dockerfile
-      repo: ghcr.io/leonardosilvacosta/padronizador-ppgsp-frontend
+      repo: ghcr.io/leonardosilvacosta/regula-frontend
       tags:
         - latest
         - ${CI_COMMIT_SHA}
       build_args:
-        - NEXT_PUBLIC_API_URL=https://padronizador.leadcode.com.br
+        - NEXT_PUBLIC_API_URL=https://regula.leadcode.com.br
 
   - name: sync-compose
     image: appleboy/drone-scp:1.6.14
@@ -46,7 +46,7 @@ steps:
         from_secret: vps_user
       key:
         from_secret: vps_ssh_key
-      target: /opt/padronizador-ppgsp
+      target: /opt/regula
       strip_components: 1
       overwrite: true
       source:
@@ -73,8 +73,8 @@ steps:
         - GHCR_TOKEN
       script_stop: true
       script:
-        - mkdir -p /opt/padronizador-ppgsp
-        - cd /opt/padronizador-ppgsp
+        - mkdir -p /opt/regula
+        - cd /opt/regula
         - test -f docker-compose.prod.yml
         - echo "$${GHCR_TOKEN}" | docker login ghcr.io -u "$${GHCR_USER}" --password-stdin
         - docker compose -f docker-compose.prod.yml pull
