@@ -1,0 +1,45 @@
+services:
+  backend:
+    image: ghcr.io/leonardosilvacosta/padronizador-ppgsp-backend:latest
+    container_name: padronizador_backend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8150:8000"
+    environment:
+      - PORT=8000
+      - CORS_ORIGINS=https://padronizador.leadcode.com.br,http://localhost:3000
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\"",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    mem_limit: 512m
+    cpus: 1.0
+    networks:
+      - padronizador_net
+
+  frontend:
+    image: ghcr.io/leonardosilvacosta/padronizador-ppgsp-frontend:latest
+    container_name: padronizador_frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3050:3000"
+    environment:
+      - PORT=3000
+      - NEXT_PUBLIC_API_URL=https://padronizador.leadcode.com.br
+    depends_on:
+      backend:
+        condition: service_healthy
+    mem_limit: 512m
+    cpus: 1.0
+    networks:
+      - padronizador_net
+
+networks:
+  padronizador_net:
+    driver: bridge

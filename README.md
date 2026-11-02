@@ -84,41 +84,40 @@ cd frontend
 npm run gen:types
 ```
 
-## Deploy na VPS
+## Pipeline Woodpecker
 
-1. Clone o repositório na VPS e defina a URL pública da API antes do build, por exemplo `NEXT_PUBLIC_API_URL=https://api.seudominio.edu.br`.
-2. Suba os serviços: `docker compose up --build -d`. Eles escutam em `127.0.0.1` se você ajustar o mapeamento para `127.0.0.1:3000:3000` e `127.0.0.1:8000:8000`, ou permanecem em `3000` e `8000` atrás do Nginx.
-3. Aponte dois server blocks (ou um site e um subdomínio) para esses upstreams e emita o certificado com Certbot.
+Dois workflows em `.woodpecker/`:
 
-Exemplo de proxy (site na 3000, API na 8000):
+| Arquivo | Quando | O que faz |
+|---------|--------|-----------|
+| `ci.yml` | `push` e `pull_request` | Instala o backend, compila os módulos Python e gera um `.docx` de qualificação. No frontend, `npm ci`, `tsc --noEmit` e `npm run lint`. Sem secrets. |
+| `deploy.yml` | `push` em `main` | Publica as imagens no GHCR com as tags `latest` e o SHA do commit, copia `deploy/docker-compose.prod.yml` para `/opt/padronizador-ppgsp` e faz `docker compose pull` e `up -d`. |
 
-```nginx
-server {
-    server_name padronizador.seudominio.edu.br;
-    location / {
-        proxy_pass http://127.0.0.1:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+Imagens:
 
-server {
-    server_name api.seudominio.edu.br;
-    client_max_body_size 32m;
-    location / {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
+- `ghcr.io/leonardosilvacosta/padronizador-ppgsp-backend`
+- `ghcr.io/leonardosilvacosta/padronizador-ppgsp-frontend`
 
-Certificados:
+O frontend é buildado com `NEXT_PUBLIC_API_URL=https://padronizador.leadcode.com.br`. O cliente já prefixa `/health` e `/api/v1`; o Nginx no mesmo host encaminha esses caminhos ao backend, então o navegador não cruza origem.
 
-```bash
-sudo certbot --nginx -d padronizador.seudominio.edu.br -d api.seudominio.edu.br
-```
+### Secrets no Woodpecker
 
-A API aceita `http://localhost:3000` e `http://127.0.0.1:3000`. Se o navegador chamar a API a partir de outro host, defina `CORS_ORIGINS` (origens separadas por vírgula) no `docker compose` e suba de novo.
+Em **Settings > Secrets** do repositório:
+
+| Secret | Conteúdo |
+|--------|----------|
+| `ghcr_user` | Usuário do GitHub (`LeonardoSilvaCosta`) |
+| `ghcr_token` | PAT clássico com `write:packages` e `read:packages` |
+| `vps_host` | IP ou hostname da VPS |
+| `vps_ssh_port` | Porta SSH (padrão esperado: `2222`) |
+| `vps_user` | Usuário com permissão de Docker |
+| `vps_ssh_key` | Chave privada autorizada na VPS |
+
+### Primeira vez na VPS
+
+1. O passo `sync-compose` envia `deploy/docker-compose.prod.yml` para `/opt/padronizador-ppgsp` antes do `pull`. O diretório é criado no deploy.
+2. Instale o virtual host a partir de `deploy/nginx.conf.example` (porta 80 com desafio ACME, 443 com `client_max_body_size 100M`). O Nginx fica fora do Compose.
+3. Emita o certificado: `sudo certbot certonly --webroot -w /var/www/letsencrypt -d padronizador.leadcode.com.br` e recarregue o Nginx. Ajuste o método se o Certbot já estiver no plugin nginx.
+4. Os containers escutam só em loopback: backend `127.0.0.1:8150`, frontend `127.0.0.1:3050`. Essas portas não ficam na interface pública. Na VPS atual as duas estão livres.
+
+`deploy/.env.prod.example` documenta `CORS_ORIGINS` e a URL pública. Os valores equivalentes já estão no compose de produção.

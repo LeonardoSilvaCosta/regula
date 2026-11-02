@@ -1,0 +1,83 @@
+when:
+  - event: push
+    branch: main
+
+steps:
+  - name: build-backend-ghcr
+    image: woodpeckerci/plugin-docker-buildx:6.1.1
+    settings:
+      registry: ghcr.io
+      username:
+        from_secret: ghcr_user
+      password:
+        from_secret: ghcr_token
+      context: ./backend
+      dockerfile: ./backend/Dockerfile
+      repo: ghcr.io/leonardosilvacosta/padronizador-ppgsp-backend
+      tags:
+        - latest
+        - ${CI_COMMIT_SHA}
+
+  - name: build-frontend-ghcr
+    image: woodpeckerci/plugin-docker-buildx:6.1.1
+    settings:
+      registry: ghcr.io
+      username:
+        from_secret: ghcr_user
+      password:
+        from_secret: ghcr_token
+      context: ./frontend
+      dockerfile: ./frontend/Dockerfile
+      repo: ghcr.io/leonardosilvacosta/padronizador-ppgsp-frontend
+      tags:
+        - latest
+        - ${CI_COMMIT_SHA}
+      build_args:
+        - NEXT_PUBLIC_API_URL=https://padronizador.leadcode.com.br
+
+  - name: sync-compose
+    image: appleboy/drone-scp:1.6.14
+    settings:
+      host:
+        from_secret: vps_host
+      port:
+        from_secret: vps_ssh_port
+      username:
+        from_secret: vps_user
+      key:
+        from_secret: vps_ssh_key
+      target: /opt/padronizador-ppgsp
+      strip_components: 1
+      overwrite: true
+      source:
+        - deploy/docker-compose.prod.yml
+
+  - name: deploy-vps
+    image: appleboy/drone-ssh:1.7.7
+    environment:
+      GHCR_USER:
+        from_secret: ghcr_user
+      GHCR_TOKEN:
+        from_secret: ghcr_token
+    settings:
+      host:
+        from_secret: vps_host
+      port:
+        from_secret: vps_ssh_port
+      username:
+        from_secret: vps_user
+      key:
+        from_secret: vps_ssh_key
+      envs:
+        - GHCR_USER
+        - GHCR_TOKEN
+      script_stop: true
+      script:
+        - mkdir -p /opt/padronizador-ppgsp
+        - cd /opt/padronizador-ppgsp
+        - test -f docker-compose.prod.yml
+        - echo "$${GHCR_TOKEN}" | docker login ghcr.io -u "$${GHCR_USER}" --password-stdin
+        - docker compose -f docker-compose.prod.yml pull
+        - docker compose -f docker-compose.prod.yml up -d --remove-orphans
+        - docker image prune -f --filter "dangling=true"
+        - curl -fsS http://127.0.0.1:8150/health

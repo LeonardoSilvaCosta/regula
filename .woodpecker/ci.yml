@@ -1,0 +1,19 @@
+when:
+  - event: [push, pull_request]
+
+steps:
+  - name: test-backend
+    image: python:3.11-slim
+    commands:
+      - cd backend
+      - pip install --no-cache-dir -r requirements.txt
+      - python -m py_compile app/main.py main.py
+      - python main.py qualificacao -i inputs/qualificacao/projeto.docx -o /tmp/qualif_ci.docx -n mestrado
+
+  - name: check-frontend
+    image: node:20-alpine
+    commands:
+      - cd frontend
+      - npm ci
+      - npx tsc --noEmit
+      - npm run lint
