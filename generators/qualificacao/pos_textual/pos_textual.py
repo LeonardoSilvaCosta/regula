@@ -87,15 +87,13 @@ def build_pos_textual(doc, referencias, apendices=None, anexos=None):
         refs_ordenadas = sorted(referencias, key=lambda x: str(x).strip().upper())
         for ref in refs_ordenadas:
             p_ref = doc.add_paragraph()
-            p_ref.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            p_ref.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            p_ref.paragraph_format.left_indent = Cm(0)
             p_ref.paragraph_format.first_line_indent = Cm(0)
             p_ref.paragraph_format.line_spacing = 1.0
             p_ref.paragraph_format.space_before = Pt(0)
             p_ref.paragraph_format.space_after = Pt(12)
-
-            r_ref = p_ref.add_run(ref.strip())
-            r_ref.font.name = "Times New Roman"
-            r_ref.font.size = Pt(12)
+            _escrever_referencia(p_ref, str(ref).strip())
     else:
         p_aviso = doc.add_paragraph()
         p_aviso.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -113,6 +111,69 @@ def build_pos_textual(doc, referencias, apendices=None, anexos=None):
 
     _emitir_itens(doc, "APÊNDICE", apendices, "pos_apendice")
     _emitir_itens(doc, "ANEXO", anexos, "pos_anexo")
+
+
+def _destacar(texto, inicio, fim):
+    return [
+        (texto[:inicio], False),
+        (texto[inicio:fim], True),
+        (texto[fim:], False),
+    ]
+
+
+def _faixa_periodico(texto):
+    """Nome do periódico imediatamente antes de ', Local, v.'."""
+    marca = ", v."
+    pos = texto.find(marca)
+    if pos < 0 or " In: " in texto[:pos]:
+        return None
+    cidade = texto.rfind(",", 0, pos)
+    if cidade < 0:
+        return None
+    inicio = texto.rfind(". ", 0, cidade)
+    if inicio < 0:
+        return None
+    return inicio + 2, cidade
+
+
+def _faixa_titulo(texto):
+    """Título do trabalho publicado em evento, entre a autoria e '. In:'."""
+    limite = texto.find(". In:")
+    if limite < 0:
+        return None
+    inicio = texto.rfind(". ", 0, limite)
+    if inicio < 0:
+        return None
+    return inicio + 2, limite
+
+
+def _partes_referencia(texto):
+    """Autor regular; título da obra ou nome do periódico em negrito, como no modelo."""
+    if " In: " in texto:
+        faixa = _faixa_titulo(texto)
+        if faixa:
+            return _destacar(texto, faixa[0], faixa[1])
+    faixa = _faixa_periodico(texto)
+    if faixa:
+        return _destacar(texto, faixa[0], faixa[1])
+    ponto = texto.find(". ")
+    while ponto >= 0:
+        resto = texto[ponto + 2 :]
+        fim = resto.find(". ")
+        if fim > 0 and not resto[:fim].endswith("et al"):
+            return _destacar(texto, ponto + 2, ponto + 2 + fim)
+        ponto = texto.find(". ", ponto + 2)
+    return [(texto, False)]
+
+
+def _escrever_referencia(paragrafo, texto):
+    for parte, negrito in _partes_referencia(texto):
+        if not parte:
+            continue
+        run = paragrafo.add_run(parte)
+        run.bold = negrito
+        run.font.name = "Times New Roman"
+        run.font.size = Pt(12)
 
 
 def _emitir_itens(doc, prefixo, itens, bookmark_prefix):

@@ -8,6 +8,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 
 from core.xml_utils import set_cell_border
+from ..formato import escrever_fonte, escrever_legenda
 
 
 def build_quadro_apresentacao(doc, dados_quadro, metadata):
@@ -23,10 +24,10 @@ def build_quadro_apresentacao(doc, dados_quadro, metadata):
     p_titulo.paragraph_format.space_after = Pt(4)
     p_titulo.paragraph_format.line_spacing = 1.0
 
-    r_titulo = p_titulo.add_run(f'Quadro 1 - Estrutura dos principais itens da {tipo_trabalho} “{titulo_curto}”.')
-    r_titulo.bold = True
-    r_titulo.font.name = "Times New Roman"
-    r_titulo.font.size = Pt(12)
+    escrever_legenda(
+        p_titulo,
+        f'Quadro 1. Estrutura dos principais itens da {tipo_trabalho} “{titulo_curto}”.',
+    )
 
     colunas = ["Título", "Objetivo Geral", "Objetivos Específicos", "Tipo de Produto", "Tipo de Estudo", "Fontes", "Status"]
     larguras_cm = [2.2, 2.5, 3.8, 3.0, 2.2, 1.4, 1.5]
@@ -114,6 +115,4 @@ def build_quadro_apresentacao(doc, dados_quadro, metadata):
     p_fonte.paragraph_format.space_before = Pt(3)
     p_fonte.paragraph_format.space_after = Pt(18)
     p_fonte.paragraph_format.line_spacing = 1.0
-    r_fonte = p_fonte.add_run(f"Fonte: Construção do autor ({metadata.get('ano', '2026')}).")
-    r_fonte.font.name = "Times New Roman"
-    r_fonte.font.size = Pt(10)
+    escrever_fonte(p_fonte, f"Fonte: Construção do autor ({metadata.get('ano', '2026')}).")

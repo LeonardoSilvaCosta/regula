@@ -11,7 +11,7 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from core.xml_utils import set_cell_border
 from core.campos import adicionar_bookmark
 from ..estrutura import eh_documental
-from ..formato import adicionar_titulo
+from ..formato import adicionar_titulo, escrever_fonte, escrever_legenda
 from ..legendas import LEGENDA_TABELA_1, LEGENDA_TABELA_2, BM_TABELA_1, BM_TABELA_2
 
 
@@ -217,10 +217,7 @@ def _inserir_tabela_amostral(doc, dados):
     p_tit = doc.add_paragraph()
     p_tit.paragraph_format.space_before = Pt(10)
     p_tit.paragraph_format.space_after = Pt(4)
-    r = p_tit.add_run(LEGENDA_TABELA_1)
-    r.bold = True
-    r.font.name = "Times New Roman"
-    r.font.size = Pt(12)
+    escrever_legenda(p_tit, LEGENDA_TABELA_1)
     adicionar_bookmark(p_tit, BM_TABELA_1)
 
     cols = [
@@ -253,19 +250,14 @@ def _inserir_tabela_amostral(doc, dados):
 
     p_f = doc.add_paragraph()
     p_f.paragraph_format.space_after = Pt(10)
-    r_f = p_f.add_run("Fonte: Dados da pesquisa extraídos do banco analítico ciap_pesquisa (2026).")
-    r_f.font.name = "Times New Roman"
-    r_f.font.size = Pt(10)
+    escrever_fonte(p_f, "Fonte: Dados da pesquisa extraídos do banco analítico ciap_pesquisa (2026).")
 
 
 def _inserir_tabela_tokens(doc, dados):
     p_tit = doc.add_paragraph()
     p_tit.paragraph_format.space_before = Pt(10)
     p_tit.paragraph_format.space_after = Pt(4)
-    r = p_tit.add_run(LEGENDA_TABELA_2)
-    r.bold = True
-    r.font.name = "Times New Roman"
-    r.font.size = Pt(12)
+    escrever_legenda(p_tit, LEGENDA_TABELA_2)
     adicionar_bookmark(p_tit, BM_TABELA_2)
 
     cols = ["Macroestrato", "Total (N)", "Mín", "P10", "Q1", "Mediana", "Q3", "P90", "Máx", "Limiar Tukey", "Outliers (%)"]
@@ -292,6 +284,4 @@ def _inserir_tabela_tokens(doc, dados):
 
     p_f = doc.add_paragraph()
     p_f.paragraph_format.space_after = Pt(10)
-    r_f = p_f.add_run("Fonte: Dados da pesquisa extraídos do banco analítico ciap_pesquisa (2026).")
-    r_f.font.name = "Times New Roman"
-    r_f.font.size = Pt(10)
+    escrever_fonte(p_f, "Fonte: Dados da pesquisa extraídos do banco analítico ciap_pesquisa (2026).")

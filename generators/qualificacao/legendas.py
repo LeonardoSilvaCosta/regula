@@ -1,10 +1,10 @@
 """Legendas únicas de quadros, tabelas e produtos, usadas no corpo e nas listas."""
 
 LEGENDA_TABELA_1 = (
-    "Tabela 1 – Distribuição Populacional da Coorte Viva e Alocação Amostral (n = 360)"
+    "Tabela 1. Distribuição Populacional da Coorte Viva e Alocação Amostral (n = 360)"
 )
 LEGENDA_TABELA_2 = (
-    "Tabela 2 – Métricas de Dispersão de Tokens por Prontuário e Limiares de Outliers (Método de Tukey)"
+    "Tabela 2. Métricas de Dispersão de Tokens por Prontuário e Limiares de Outliers (Método de Tukey)"
 )
 
 BM_QUADRO_1 = "leg_quadro_1"
@@ -22,15 +22,15 @@ def legenda_quadro_1(metadata):
     metadata = metadata or {}
     nivel = metadata.get("nivel", "mestrado")
     tipo = "tese" if _eh_doutorado(nivel) else "dissertação"
-    titulo = (metadata.get("titulo_curto") or metadata.get("titulo") or "[título da pesquisa]").strip()
-    return f'Quadro 1 – Estrutura dos principais itens da {tipo} "{titulo}".'
+    titulo = (metadata.get("titulo") or metadata.get("titulo_curto") or "[título da pesquisa]").strip()
+    return f"Quadro 1 - Estrutura dos principais itens da {tipo} “{titulo}”."
 
 
 def legenda_quadro_2(nivel, parte=None):
     """Cronograma. No mestrado há uma única legenda; no doutorado, continua e conclusão."""
     if _eh_doutorado(nivel):
         base = (
-            "Quadro 2 – Atividades a serem realizadas durante o curso de Doutorado, "
+            "Quadro 2. Atividades a serem realizadas durante o curso de Doutorado, "
             "no período do mês 1 ao mês 48, no PPGSP da UFPA"
         )
         if parte == "continua":
@@ -39,7 +39,7 @@ def legenda_quadro_2(nivel, parte=None):
             return base + " (Conclusão)."
         return base + "."
     return (
-        "Quadro 2 – Atividades a serem realizadas durante o curso de Mestrado, "
+        "Quadro 2. Atividades a serem realizadas durante o curso de Mestrado, "
         "no período do mês 1 ao mês 24, no PPGSP da UFPA."
     )
 

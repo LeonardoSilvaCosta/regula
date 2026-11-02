@@ -1,4 +1,6 @@
 """Títulos e parágrafos da Resolução nº 009/2025."""
+import re
+
 from docx.shared import Cm, Pt, RGBColor, Twips
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
@@ -106,6 +108,84 @@ def adicionar_subtitulo_lista(doc, texto):
     r.font.name = "Times New Roman"
     r.font.size = Pt(12)
     return p
+
+
+_RE_ROTULO_LEGENDA = re.compile(
+    r"^((?:Quadro|Tabela|Figura|Gráfico|Grafico)\s+\d+)\.\s*",
+    re.IGNORECASE,
+)
+
+
+def partir_legenda(texto):
+    """Separa 'Quadro 1.' do restante da legenda."""
+    texto = texto or ""
+    achado = _RE_ROTULO_LEGENDA.match(texto)
+    if achado:
+        return achado.group(1) + ".", texto[achado.end() :]
+    ponto = texto.find(".")
+    if ponto >= 0:
+        return texto[: ponto + 1], texto[ponto + 1 :].lstrip()
+    return texto, ""
+
+
+def escrever_legenda(paragrafo, texto, tamanho=12):
+    """Negrito até o ponto do rótulo; o título descritivo fica sem negrito."""
+    rotulo, resto = partir_legenda(texto)
+    r_rotulo = paragrafo.add_run(rotulo)
+    r_rotulo.bold = True
+    r_rotulo.font.name = "Times New Roman"
+    r_rotulo.font.size = Pt(tamanho)
+    if resto:
+        r_resto = paragrafo.add_run(" " + resto if not resto.startswith(" ") else resto)
+        r_resto.bold = False
+        r_resto.font.name = "Times New Roman"
+        r_resto.font.size = Pt(tamanho)
+    return paragrafo
+
+
+def escrever_legenda_quadro_1(paragrafo, texto, tamanho=11):
+    """Modelo oficial: 'Quadro 1 - ' e o título entre aspas em negrito; o miolo, sem."""
+    texto = texto or ""
+    marca = "Quadro 1 - "
+    abre = texto.find("“")
+    fecha = texto.rfind("”")
+    if texto.startswith(marca) and abre > len(marca) and fecha > abre:
+        trechos = [
+            (texto[: len(marca)], True),
+            (texto[len(marca) : abre + 1], False),
+            (texto[abre + 1 : fecha], True),
+            (texto[fecha:], False),
+        ]
+    else:
+        trechos = [(texto, True)]
+    for parte, negrito in trechos:
+        if not parte:
+            continue
+        run = paragrafo.add_run(parte)
+        run.bold = negrito
+        run.font.name = "Times New Roman"
+        run.font.size = Pt(tamanho)
+    return paragrafo
+
+
+def escrever_fonte(paragrafo, texto, tamanho=10):
+    """Negrito até os dois-pontos de 'Fonte:'; o crédito fica sem negrito."""
+    texto = texto or ""
+    corte = texto.find(":")
+    if corte >= 0:
+        rotulo, resto = texto[: corte + 1], texto[corte + 1 :]
+    else:
+        rotulo, resto = texto, ""
+    r_rotulo = paragrafo.add_run(rotulo)
+    r_rotulo.bold = True
+    r_rotulo.font.name = "Times New Roman"
+    r_rotulo.font.size = Pt(tamanho)
+    if resto:
+        r_resto = paragrafo.add_run(resto)
+        r_resto.bold = False
+        r_resto.font.name = "Times New Roman"
+        r_resto.font.size = Pt(tamanho)
+    return paragrafo
 
 
 def adicionar_paragrafo(doc, texto):

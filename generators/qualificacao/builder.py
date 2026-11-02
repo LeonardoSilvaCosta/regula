@@ -6,7 +6,7 @@ conforme a Resolução nº 009/2025-PPGSP/UFPA.
 import docx
 from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.section import WD_SECTION
+from docx.enum.section import WD_ORIENT, WD_SECTION
 
 from core.styles import apply_base_styles, aplicar_idioma_pt_br, aplicar_rodape_local_ano, limpar_rodape, set_page_margins
 from core.xml_utils import configure_section_page_numbers, add_page_number_field
@@ -34,7 +34,7 @@ from .pre_textual.listas_siglas import build_lista_siglas, normalizar_siglas
 from .pre_textual.listas_simbolos import build_lista_simbolos
 from .pre_textual.sumario import build_sumario
 from .estrutura import numeracao_secoes
-from .textual.apresentacao import build_apresentacao
+from .textual.apresentacao import build_apresentacao, build_quadro_estrutura
 from .projeto import build_projeto_secoes
 from .textual.resultados_preliminares import build_resultados_preliminares
 from .pos_textual.pos_textual import build_pos_textual, itens_com_corpo
@@ -45,6 +45,27 @@ def _secao_sem_numero(doc, primeira=False):
     set_page_margins(section)
     section.header.is_linked_to_previous = False
     section.footer.is_linked_to_previous = False
+    return section
+
+
+def _secao_paisagem(doc):
+    """Página isolada em paisagem, herdando cabeçalho e numeração da seção anterior."""
+    section = doc.add_section(WD_SECTION.NEW_PAGE)
+    set_page_margins(section)
+    section.orientation = WD_ORIENT.LANDSCAPE
+    section.page_width = Cm(29.7)
+    section.page_height = Cm(21.0)
+    section.header.is_linked_to_previous = True
+    section.footer.is_linked_to_previous = True
+    return section
+
+
+def _secao_retrato_continua(doc):
+    """Volta ao retrato sem reiniciar a numeração."""
+    section = doc.add_section(WD_SECTION.NEW_PAGE)
+    set_page_margins(section)
+    section.header.is_linked_to_previous = True
+    section.footer.is_linked_to_previous = True
     return section
 
 
@@ -153,6 +174,14 @@ def gerar_documento_qualificacao(caminho_entrada, caminho_saida, nivel="mestrado
     numeros = numeracao_secoes(dados["projeto"])
 
     build_apresentacao(doc, dados["apresentacao"], dados["metadata"])
+    _secao_paisagem(doc)
+    build_quadro_estrutura(
+        doc,
+        dados["apresentacao"],
+        dados["metadata"],
+        objetivo_geral=(dados.get("projeto") or {}).get("objetivo_geral", ""),
+    )
+    _secao_retrato_continua(doc)
     build_projeto_secoes(doc, dados["projeto"], nivel=nivel, numeros=numeros)
     build_resultados_preliminares(doc, dados["resultados"], numero=numeros["resultados"])
     build_pos_textual(doc, dados["referencias"], apendices=apendices, anexos=anexos)

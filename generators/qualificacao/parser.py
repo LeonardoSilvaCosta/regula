@@ -301,12 +301,12 @@ def parse_projeto_docx(caminho_docx):
                 {"nome": "Prof. Dr. [Nome do Avaliador Externo]", "instituicao": "[Instituição Externa]", "funcao": "Avaliador Externo"}
             ],
             "lista_ilustracoes": [
-                ("Quadro 1 – Estrutura dos principais itens da pesquisa", "vi"),
-                ("Quadro 2 – Cronograma de atividades desenvolvidas durante o Mestrado (24 meses)", "12")
+                ("Quadro 1. Estrutura dos principais itens da pesquisa", "vi"),
+                ("Quadro 2. Cronograma de atividades desenvolvidas durante o Mestrado (24 meses)", "12")
             ],
             "lista_tabelas": [
-                ("Tabela 1 – Distribuição Populacional da Coorte Viva e Alocação Amostral (n = 360)", "7"),
-                ("Tabela 2 – Métricas de Dispersão de Tokens por Prontuário e Limiares de Outliers (Método de Tukey)", "8")
+                ("Tabela 1. Distribuição Populacional da Coorte Viva e Alocação Amostral (n = 360)", "7"),
+                ("Tabela 2. Métricas de Dispersão de Tokens por Prontuário e Limiares de Outliers (Método de Tukey)", "8")
             ],
             "siglas": [
                 ("ABNT", "Associação Brasileira de Normas Técnicas"),
