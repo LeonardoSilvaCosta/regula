@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type DragEvent } from "react";
-import { FileUp } from "lucide-react";
+import { FileUp, PenLine } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
 import type { AcademicLevel } from "@/lib/api";
@@ -25,6 +25,7 @@ export function Step1Upload({
   onTipo,
   onNivel,
   onAnalyze,
+  onStartDirect,
 }: {
   file: File | null;
   tipoDocumento: DocumentType;
@@ -35,6 +36,7 @@ export function Step1Upload({
   onTipo: (tipo: DocumentType) => void;
   onNivel: (nivel: AcademicLevel) => void;
   onAnalyze: () => void;
+  onStartDirect: () => void;
 }) {
   const [over, setOver] = useState(false);
 
@@ -58,40 +60,6 @@ export function Step1Upload({
 
   return (
     <div className="flex flex-col gap-5">
-      <Card
-        title="Documento de origem"
-        description="Envie o arquivo .docx que será diagnosticado e padronizado."
-      >
-        <label
-          onDragOver={(event) => {
-            event.preventDefault();
-            setOver(true);
-          }}
-          onDragLeave={() => setOver(false)}
-          onDrop={onDrop}
-          className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed px-6 py-10 text-center ${
-            over ? "border-[#0f3d32] bg-[#eef6f3]" : "border-[#cfc6b6] bg-[#fbf9f4]"
-          }`}
-        >
-          <FileUp className="mb-3 size-7 text-[#0f3d32]" aria-hidden />
-          <span className="text-sm font-medium text-[#1c1915]">
-            Arraste o .docx ou clique para escolher
-          </span>
-          <span className="mt-1 text-xs text-[#6b645a]">Somente arquivos Word (.docx)</span>
-          <input
-            type="file"
-            accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            className="sr-only"
-            onChange={(event) => accept(event.target.files?.[0] ?? null)}
-          />
-        </label>
-        {file && (
-          <p className="mt-3 text-sm text-[#0f3d32]">
-            Arquivo selecionado: <span className="font-medium">{file.name}</span>
-          </p>
-        )}
-      </Card>
-
       <Card title="Tipo e nível">
         <fieldset>
           <legend className="mb-2 text-sm font-medium">Tipo de documento</legend>
@@ -143,22 +111,79 @@ export function Step1Upload({
         </fieldset>
       </Card>
 
+      <div className="grid gap-5 lg:grid-cols-2">
+      <Card
+        title="Importar de arquivo .docx"
+        description="Envie o arquivo .docx que será diagnosticado e padronizado."
+      >
+        <label
+          onDragOver={(event) => {
+            event.preventDefault();
+            setOver(true);
+          }}
+          onDragLeave={() => setOver(false)}
+          onDrop={onDrop}
+          className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed px-6 py-10 text-center ${
+            over ? "border-[#0f3d32] bg-[#eef6f3]" : "border-[#cfc6b6] bg-[#fbf9f4]"
+          }`}
+        >
+          <FileUp className="mb-3 size-7 text-[#0f3d32]" aria-hidden />
+          <span className="text-sm font-medium text-[#1c1915]">
+            Arraste o .docx ou clique para escolher
+          </span>
+          <span className="mt-1 text-xs text-[#6b645a]">Somente arquivos Word (.docx)</span>
+          <input
+            type="file"
+            accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            className="sr-only"
+            onChange={(event) => accept(event.target.files?.[0] ?? null)}
+          />
+        </label>
+        {file && (
+          <p className="mt-3 text-sm text-[#0f3d32]">
+            Arquivo selecionado: <span className="font-medium">{file.name}</span>
+          </p>
+        )}
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            disabled={!file || isParsing}
+            onClick={onAnalyze}
+            className="inline-flex h-11 items-center rounded-md bg-[#0f3d32] px-5 text-sm font-medium text-white hover:bg-[#145244] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isParsing ? "Analisando…" : "Analisar Documento"}
+          </button>
+        </div>
+      </Card>
+
+      <Card
+        title="Preencher seções diretamente"
+        description="Comece do zero com os textos institucionais do PPGSP, sem importar um .docx."
+      >
+        <div className="flex h-full flex-col items-start justify-between gap-4 rounded-lg border border-[#0f3d32]/20 bg-[#eef6f3] px-5 py-8">
+          <div>
+            <PenLine className="mb-3 size-7 text-[#0f3d32]" aria-hidden />
+            <p className="text-sm text-[#1c1915]">
+              Metadados, banca, siglas e seções normativas ficam em branco para você preencher na revisão.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onStartDirect}
+            className="inline-flex h-11 items-center rounded-md bg-[#0f3d32] px-5 text-sm font-semibold text-white shadow-sm hover:bg-[#145244]"
+          >
+            Iniciar preenchimento direto
+          </button>
+        </div>
+      </Card>
+      </div>
+
       {error && (
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900" role="alert">
           {error}
         </p>
       )}
 
-      <div className="flex justify-end">
-        <button
-          type="button"
-          disabled={!file || isParsing}
-          onClick={onAnalyze}
-          className="inline-flex h-11 items-center rounded-md bg-[#0f3d32] px-5 text-sm font-medium text-white hover:bg-[#145244] disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {isParsing ? "Analisando…" : "Analisar Documento"}
-        </button>
-      </div>
     </div>
   );
 }

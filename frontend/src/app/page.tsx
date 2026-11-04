@@ -22,6 +22,64 @@ type DocumentType = components["schemas"]["DocumentType"];
 type WizardStep = 1 | 2 | 3 | 4;
 type ApiStatus = "checking" | "online" | "offline";
 
+function criarEstadoVazio(tipo: DocumentType, nivel: AcademicLevel): ParseResponse {
+  return {
+    documento_id: "",
+    tipo_documento: tipo,
+    nivel,
+    metadata: {
+      titulo: "",
+      subtitulo: "",
+      autor: "",
+      orientador: "",
+      coorientador: "",
+      coordenador: "Prof. Dr. Edson Marcos Leal Soares Ramos",
+      ano: "2026",
+      local: "Belém-Pará",
+      area_concentracao: "Segurança Pública, Justiça, Conflitos e Cidadania",
+      linha_pesquisa: "Políticas, Gestão, Direitos Humanos, Criminalidade e Tecnologia da Informação",
+      data_aprovacao: "Belém, Pará, ____ de _______________ de 2026.",
+    },
+    sections: {
+      apresentacao: [],
+      introducao: [],
+      justificativa: [],
+      problema: [],
+      revisao: [],
+      objetivo_geral: "",
+      objetivos_especificos: [],
+      hipotese: [],
+      metodologia_natureza: [],
+      metodologia_locus: "",
+      metodologia_participantes: "",
+      metodologia_fontes: [],
+      metodologia_coleta: [],
+      metodologia_etica: "",
+      metodologia_analise: "",
+      referencias: [],
+    },
+    banca: [
+      { nome: "", funcao: "Orientador(a)", instituicao: "Universidade Federal do Pará" },
+      { nome: "", funcao: "Avaliador(a) Interno(a)", instituicao: "Universidade Federal do Pará" },
+      { nome: "", funcao: "Avaliador(a) Externo(a)", instituicao: "" },
+    ],
+    siglas: [
+      ["UFPA", "Universidade Federal do Pará"],
+      ["PPGSP", "Programa de Pós-Graduação em Segurança Pública"],
+      ["CIAP", "Centro Integrado de Atenção Psicossocial"],
+      ["PMPA", "Polícia Militar do Pará"],
+    ],
+    ptts: [],
+    lacunas: [],
+    conformidade_ptt: {
+      valido: false,
+      total: 0,
+      prop_alta: 0,
+      mensagem: "",
+    },
+  };
+}
+
 const INITIAL = {
   step: 1 as WizardStep,
   tipoDocumento: "qualificacao" as DocumentType,
@@ -41,6 +99,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [fileHint, setFileHint] = useState<string | null>(null);
   const [downloaded, setDownloaded] = useState(false);
+  const [preenchimentoDireto, setPreenchimentoDireto] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -80,13 +139,16 @@ export default function Home() {
     setFileHint(null);
     try {
       const data = await parseDocument(file, nivel);
+      const vazio = criarEstadoVazio(tipoDocumento, nivel);
       setParsedData({
         ...data,
         tipo_documento: tipoDocumento,
         nivel,
+        sections: data.sections ?? vazio.sections,
       });
       setSubtitulo(data.metadata.subtitulo ?? "");
       setDownloaded(false);
+      setPreenchimentoDireto(false);
       setStep(2);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Não foi possível analisar o documento.");
@@ -95,8 +157,22 @@ export default function Home() {
     }
   }
 
+  function iniciarPreenchimentoDireto() {
+    setParsedData(criarEstadoVazio(tipoDocumento, nivel));
+    setSubtitulo("");
+    setError(null);
+    setFileHint(null);
+    setDownloaded(false);
+    setPreenchimentoDireto(true);
+    setStep(3);
+  }
+
   async function gerar() {
-    if (!parsedData?.documento_id) {
+    if (!parsedData) {
+      setError("Analise novamente o arquivo em Documento de origem antes de gerar.");
+      return;
+    }
+    if (!preenchimentoDireto && !parsedData.documento_id) {
       setError("Analise novamente o arquivo em Documento de origem antes de gerar.");
       return;
     }
@@ -114,6 +190,7 @@ export default function Home() {
         tipo_documento: tipoDocumento,
         nivel,
         metadata: { ...parsedData.metadata, titulo },
+        sections: parsedData.sections,
         banca: parsedData.banca,
         siglas: parsedData.siglas,
         ptts: parsedData.ptts,
@@ -144,6 +221,7 @@ export default function Home() {
     setError(null);
     setFileHint(null);
     setDownloaded(false);
+    setPreenchimentoDireto(false);
   }
 
   return (
@@ -175,6 +253,7 @@ export default function Home() {
               onTipo={escolherTipo}
               onNivel={setNivel}
               onAnalyze={analisar}
+              onStartDirect={iniciarPreenchimentoDireto}
             />
           )}
           {step === 2 && parsedData && (
@@ -191,7 +270,7 @@ export default function Home() {
               subtitulo={subtitulo}
               onSubtitulo={setSubtitulo}
               onChange={setParsedData}
-              onBack={() => setStep(2)}
+              onBack={() => setStep(preenchimentoDireto ? 1 : 2)}
               onNext={() => {
                 setError(null);
                 setStep(4);

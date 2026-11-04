@@ -4,10 +4,41 @@ export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
 export type AcademicLevel = components["schemas"]["AcademicLevel"];
-export type ParseResponse = components["schemas"]["ParseResponse"];
 export type PTTItem = components["schemas"]["PTTItem"];
 export type PTTValidationResult = components["schemas"]["PTTValidationResult"];
-export type GenerateRequest = components["schemas"]["GenerateRequest"];
+
+export interface DocumentSections {
+  apresentacao?: string[];
+  introducao?: string[];
+  justificativa?: string[];
+  problema?: string[];
+  revisao?: string[];
+  objetivo_geral?: string;
+  objetivos_especificos?: string[];
+  hipotese?: string[];
+  metodologia_natureza?: string[];
+  metodologia_locus?: string;
+  metodologia_participantes?: string;
+  metodologia_fontes?: string[];
+  metodologia_coleta?: string[];
+  metodologia_etica?: string;
+  metodologia_analise?: string;
+  referencias?: string[];
+}
+
+type SchemaParseResponse = components["schemas"]["ParseResponse"];
+type SchemaGenerateRequest = components["schemas"]["GenerateRequest"];
+
+export type ParseResponse = Omit<SchemaParseResponse, "metadata"> & {
+  metadata: components["schemas"]["DocumentMetadata"] & {
+    data_aprovacao?: string;
+  };
+  sections: DocumentSections;
+};
+
+export type GenerateRequest = SchemaGenerateRequest & {
+  sections: DocumentSections;
+};
 
 export class ApiError extends Error {
   constructor(
