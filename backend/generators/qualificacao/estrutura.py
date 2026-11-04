@@ -198,14 +198,25 @@ def bloco_preenchido(blocos, chave):
     return bool(str(blocos.get(chave) or "").strip())
 
 
+_ROMANOS = ("I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
+
+
+def _titulo_artigo_informado(titulo):
+    baixo = (titulo or "").strip().lower()
+    return bool(baixo) and baixo not in ("resultados preliminares", "artigo")
+
+
 def rotulo_artigo(numero, indice, artigo):
+    """Identificação do produto bibliográfico no sumário e no corpo."""
+    del numero
     titulo = (artigo.get("titulo") or "").strip()
-    prefixo = f"{numero}.{indice}."
-    if titulo.upper().startswith(prefixo) or titulo.upper().startswith(f"{numero}.{indice} "):
+    if titulo.lower().startswith("produto bibliográfico"):
         return titulo
-    if titulo:
-        return f"{prefixo} {titulo}"
-    return f"{prefixo} PRODUTO BIBLIOGRÁFICO"
+    romano = _ROMANOS[indice - 1] if 1 <= indice <= len(_ROMANOS) else str(indice)
+    base = f"Produto Bibliográfico {romano} - Artigo {indice}"
+    if _titulo_artigo_informado(titulo):
+        return f"{base} – {titulo}"
+    return base
 
 
 def rotulo_pos(prefixo, indice, total, rotulo):

@@ -293,8 +293,20 @@ def gerar_documento_qualificacao(
         objetivo_geral=(dados.get("projeto") or {}).get("objetivo_geral", ""),
     )
     _secao_retrato_continua(doc)
-    build_projeto_secoes(doc, dados["projeto"], nivel=nivel, numeros=numeros)
-    build_resultados_preliminares(doc, dados["resultados"], numero=numeros["resultados"])
+    meta = dados.get("metadata") or {}
+    projeto = dados["projeto"]
+    for origem in ("autor", "area_concentracao", "linha_pesquisa", "titulo", "orientador", "coorientador"):
+        if not str(projeto.get(origem) or "").strip():
+            projeto[origem] = meta.get(origem) or ""
+    if str(meta.get("ano") or "").strip():
+        projeto["ano"] = meta["ano"]
+    build_projeto_secoes(doc, projeto, nivel=nivel, numeros=numeros)
+    build_resultados_preliminares(
+        doc,
+        dados["resultados"],
+        numero=numeros["resultados"],
+        metadata=meta,
+    )
     for secao in dados.get("secoes_nao_mapeadas") or []:
         adicionar_titulo(doc, secao.get("titulo") or "Seção", primario=True, marcar=False)
         for paragrafo in secao.get("paragrafos") or []:

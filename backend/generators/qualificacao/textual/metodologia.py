@@ -4,15 +4,13 @@ do Projeto de Qualificação conforme o Art. 1º, II, item 4 da Resolução nº 
 Suporta tanto Pesquisas de Campo/Empíricas (4.1) quanto Pesquisas Documentais/Bibliográficas (4.2).
 """
 
-from docx.shared import Cm, Pt, RGBColor
+from docx.shared import Cm, Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_ALIGN_VERTICAL, WD_TABLE_ALIGNMENT
 
-from core.xml_utils import aplicar_estilo_tabela_ibge
-from core.campos import adicionar_bookmark
 from ..estrutura import eh_documental
-from ..formato import adicionar_titulo, escrever_fonte, escrever_legenda
-from ..legendas import LEGENDA_TABELA_1, LEGENDA_TABELA_2, BM_TABELA_1, BM_TABELA_2
+from ..formato import adicionar_titulo
+from ..legendas import BM_TABELA_1, BM_TABELA_2
+from ...common.tabelas import inserir_tabela
 
 
 def build_metodologia(doc, dados_projeto, numero=4):
@@ -213,50 +211,14 @@ def build_metodologia(doc, dados_projeto, numero=4):
         )
 
 
-def _preencher_celula(celula, texto, alinhamento, negrito=False):
-    celula.text = ""
-    celula.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-    paragrafo = celula.paragraphs[0]
-    paragrafo.alignment = alinhamento
-    paragrafo.paragraph_format.line_spacing = 1.0
-    paragrafo.paragraph_format.space_before = Pt(2)
-    paragrafo.paragraph_format.space_after = Pt(2)
-    run = paragrafo.add_run(texto)
-    run.font.name = "Times New Roman"
-    run.font.size = Pt(10)
-    run.font.bold = negrito
-    run.font.color.rgb = RGBColor(0, 0, 0)
-
-
-def _montar_tabela_ibge(doc, colunas, linhas, alinhamentos):
-    tabela = doc.add_table(rows=1, cols=len(colunas))
-    tabela.alignment = WD_TABLE_ALIGNMENT.CENTER
-    tabela.autofit = True
-    for indice, titulo in enumerate(colunas):
-        _preencher_celula(tabela.rows[0].cells[indice], titulo, alinhamentos[indice], negrito=True)
-    for linha in linhas:
-        celulas = tabela.add_row().cells
-        for indice, valor in enumerate(linha):
-            if indice >= len(celulas):
-                break
-            _preencher_celula(celulas[indice], valor, alinhamentos[indice])
-    aplicar_estilo_tabela_ibge(tabela)
-
-
 def _inserir_tabela_amostral(doc, dados):
-    p_tit = doc.add_paragraph()
-    p_tit.paragraph_format.space_before = Pt(10)
-    p_tit.paragraph_format.space_after = Pt(4)
-    escrever_legenda(p_tit, LEGENDA_TABELA_1)
-    adicionar_bookmark(p_tit, BM_TABELA_1)
-
-    cols = [
+    colunas = [
         "Macroestrato Metodológico",
         "População Real (Nh)",
         "Proporção (%)",
         "Amostra Proporcional (nh)",
         "Amostra Otimizada Balanceada (nh)",
-        "Papel na Escala EVRP / Spans"
+        "Papel na Escala EVRP / Spans",
     ]
     alinhamentos = [
         WD_ALIGN_PARAGRAPH.LEFT,
@@ -266,24 +228,40 @@ def _inserir_tabela_amostral(doc, dados):
         WD_ALIGN_PARAGRAPH.RIGHT,
         WD_ALIGN_PARAGRAPH.LEFT,
     ]
-    _montar_tabela_ibge(doc, cols, dados.get("linhas", []), alinhamentos)
-
-    p_f = doc.add_paragraph()
-    p_f.paragraph_format.space_after = Pt(10)
-    escrever_fonte(p_f, "Fonte: Dados da pesquisa extraídos do banco analítico ciap_pesquisa (2026).")
+    inserir_tabela(
+        doc,
+        numero=1,
+        titulo="Distribuição Populacional da Coorte Viva e Alocação Amostral (n = 360)",
+        colunas=colunas,
+        linhas=dados.get("linhas", []),
+        fonte="Dados da pesquisa extraídos do banco analítico ciap_pesquisa (2026).",
+        alinhamentos=alinhamentos,
+        bookmark=BM_TABELA_1,
+    )
 
 
 def _inserir_tabela_tokens(doc, dados):
-    p_tit = doc.add_paragraph()
-    p_tit.paragraph_format.space_before = Pt(10)
-    p_tit.paragraph_format.space_after = Pt(4)
-    escrever_legenda(p_tit, LEGENDA_TABELA_2)
-    adicionar_bookmark(p_tit, BM_TABELA_2)
-
-    cols = ["Macroestrato", "Total (N)", "Mín", "P10", "Q1", "Mediana", "Q3", "P90", "Máx", "Limiar Tukey", "Outliers (%)"]
-    alinhamentos = [WD_ALIGN_PARAGRAPH.LEFT] + [WD_ALIGN_PARAGRAPH.RIGHT] * (len(cols) - 1)
-    _montar_tabela_ibge(doc, cols, dados.get("linhas", []), alinhamentos)
-
-    p_f = doc.add_paragraph()
-    p_f.paragraph_format.space_after = Pt(10)
-    escrever_fonte(p_f, "Fonte: Dados da pesquisa extraídos do banco analítico ciap_pesquisa (2026).")
+    colunas = [
+        "Macroestrato",
+        "Total (N)",
+        "Mín",
+        "P10",
+        "Q1",
+        "Mediana",
+        "Q3",
+        "P90",
+        "Máx",
+        "Limiar Tukey",
+        "Outliers (%)",
+    ]
+    alinhamentos = [WD_ALIGN_PARAGRAPH.LEFT] + [WD_ALIGN_PARAGRAPH.RIGHT] * (len(colunas) - 1)
+    inserir_tabela(
+        doc,
+        numero=2,
+        titulo="Métricas de Dispersão de Tokens por Prontuário e Limiares de Outliers (Método de Tukey)",
+        colunas=colunas,
+        linhas=dados.get("linhas", []),
+        fonte="Dados da pesquisa extraídos do banco analítico ciap_pesquisa (2026).",
+        alinhamentos=alinhamentos,
+        bookmark=BM_TABELA_2,
+    )

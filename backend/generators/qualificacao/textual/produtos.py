@@ -7,9 +7,35 @@ e as normas da Resolução nº 007/2025-PPGSP/UFPA (Art. 7º e modelo das págs.
 from docx.shared import Cm, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
+from core.campos import ancorar_paragrafo
 from core.ptt_schema import formatar_ficha_22_itens
-from ..formato import adicionar_titulo, adicionar_titulo_produto
-from ..legendas import titulo_produto
+from ..formato import adicionar_titulo
+
+_ROTULOS_JUSTIFICATIVA = {
+    "XIV. Justificativa do Impacto": "Justificativa do Impacto – até 50 palavras",
+    "XVI. Justificativa da Inovação": "Justificativa da Inovação – até 50 palavras",
+    "XVIII. Justificativa da Complexidade": "Justificativa da Complexidade – até 50 palavras",
+}
+
+
+def _titulo_produto_ficha(indice, ptt):
+    ptt = ptt or {}
+    subtipo = str(ptt.get("subtipo") or ptt.get("subtipo_producao") or "").strip()
+    titulo = str(ptt.get("titulo") or "").strip()
+    base = f"PRODUTO {indice}."
+    if subtipo and titulo:
+        return f"{base} {subtipo} – {titulo}"
+    if subtipo:
+        return f"{base} {subtipo}"
+    if titulo:
+        return f"{base} {titulo}"
+    return base
+
+
+def _run_times(run, negrito):
+    run.font.name = "Times New Roman"
+    run.font.size = Pt(12)
+    run.bold = negrito
 
 
 def build_produtos(doc, dados_projeto, numero=5):
@@ -67,42 +93,55 @@ def build_produtos(doc, dados_projeto, numero=5):
 
     if ptts:
         for idx_p, ptt in enumerate(ptts, start=1):
-            adicionar_titulo_produto(
-                doc,
-                titulo_produto(idx_p, ptt, numero),
-                numero,
-                bookmark=f"sec_prod_{idx_p}",
-            )
+            if idx_p > 1:
+                separador = doc.add_paragraph()
+                separador.paragraph_format.space_before = Pt(0)
+                separador.paragraph_format.space_after = Pt(18)
+                separador.paragraph_format.line_spacing = 1.0
 
-            ficha = formatar_ficha_22_itens(ptt)
+            cabecalho = _titulo_produto_ficha(idx_p, ptt)
+            p_titulo = doc.add_paragraph()
+            p_titulo.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            p_titulo.paragraph_format.space_before = Pt(12)
+            p_titulo.paragraph_format.space_after = Pt(6)
+            p_titulo.paragraph_format.line_spacing = 1.0
+            p_titulo.paragraph_format.first_line_indent = Pt(0)
+            _run_times(p_titulo.add_run(cabecalho), True)
+            ancorar_paragrafo(p_titulo, cabecalho, bookmark=f"sec_prod_{idx_p}")
+
+            ficha = formatar_ficha_22_itens(ptt, dados_projeto)
             for campo, valor in ficha:
-                p_item = doc.add_paragraph()
-                p_item.alignment = WD_ALIGN_PARAGRAPH.LEFT
-                p_item.paragraph_format.left_indent = Cm(0)
-                p_item.paragraph_format.first_line_indent = Cm(0)
-                p_item.paragraph_format.line_spacing = 1.0
-                p_item.paragraph_format.space_before = Pt(2)
-                p_item.paragraph_format.space_after = Pt(2)
+                rotulo_justificativa = _ROTULOS_JUSTIFICATIVA.get(campo)
+                if rotulo_justificativa:
+                    p_rotulo = doc.add_paragraph()
+                    p_rotulo.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                    p_rotulo.paragraph_format.space_before = Pt(0)
+                    p_rotulo.paragraph_format.space_after = Pt(3)
+                    p_rotulo.paragraph_format.line_spacing = 1.0
+                    p_rotulo.paragraph_format.first_line_indent = Pt(0)
+                    _run_times(p_rotulo.add_run(rotulo_justificativa), True)
 
-                if "Justificativa" in campo:
-                    rotulo = f"{campo}\n"
-                elif "Coautoria" in campo or "Co-autoria" in campo:
-                    rotulo = f"{campo}:\n"
-                else:
-                    rotulo = f"{campo}: "
-                r_c = p_item.add_run(rotulo)
-                r_c.bold = False
-                r_c.font.name = "Times New Roman"
-                r_c.font.size = Pt(12)
+                    p_texto = doc.add_paragraph()
+                    p_texto.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                    p_texto.paragraph_format.space_before = Pt(0)
+                    p_texto.paragraph_format.space_after = Pt(6)
+                    p_texto.paragraph_format.line_spacing = 1.5
+                    p_texto.paragraph_format.first_line_indent = Cm(1.27)
+                    _run_times(p_texto.add_run(str(valor)), False)
+                    continue
 
-                r_v = p_item.add_run(f"{valor}")
-                r_v.bold = True
-                r_v.font.name = "Times New Roman"
-                r_v.font.size = Pt(12)
+                p = doc.add_paragraph()
+                p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                p.paragraph_format.space_before = Pt(0)
+                p.paragraph_format.space_after = Pt(3)
+                p.paragraph_format.line_spacing = 1.0
+                p.paragraph_format.first_line_indent = Pt(0)
 
-            p_esp = doc.add_paragraph()
-            p_esp.paragraph_format.space_before = Pt(0)
-            p_esp.paragraph_format.space_after = Pt(12)
+                run_label = p.add_run(campo + " ")
+                _run_times(run_label, True)
+
+                run_val = p.add_run(str(valor))
+                _run_times(run_val, False)
     else:
         add_placeholder(
             "Conforme a Resolução nº 007/2025-PPGSP e o modelo das páginas 18 e 19 da Resolução nº 009/2025, "

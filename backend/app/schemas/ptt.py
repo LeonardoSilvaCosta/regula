@@ -1,10 +1,17 @@
 """Schemas dos 22 itens de PTT e da validação da Resolução 007/2025."""
 
-from pydantic import BaseModel, Field
+from typing import Optional
+
+from pydantic import BaseModel, Field, model_validator
 
 
 class PTTItem(BaseModel):
-    """Ficha técnica da Resolução nº 007/2025-PPGSP (22 itens)."""
+    """Ficha técnica da Resolução nº 007/2025-PPGSP (22 itens).
+
+    Ano vazio herda o ano do trabalho. Coautoria e divulgação aceitam os
+    nomes canônicos (`coautoria`, `divulgacao`) e os do formulário
+    (`coautores`, `divulgacao_url`).
+    """
 
     num: str = ""
     nome: str = ""
@@ -12,22 +19,49 @@ class PTTItem(BaseModel):
     tipo: str = ""
     subtipo: str = ""
     titulo: str = ""
-    ano: str = ""
+    ano: Optional[str] = None
     coautoria: str = ""
+    coautores: Optional[str] = ""
     projeto: str = ""
     financiamento: str = ""
     financiador: str = ""
-    demanda: str = ""
-    impacto: str = ""
+    demanda: str = "Espontânea"
+    impacto: str = "Alto"
     justificativa_impacto: str = ""
-    inovacao: str = ""
+    inovacao: str = "Alto"
     justificativa_inovacao: str = ""
-    complexidade: str = ""
+    complexidade: str = "Alta"
     justificativa_complexidade: str = ""
     validacao: str = ""
     divulgacao: str = ""
-    abrangencia: str = ""
-    publico_usuario: str = ""
+    divulgacao_url: str = ""
+    abrangencia: str = "Local"
+    publico_usuario: str = "Estado, Município, Comunidade"
+
+    @model_validator(mode="before")
+    @classmethod
+    def _ano_vazio(cls, dados):
+        if isinstance(dados, dict):
+            ano = dados.get("ano")
+            if isinstance(ano, str) and not ano.strip():
+                dados = {**dados, "ano": None}
+        return dados
+
+    @model_validator(mode="after")
+    def _espelhar_nomes(self):
+        coautores = (self.coautores or "").strip()
+        coautoria = (self.coautoria or "").strip()
+        if coautores and not coautoria:
+            self.coautoria = coautores
+        elif coautoria and not coautores:
+            self.coautores = coautoria
+        url = (self.divulgacao_url or "").strip()
+        divulgacao = (self.divulgacao or "").strip()
+        if url and not divulgacao:
+            self.divulgacao = url
+        elif divulgacao and not url:
+            self.divulgacao_url = divulgacao
+        return self
 
 
 class PTTValidationResult(BaseModel):

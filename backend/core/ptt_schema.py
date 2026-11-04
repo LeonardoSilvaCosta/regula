@@ -32,19 +32,51 @@ def _valor(dados_ptt, *chaves):
     return ""
 
 
-def formatar_ficha_22_itens(dados_ptt):
-    """Lista os 22 campos. Campo vazio permanece vazio; área e linha são institucionais."""
+def _contexto(dados_projeto):
+    dados_projeto = dados_projeto or {}
+    return {
+        "autoria": _valor(dados_projeto, "autor", "autoria"),
+        "ano": _valor(dados_projeto, "ano"),
+        "area": _valor(dados_projeto, "area_concentracao") or _AREA,
+        "linha": _valor(dados_projeto, "linha_pesquisa") or _LINHA,
+        "projeto": _valor(dados_projeto, "titulo", "projeto_pesquisa"),
+        "coautoria": _coautoria_docente(dados_projeto),
+    }
+
+
+def _coautoria_docente(dados_projeto):
+    partes = []
+    for chave in ("orientador", "coorientador"):
+        nome = _valor(dados_projeto, chave)
+        if nome:
+            partes.append(f"{nome} - Docente")
+    return "; ".join(partes)
+
+
+def _herdar(dados_ptt, contexto, *chaves, fallback=""):
+    proprio = _valor(dados_ptt, *chaves)
+    if proprio:
+        return proprio
+    return fallback
+
+
+def formatar_ficha_22_itens(dados_ptt, dados_projeto=None):
+    """Lista os 22 campos na ordem da Resolução 007/2025.
+
+    Autoria, ano, coautoria, área, linha e projeto vazios herdam o trabalho.
+    """
     dados_ptt = dados_ptt or {}
+    ctx = _contexto(dados_projeto)
     return [
-        ("I. Autoria", _valor(dados_ptt, "autoria")),
+        ("I. Autoria", _herdar(dados_ptt, ctx, "autoria", fallback=ctx["autoria"])),
         ("II. Tipo de produção", _valor(dados_ptt, "tipo")),
         ("III. Subtipo de produção", _valor(dados_ptt, "subtipo", "subtipo_producao")),
         ("IV. Título", _valor(dados_ptt, "titulo")),
-        ("V. Ano", _valor(dados_ptt, "ano")),
-        ("VI. Coautoria e categoria", _valor(dados_ptt, "coautoria")),
-        ("VII. Área de concentração", _AREA),
-        ("VIII. Linha de pesquisa", _LINHA),
-        ("IX. Projeto de pesquisa", _valor(dados_ptt, "projeto")),
+        ("V. Ano", _herdar(dados_ptt, ctx, "ano", fallback=ctx["ano"])),
+        ("VI. Coautoria e categoria", _herdar(dados_ptt, ctx, "coautores", "coautoria", fallback=ctx["coautoria"])),
+        ("VII. Área de concentração", _herdar(dados_ptt, ctx, "area_concentracao", fallback=ctx["area"])),
+        ("VIII. Linha de pesquisa", _herdar(dados_ptt, ctx, "linha_pesquisa", fallback=ctx["linha"])),
+        ("IX. Projeto de pesquisa", _herdar(dados_ptt, ctx, "projeto", fallback=ctx["projeto"])),
         ("X. Projeto com financiamento", _valor(dados_ptt, "financiamento")),
         ("XI. Financiador", _valor(dados_ptt, "financiador")),
         ("XII. Demanda", _valor(dados_ptt, "demanda")),
@@ -55,7 +87,7 @@ def formatar_ficha_22_itens(dados_ptt):
         ("XVII. Complexidade", _valor(dados_ptt, "complexidade")),
         ("XVIII. Justificativa da Complexidade", _valor(dados_ptt, "justificativa_complexidade")),
         ("XIX. Validação do Produto", _valor(dados_ptt, "validacao")),
-        ("XX. Modo de Divulgação", _valor(dados_ptt, "divulgacao")),
+        ("XX. Modo de Divulgação", _valor(dados_ptt, "divulgacao_url", "divulgacao")),
         ("XXI. Abrangência ou Inserção Social", _valor(dados_ptt, "abrangencia")),
         ("XXII. Público Usuário", _valor(dados_ptt, "publico_usuario")),
     ]

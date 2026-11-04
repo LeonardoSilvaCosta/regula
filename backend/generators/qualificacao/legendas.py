@@ -1,10 +1,10 @@
 """Legendas únicas de quadros, tabelas e produtos, usadas no corpo e nas listas."""
 
 LEGENDA_TABELA_1 = (
-    "Tabela 1. Distribuição Populacional da Coorte Viva e Alocação Amostral (n = 360)"
+    "Tabela 1 – Distribuição Populacional da Coorte Viva e Alocação Amostral (n = 360)"
 )
 LEGENDA_TABELA_2 = (
-    "Tabela 2. Métricas de Dispersão de Tokens por Prontuário e Limiares de Outliers (Método de Tukey)"
+    "Tabela 2 – Métricas de Dispersão de Tokens por Prontuário e Limiares de Outliers (Método de Tukey)"
 )
 
 BM_QUADRO_1 = "leg_quadro_1"

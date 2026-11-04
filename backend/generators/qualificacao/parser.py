@@ -1,5 +1,6 @@
 """Extrai seções, metadados e tabelas do .docx enviado pelo usuário."""
 
+import logging
 import os
 import re
 import unicodedata
@@ -9,6 +10,14 @@ from docx.oxml.ns import qn
 from docx.table import Table
 from docx.text.paragraph import Paragraph
 
+
+logger = logging.getLogger(__name__)
+
+_JUSTIFICATIVAS_50 = (
+    "justificativa_impacto",
+    "justificativa_inovacao",
+    "justificativa_complexidade",
+)
 
 _RE_NUMERO = re.compile(r"^(?:cap[ií]tulo\s+)?\d+(?:\.\d+)*\s*[-–.)]?\s*", re.IGNORECASE)
 _RE_ROTULO = re.compile(r"^(?P<chave>[^:]{2,60})\s*[:：]\s*(?P<valor>.*)$")
@@ -1048,6 +1057,17 @@ def parse_projeto_docx(caminho_docx):
                 "tecnologia", "dados", "algoritm", "software", "llm", "modelo",
             )):
                 meta_rotulos["linha_pesquisa"] = _LINHA_TECNOLOGIA
+
+    for indice, item in enumerate(ptts, start=1):
+        for campo in _JUSTIFICATIVAS_50:
+            quantidade = len(re.findall(r"\S+", str(item.get(campo) or "")))
+            if quantidade > 50:
+                logger.warning(
+                    "Produto %s: %s tem %s palavras (máximo de 50).",
+                    indice,
+                    campo,
+                    quantidade,
+                )
 
     for item in ptts:
         if not item.get("autoria"):

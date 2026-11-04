@@ -259,12 +259,18 @@ export interface components {
              * Ano
              * @default
              */
-            ano: string;
+            /** Vazio herda o ano do trabalho. */
+            ano: string | null;
             /**
              * Coautoria
              * @default
              */
             coautoria: string;
+            /**
+             * Coautores
+             * @default
+             */
+            coautores: string;
             /**
              * Projeto
              * @default
@@ -284,11 +290,9 @@ export interface components {
              * Demanda
              * @default
              */
+            /** @default Espontânea */
             demanda: string;
-            /**
-             * Impacto
-             * @default
-             */
+            /** @default Alto */
             impacto: string;
             /**
              * Justificativa Impacto
@@ -299,6 +303,7 @@ export interface components {
              * Inovacao
              * @default
              */
+            /** @default Alto */
             inovacao: string;
             /**
              * Justificativa Inovacao
@@ -309,6 +314,7 @@ export interface components {
              * Complexidade
              * @default
              */
+            /** @default Alta */
             complexidade: string;
             /**
              * Justificativa Complexidade
@@ -326,14 +332,13 @@ export interface components {
              */
             divulgacao: string;
             /**
-             * Abrangencia
+             * Divulgacao Url
              * @default
              */
+            divulgacao_url: string;
+            /** @default Local */
             abrangencia: string;
-            /**
-             * Publico Usuario
-             * @default
-             */
+            /** @default Estado, Município, Comunidade */
             publico_usuario: string;
         };
         /** PTTValidationResult */

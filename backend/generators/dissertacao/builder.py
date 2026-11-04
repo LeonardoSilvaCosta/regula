@@ -6,6 +6,7 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 
 from core.styles import apply_base_styles, set_page_margins, insert_brasao, insert_cabecalho_institucional
 from core.xml_utils import set_cell_border, add_page_number_field, configure_section_page_numbers
+from generators.common.referencias import renderizar_referencias
 from generators.qualificacao.parser import parse_projeto_docx
 
 def _campo(revisado, extraido, chave):
@@ -199,8 +200,6 @@ def gerar_documento_dissertacao(
     referencias = dados.get("referencias") or []
     if referencias:
         doc.add_page_break()
-        add_cap_title("REFERÊNCIAS")
-        for referencia in referencias:
-            add_body_p(referencia)
+        renderizar_referencias(doc, referencias, titulo="REFERÊNCIAS", bookmark="sec_referencias")
 
     doc.save(caminho_saida)

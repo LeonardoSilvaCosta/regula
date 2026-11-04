@@ -4,6 +4,7 @@ from docx.shared import Cm, Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from core.styles import apply_base_styles, set_page_margins, insert_brasao, insert_cabecalho_institucional
+from generators.common.referencias import renderizar_referencias
 from generators.qualificacao.parser import parse_projeto_docx
 from core.xml_utils import add_page_number_field, configure_section_page_numbers
 
@@ -167,7 +168,9 @@ def gerar_documento_tese(
         add_sec_title(secao.get("titulo") or "Seção")
         for paragrafo in secao.get("paragrafos") or []:
             add_body_p(paragrafo)
-    for referencia in dados.get("referencias") or []:
-        add_body_p(referencia)
+    referencias = dados.get("referencias") or []
+    if referencias:
+        doc.add_page_break()
+        renderizar_referencias(doc, referencias, titulo="REFERÊNCIAS", bookmark="sec_referencias")
 
     doc.save(caminho_saida)

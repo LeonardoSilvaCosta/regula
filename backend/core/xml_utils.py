@@ -21,7 +21,7 @@ def aplicar_estilo_tabela_ibge(tabela):
         elemento = OxmlElement(f"w:{aresta}")
         elemento.set(qn("w:val"), valor)
         if valor == "single":
-            elemento.set(qn("w:sz"), "8")
+            elemento.set(qn("w:sz"), "4")
             elemento.set(qn("w:space"), "0")
             elemento.set(qn("w:color"), "000000")
         bordas.append(elemento)
@@ -35,7 +35,7 @@ def aplicar_estilo_tabela_ibge(tabela):
         tcBorders = OxmlElement("w:tcBorders")
         inferior = OxmlElement("w:bottom")
         inferior.set(qn("w:val"), "single")
-        inferior.set(qn("w:sz"), "8")
+        inferior.set(qn("w:sz"), "4")
         inferior.set(qn("w:space"), "0")
         inferior.set(qn("w:color"), "000000")
         tcBorders.append(inferior)

@@ -45,6 +45,11 @@ const INSTITUICAO_ORIENTADOR_PLACEHOLDER = "Universidade Federal do Pará";
 const COORDENADOR_PLACEHOLDER = "Prof. Dr. Edson Marcos Leal Soares Ramos";
 const ORIENTADOR_PLACEHOLDER = "Prof. Dr. Renato Hidaka Torres";
 const IMPACTOS = ["Alto", "Médio", "Baixo"] as const;
+const INOVACOES = ["Alto", "Médio", "Baixo"] as const;
+const COMPLEXIDADES = ["Alta", "Média", "Baixa"] as const;
+const DEMANDAS = ["Espontânea", "Contratada", "Edital-concorrência"] as const;
+const ABRANGENCIAS = ["Local", "Regional", "Nacional", "Internacional"] as const;
+const LIMITE_PALAVRAS = 50;
 
 const TIPOS_PTT = [
   { tipo: "Material Didático", subtipo: "Infográfico" },
@@ -87,23 +92,39 @@ const PTT_VAZIO: PTTItem = {
   tipo: "",
   subtipo: "",
   titulo: "",
-  ano: "",
+  ano: null,
   coautoria: "",
+  coautores: "",
   projeto: "",
   financiamento: "",
   financiador: "",
-  demanda: "",
-  impacto: "",
+  demanda: "Espontânea",
+  impacto: "Alto",
   justificativa_impacto: "",
-  inovacao: "",
+  inovacao: "Alto",
   justificativa_inovacao: "",
-  complexidade: "",
+  complexidade: "Alta",
   justificativa_complexidade: "",
   validacao: "",
   divulgacao: "",
-  abrangencia: "",
-  publico_usuario: "",
+  divulgacao_url: "",
+  abrangencia: "Local",
+  publico_usuario: "Estado, Município, Comunidade",
 };
+
+function contarPalavras(texto: string) {
+  const limpo = texto.trim();
+  if (!limpo) return 0;
+  return limpo.split(/\s+/).length;
+}
+
+function coautoriaDocente(orientador: string, coorientador: string) {
+  return [orientador, coorientador]
+    .map((nome) => nome.trim())
+    .filter(Boolean)
+    .map((nome) => `${nome} - Docente`)
+    .join("; ");
+}
 
 function impactoSelecionado(impacto: string): "" | (typeof IMPACTOS)[number] {
   const faixa = faixaImpacto(impacto);
@@ -133,6 +154,34 @@ function funcaoCanonico(funcao: string) {
   if (papel.includes("orient")) return "Orientador(a)";
   if (papel.includes("extern")) return "Avaliador(a) Externo(a)";
   return "Avaliador(a) Interno(a)";
+}
+
+function Justificativa({
+  rotulo,
+  valor,
+  onChange,
+}: {
+  rotulo: string;
+  valor: string;
+  onChange: (valor: string) => void;
+}) {
+  const palavras = contarPalavras(valor);
+  const estourou = palavras > LIMITE_PALAVRAS;
+  return (
+    <label className="block text-xs text-[#6b645a]">
+      {rotulo}
+      <textarea
+        rows={3}
+        className={`mt-1 w-full rounded-md border px-2 py-1.5 text-sm ${estourou ? "border-red-700" : "border-[#d9d1c3]"}`}
+        value={valor}
+        onChange={(event) => onChange(event.target.value)}
+      />
+      <span className={`mt-1 block ${estourou ? "font-medium text-red-800" : "text-[#6b645a]"}`}>
+        {palavras}/{LIMITE_PALAVRAS} palavras
+        {estourou ? " — acima do limite da Resolução 007/2025" : ""}
+      </span>
+    </label>
+  );
 }
 
 export function Step3MetadataReview({
@@ -209,6 +258,19 @@ export function Step3MetadataReview({
     const ptts = data.ptts.map((item, i) => (i === index ? { ...item, ...partial } : item));
     onChange({ ...data, ptts });
   }
+
+  const sugestaoCoautoria = coautoriaDocente(data.metadata.orientador, data.metadata.coorientador);
+
+  useEffect(() => {
+    if (!sugestaoCoautoria) return;
+    const ptts = data.ptts.map((item) => {
+      if ((item.coautores || item.coautoria || "").trim()) return item;
+      return { ...item, coautores: sugestaoCoautoria, coautoria: sugestaoCoautoria };
+    });
+    if (ptts.some((item, indice) => item !== data.ptts[indice])) {
+      onChange({ ...data, ptts });
+    }
+  }, [data, onChange, sugestaoCoautoria]);
 
   function patchSection(chave: keyof DocumentSections, valor: string | string[]) {
     const sections = { ...data.sections, [chave]: valor };
@@ -654,84 +716,260 @@ export function Step3MetadataReview({
           {data.ptts.length === 0 ? (
             <p className="text-sm text-[#5c564c]">Nenhum produto técnico foi extraído.</p>
           ) : (
-            <ul className="flex flex-col gap-3">
-              {data.ptts.map((item, index) => (
-                <li key={`${item.num}-${index}`} className="grid gap-2 rounded-lg border border-[#efe8dc] p-3 sm:grid-cols-2">
-                  <div className="sm:col-span-2">
-                    <p className="text-xs text-[#6b645a]">{item.num || `PTT ${index + 1}`}</p>
-                    <input
-                      aria-label="Título do produto"
-                      className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
-                      value={item.titulo || item.nome}
-                      onChange={(event) => patchPtt(index, { titulo: event.target.value })}
-                    />
-                  </div>
-                  <label className="text-xs text-[#6b645a]">
-                    Tipo
-                    <select
-                      className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
-                      value={item.tipo}
-                      onChange={(event) => {
-                        const par = TIPOS_PTT.find((opcao) => opcao.tipo === event.target.value);
-                        patchPtt(index, { tipo: event.target.value, subtipo: par?.subtipo ?? item.subtipo });
-                      }}
-                    >
-                      <option value="">Selecione</option>
-                      {item.tipo && !TIPOS_PTT.some((opcao) => opcao.tipo === item.tipo) ? (
-                        <option value={item.tipo}>{item.tipo}</option>
-                      ) : null}
-                      {TIPOS_PTT.map((opcao) => (
-                        <option key={opcao.tipo} value={opcao.tipo}>
-                          {opcao.tipo}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="text-xs text-[#6b645a]">
-                    Subtipo
-                    <select
-                      className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
-                      value={item.subtipo}
-                      onChange={(event) => patchPtt(index, { subtipo: event.target.value })}
-                    >
-                      <option value="">Selecione</option>
-                      {item.subtipo && !TIPOS_PTT.some((opcao) => opcao.subtipo === item.subtipo) ? (
-                        <option value={item.subtipo}>{item.subtipo}</option>
-                      ) : null}
-                      {TIPOS_PTT.map((opcao) => (
-                        <option key={opcao.subtipo} value={opcao.subtipo}>
-                          {opcao.subtipo}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="text-xs text-[#6b645a]">
-                    Impacto
-                    <select
-                      required
-                      className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
-                      value={impactoSelecionado(item.impacto)}
-                      onChange={(event) => patchPtt(index, { impacto: event.target.value })}
-                    >
-                      <option value="" disabled>
-                        Selecione
-                      </option>
-                      {IMPACTOS.map((valor) => (
-                        <option key={valor} value={valor}>
-                          {valor}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <button
-                    type="button"
-                    className="self-end justify-self-start pb-1.5 text-sm text-red-800"
-                    onClick={() => onChange({ ...data, ptts: data.ptts.filter((_, i) => i !== index) })}
-                  >
-                    Remover
-                  </button>
-                </li>
-              ))}
+            <ul className="flex flex-col gap-4">
+              {data.ptts.map((item, index) => {
+                const coautores = item.coautores || item.coautoria;
+                const divulgacao = item.divulgacao_url || item.divulgacao;
+                return (
+                  <li key={`${item.num}-${index}`} className="rounded-lg border border-[#efe8dc] p-3">
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold text-[#0f3d32]">{item.num || `PTT ${index + 1}`}</p>
+                      <button
+                        type="button"
+                        className="text-sm text-red-800"
+                        onClick={() => onChange({ ...data, ptts: data.ptts.filter((_, i) => i !== index) })}
+                      >
+                        Remover
+                      </button>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <details open className="rounded-lg border border-[#efe8dc] p-3">
+                        <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">Dados Básicos</summary>
+                        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                          <p className="text-xs text-[#6b645a] sm:col-span-2">
+                            Autoria, área, linha e projeto saem dos dados gerais quando ficam em branco aqui.
+                            Autoria atual: {data.metadata.autor || "—"}.
+                          </p>
+                          <label className="text-xs text-[#6b645a] sm:col-span-2">
+                            Título
+                            <input
+                              aria-label="Título do produto"
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              value={item.titulo || item.nome}
+                              onChange={(event) => patchPtt(index, { titulo: event.target.value, nome: event.target.value })}
+                            />
+                          </label>
+                          <label className="text-xs text-[#6b645a]">
+                            Tipo
+                            <select
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              value={item.tipo}
+                              onChange={(event) => {
+                                const par = TIPOS_PTT.find((opcao) => opcao.tipo === event.target.value);
+                                patchPtt(index, { tipo: event.target.value, subtipo: par?.subtipo ?? item.subtipo });
+                              }}
+                            >
+                              <option value="">Selecione</option>
+                              {item.tipo && !TIPOS_PTT.some((opcao) => opcao.tipo === item.tipo) ? (
+                                <option value={item.tipo}>{item.tipo}</option>
+                              ) : null}
+                              {TIPOS_PTT.map((opcao) => (
+                                <option key={opcao.tipo} value={opcao.tipo}>
+                                  {opcao.tipo}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label className="text-xs text-[#6b645a]">
+                            Subtipo
+                            <select
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              value={item.subtipo}
+                              onChange={(event) => patchPtt(index, { subtipo: event.target.value })}
+                            >
+                              <option value="">Selecione</option>
+                              {item.subtipo && !TIPOS_PTT.some((opcao) => opcao.subtipo === item.subtipo) ? (
+                                <option value={item.subtipo}>{item.subtipo}</option>
+                              ) : null}
+                              {TIPOS_PTT.map((opcao) => (
+                                <option key={opcao.subtipo} value={opcao.subtipo}>
+                                  {opcao.subtipo}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label className="text-xs text-[#6b645a]">
+                            Ano
+                            <input
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              placeholder={data.metadata.ano || "Ano do trabalho"}
+                              value={item.ano ?? ""}
+                              onChange={(event) => patchPtt(index, { ano: event.target.value || null })}
+                            />
+                          </label>
+                          <label className="text-xs text-[#6b645a]">
+                            Demanda
+                            <select
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              value={item.demanda || "Espontânea"}
+                              onChange={(event) => patchPtt(index, { demanda: event.target.value })}
+                            >
+                              {DEMANDAS.map((valor) => (
+                                <option key={valor} value={valor}>
+                                  {valor}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label className="text-xs text-[#6b645a] sm:col-span-2">
+                            Coautoria e categoria
+                            <input
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              placeholder="Nome Orientador - Docente"
+                              value={coautores}
+                              onChange={(event) =>
+                                patchPtt(index, { coautores: event.target.value, coautoria: event.target.value })
+                              }
+                            />
+                          </label>
+                          <label className="text-xs text-[#6b645a] sm:col-span-2">
+                            Projeto de pesquisa
+                            <input
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              placeholder={data.metadata.titulo}
+                              value={item.projeto}
+                              onChange={(event) => patchPtt(index, { projeto: event.target.value })}
+                            />
+                          </label>
+                          <label className="text-xs text-[#6b645a]">
+                            Financiamento
+                            <input
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              value={item.financiamento}
+                              onChange={(event) => patchPtt(index, { financiamento: event.target.value })}
+                            />
+                          </label>
+                          <label className="text-xs text-[#6b645a]">
+                            Financiador
+                            <input
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              value={item.financiador}
+                              onChange={(event) => patchPtt(index, { financiador: event.target.value })}
+                            />
+                          </label>
+                        </div>
+                      </details>
+
+                      <details className="rounded-lg border border-[#efe8dc] p-3">
+                        <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">
+                          Avaliação Técnica - 50 palavras
+                        </summary>
+                        <div className="mt-3 grid gap-3">
+                          <label className="text-xs text-[#6b645a]">
+                            Impacto
+                            <select
+                              required
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              value={impactoSelecionado(item.impacto)}
+                              onChange={(event) => patchPtt(index, { impacto: event.target.value })}
+                            >
+                              <option value="" disabled>
+                                Selecione
+                              </option>
+                              {IMPACTOS.map((valor) => (
+                                <option key={valor} value={valor}>
+                                  {valor}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <Justificativa
+                            rotulo="Justificativa do impacto"
+                            valor={item.justificativa_impacto}
+                            onChange={(valor) => patchPtt(index, { justificativa_impacto: valor })}
+                          />
+                          <label className="text-xs text-[#6b645a]">
+                            Inovação
+                            <select
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              value={item.inovacao || "Alto"}
+                              onChange={(event) => patchPtt(index, { inovacao: event.target.value })}
+                            >
+                              {INOVACOES.map((valor) => (
+                                <option key={valor} value={valor}>
+                                  {valor}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <Justificativa
+                            rotulo="Justificativa da inovação"
+                            valor={item.justificativa_inovacao}
+                            onChange={(valor) => patchPtt(index, { justificativa_inovacao: valor })}
+                          />
+                          <label className="text-xs text-[#6b645a]">
+                            Complexidade
+                            <select
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              value={item.complexidade || "Alta"}
+                              onChange={(event) => patchPtt(index, { complexidade: event.target.value })}
+                            >
+                              {COMPLEXIDADES.map((valor) => (
+                                <option key={valor} value={valor}>
+                                  {valor}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <Justificativa
+                            rotulo="Justificativa da complexidade"
+                            valor={item.justificativa_complexidade}
+                            onChange={(valor) => patchPtt(index, { justificativa_complexidade: valor })}
+                          />
+                        </div>
+                      </details>
+
+                      <details className="rounded-lg border border-[#efe8dc] p-3">
+                        <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">Validação e Inserção</summary>
+                        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                          <label className="text-xs text-[#6b645a] sm:col-span-2">
+                            Validação do produto
+                            <input
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              placeholder="Publicado no Portal EduCapes, Registro INPI"
+                              value={item.validacao}
+                              onChange={(event) => patchPtt(index, { validacao: event.target.value })}
+                            />
+                          </label>
+                          <label className="text-xs text-[#6b645a] sm:col-span-2">
+                            Modo de divulgação
+                            <input
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              placeholder="https://"
+                              value={divulgacao}
+                              onChange={(event) =>
+                                patchPtt(index, { divulgacao_url: event.target.value, divulgacao: event.target.value })
+                              }
+                            />
+                          </label>
+                          <label className="text-xs text-[#6b645a]">
+                            Abrangência
+                            <select
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              value={item.abrangencia || "Local"}
+                              onChange={(event) => patchPtt(index, { abrangencia: event.target.value })}
+                            >
+                              {ABRANGENCIAS.map((valor) => (
+                                <option key={valor} value={valor}>
+                                  {valor}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label className="text-xs text-[#6b645a]">
+                            Público usuário
+                            <input
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              value={item.publico_usuario}
+                              onChange={(event) => patchPtt(index, { publico_usuario: event.target.value })}
+                            />
+                          </label>
+                        </div>
+                      </details>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
           <button
@@ -745,8 +983,15 @@ export function Step3MetadataReview({
                   {
                     ...PTT_VAZIO,
                     autoria: data.metadata.autor,
-                    ano: data.metadata.ano,
+                    ano: data.metadata.ano || null,
+                    coautores: sugestaoCoautoria,
+                    coautoria: sugestaoCoautoria,
                     impacto: "Alto",
+                    inovacao: "Alto",
+                    complexidade: "Alta",
+                    demanda: "Espontânea",
+                    abrangencia: "Local",
+                    publico_usuario: "Estado, Município, Comunidade",
                     projeto: data.metadata.titulo,
                   },
                 ],
