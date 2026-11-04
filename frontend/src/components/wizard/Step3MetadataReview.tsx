@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { Card } from "@/components/ui/Card";
-import type { ParseResponse, PTTItem } from "@/lib/api";
+import type { DocumentSections, ParseResponse, PTTItem } from "@/lib/api";
 import { faixaImpacto } from "@/lib/ptt";
 import type { components } from "@/types/api";
 
@@ -26,8 +26,9 @@ function linhaOficial(valor: string): LinhaPesquisa | "" {
 const ABAS = [
   { id: "gerais", label: "Dados gerais" },
   { id: "banca", label: "Orientação e banca" },
+  { id: "secoes", label: "Seções do trabalho" },
+  { id: "siglas", label: "Siglas" },
   { id: "ptts", label: "Produtos técnicos" },
-  { id: "siglas", label: "Abreviaturas e siglas" },
 ] as const;
 
 type Aba = (typeof ABAS)[number]["id"];
@@ -44,6 +45,40 @@ const INSTITUICAO_ORIENTADOR_PLACEHOLDER = "Universidade Federal do Pará";
 const COORDENADOR_PLACEHOLDER = "Prof. Dr. Edson Marcos Leal Soares Ramos";
 const ORIENTADOR_PLACEHOLDER = "Prof. Dr. Renato Hidaka Torres";
 const IMPACTOS = ["Alto", "Médio", "Baixo"] as const;
+
+const TIPOS_PTT = [
+  { tipo: "Material Didático", subtipo: "Infográfico" },
+  { tipo: "Software Registrável", subtipo: "Software" },
+  { tipo: "Base de Dados", subtipo: "Base de Dados" },
+  { tipo: "Manual/Protocolo", subtipo: "Codebook" },
+] as const;
+
+const CAMPOS_PARAGRAFOS = [
+  "apresentacao",
+  "introducao",
+  "justificativa",
+  "problema",
+  "revisao",
+  "objetivos_especificos",
+  "hipotese",
+  "metodologia_natureza",
+  "metodologia_fontes",
+  "metodologia_coleta",
+  "referencias",
+] as const satisfies readonly (keyof DocumentSections)[];
+
+type CampoParagrafos = (typeof CAMPOS_PARAGRAFOS)[number];
+
+function paragrafosParaTexto(valor: string[] | undefined) {
+  return (valor ?? []).join("\n\n");
+}
+
+function textoParaParagrafos(valor: string) {
+  return valor
+    .split("\n\n")
+    .map((paragrafo) => paragrafo.trim())
+    .filter(Boolean);
+}
 
 const PTT_VAZIO: PTTItem = {
   num: "",
@@ -173,6 +208,16 @@ export function Step3MetadataReview({
   function patchPtt(index: number, partial: Partial<PTTItem>) {
     const ptts = data.ptts.map((item, i) => (i === index ? { ...item, ...partial } : item));
     onChange({ ...data, ptts });
+  }
+
+  function patchSection(chave: keyof DocumentSections, valor: string | string[]) {
+    const sections = { ...data.sections, [chave]: valor };
+    onChange({ ...data, sections });
+  }
+
+  function valorParagrafos(chave: CampoParagrafos) {
+    const atual = data.sections?.[chave];
+    return Array.isArray(atual) ? atual : [];
   }
 
   return (
@@ -425,6 +470,185 @@ export function Step3MetadataReview({
         </Card>
       )}
 
+      {aba === "secoes" && (
+        <Card title="Seções do trabalho">
+          <div className="flex flex-col gap-3">
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">
+                Apresentação e contexto <span className="font-normal text-[#6b645a]">(opcional)</span>
+              </summary>
+              <label className="mt-3 block text-sm">
+                Trajetória e percurso do autor
+                <textarea
+                  rows={5}
+                  className={campo}
+                  value={paragrafosParaTexto(valorParagrafos("apresentacao"))}
+                  onChange={(event) => patchSection("apresentacao", textoParaParagrafos(event.target.value))}
+                />
+              </label>
+            </details>
+
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">1. Considerações gerais</summary>
+              <div className="mt-3 flex flex-col gap-4">
+                <label className="text-sm">
+                  Contextualização e justificativa do tema
+                  <textarea
+                    rows={5}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("introducao"))}
+                    onChange={(event) => patchSection("introducao", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+                <label className="text-sm">
+                  Relevância institucional e acadêmica
+                  <textarea
+                    rows={5}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("justificativa"))}
+                    onChange={(event) => patchSection("justificativa", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+                <label className="text-sm">
+                  Problema de pesquisa / questão central
+                  <textarea
+                    rows={4}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("problema"))}
+                    onChange={(event) => patchSection("problema", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+                <label className="text-sm">
+                  Referencial teórico / estado da arte
+                  <textarea
+                    rows={5}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("revisao"))}
+                    onChange={(event) => patchSection("revisao", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+              </div>
+            </details>
+
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">2. Objetivos e hipótese</summary>
+              <div className="mt-3 flex flex-col gap-4">
+                <label className="text-sm">
+                  Objetivo geral
+                  <input
+                    className={campo}
+                    value={data.sections?.objetivo_geral ?? ""}
+                    onChange={(event) => patchSection("objetivo_geral", event.target.value)}
+                  />
+                </label>
+                <label className="text-sm">
+                  Objetivos específicos
+                  <span className="block text-xs text-[#6b645a]">Um objetivo por parágrafo.</span>
+                  <textarea
+                    rows={5}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("objetivos_especificos"))}
+                    onChange={(event) => patchSection("objetivos_especificos", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+                <label className="text-sm">
+                  Hipóteses ou questões norteadoras
+                  <textarea
+                    rows={4}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("hipotese"))}
+                    onChange={(event) => patchSection("hipotese", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+              </div>
+            </details>
+
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">4. Metodologia</summary>
+              <div className="mt-3 flex flex-col gap-4">
+                <label className="text-sm">
+                  Tipo e tipificação da pesquisa
+                  <textarea
+                    rows={4}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("metodologia_natureza"))}
+                    onChange={(event) => patchSection("metodologia_natureza", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+                <label className="text-sm">
+                  Lócus institucional
+                  <textarea
+                    rows={3}
+                    className={campo}
+                    value={data.sections?.metodologia_locus ?? ""}
+                    onChange={(event) => patchSection("metodologia_locus", event.target.value)}
+                  />
+                </label>
+                <label className="text-sm">
+                  Universo e amostragem
+                  <textarea
+                    rows={3}
+                    className={campo}
+                    value={data.sections?.metodologia_participantes ?? ""}
+                    onChange={(event) => patchSection("metodologia_participantes", event.target.value)}
+                  />
+                </label>
+                <label className="text-sm">
+                  Fontes de dados
+                  <textarea
+                    rows={4}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("metodologia_fontes"))}
+                    onChange={(event) => patchSection("metodologia_fontes", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+                <label className="text-sm">
+                  Procedimentos de coleta/mineração
+                  <textarea
+                    rows={4}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("metodologia_coleta"))}
+                    onChange={(event) => patchSection("metodologia_coleta", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+                <label className="text-sm">
+                  Salvaguardas éticas e LGPD
+                  <textarea
+                    rows={3}
+                    className={campo}
+                    value={data.sections?.metodologia_etica ?? ""}
+                    onChange={(event) => patchSection("metodologia_etica", event.target.value)}
+                  />
+                </label>
+                <label className="text-sm">
+                  Análise de dados e modelagem
+                  <textarea
+                    rows={3}
+                    className={campo}
+                    value={data.sections?.metodologia_analise ?? ""}
+                    onChange={(event) => patchSection("metodologia_analise", event.target.value)}
+                  />
+                </label>
+              </div>
+            </details>
+
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">Referências</summary>
+              <label className="mt-3 block text-sm">
+                Lista de referências em normas ABNT
+                <span className="block text-xs text-[#6b645a]">Uma referência por parágrafo.</span>
+                <textarea
+                  rows={8}
+                  className={campo}
+                  value={paragrafosParaTexto(valorParagrafos("referencias"))}
+                  onChange={(event) => patchSection("referencias", textoParaParagrafos(event.target.value))}
+                />
+              </label>
+            </details>
+          </div>
+        </Card>
+      )}
+
       {aba === "ptts" && (
         <Card title="Produtos técnicos (PTTs)">
           {data.ptts.length === 0 ? (
@@ -432,8 +656,8 @@ export function Step3MetadataReview({
           ) : (
             <ul className="flex flex-col gap-3">
               {data.ptts.map((item, index) => (
-                <li key={`${item.num}-${index}`} className="grid gap-2 rounded-lg border border-[#efe8dc] p-3 sm:grid-cols-[1fr_9rem_auto]">
-                  <div>
+                <li key={`${item.num}-${index}`} className="grid gap-2 rounded-lg border border-[#efe8dc] p-3 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
                     <p className="text-xs text-[#6b645a]">{item.num || `PTT ${index + 1}`}</p>
                     <input
                       aria-label="Título do produto"
@@ -442,6 +666,45 @@ export function Step3MetadataReview({
                       onChange={(event) => patchPtt(index, { titulo: event.target.value })}
                     />
                   </div>
+                  <label className="text-xs text-[#6b645a]">
+                    Tipo
+                    <select
+                      className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                      value={item.tipo}
+                      onChange={(event) => {
+                        const par = TIPOS_PTT.find((opcao) => opcao.tipo === event.target.value);
+                        patchPtt(index, { tipo: event.target.value, subtipo: par?.subtipo ?? item.subtipo });
+                      }}
+                    >
+                      <option value="">Selecione</option>
+                      {item.tipo && !TIPOS_PTT.some((opcao) => opcao.tipo === item.tipo) ? (
+                        <option value={item.tipo}>{item.tipo}</option>
+                      ) : null}
+                      {TIPOS_PTT.map((opcao) => (
+                        <option key={opcao.tipo} value={opcao.tipo}>
+                          {opcao.tipo}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="text-xs text-[#6b645a]">
+                    Subtipo
+                    <select
+                      className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                      value={item.subtipo}
+                      onChange={(event) => patchPtt(index, { subtipo: event.target.value })}
+                    >
+                      <option value="">Selecione</option>
+                      {item.subtipo && !TIPOS_PTT.some((opcao) => opcao.subtipo === item.subtipo) ? (
+                        <option value={item.subtipo}>{item.subtipo}</option>
+                      ) : null}
+                      {TIPOS_PTT.map((opcao) => (
+                        <option key={opcao.subtipo} value={opcao.subtipo}>
+                          {opcao.subtipo}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                   <label className="text-xs text-[#6b645a]">
                     Impacto
                     <select
@@ -462,7 +725,7 @@ export function Step3MetadataReview({
                   </label>
                   <button
                     type="button"
-                    className="self-end pb-1.5 text-sm text-red-800"
+                    className="self-end justify-self-start pb-1.5 text-sm text-red-800"
                     onClick={() => onChange({ ...data, ptts: data.ptts.filter((_, i) => i !== index) })}
                   >
                     Remover
@@ -474,7 +737,21 @@ export function Step3MetadataReview({
           <button
             type="button"
             className="mt-3 text-sm font-medium text-[#0f3d32]"
-            onClick={() => onChange({ ...data, ptts: [...data.ptts, { ...PTT_VAZIO }] })}
+            onClick={() =>
+              onChange({
+                ...data,
+                ptts: [
+                  ...data.ptts,
+                  {
+                    ...PTT_VAZIO,
+                    autoria: data.metadata.autor,
+                    ano: data.metadata.ano,
+                    impacto: "Alto",
+                    projeto: data.metadata.titulo,
+                  },
+                ],
+              })
+            }
           >
             Adicionar produto
           </button>
