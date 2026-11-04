@@ -56,7 +56,7 @@ def ancorar_paragrafo(paragraph, texto, bookmark=None):
         adicionar_bookmark(paragraph, nome)
 
 
-def _run_times(tamanho_meio_pontos="24"):
+def _run_times(tamanho_meio_pontos="24", italico=False):
     run = OxmlElement("w:r")
     rpr = OxmlElement("w:rPr")
     fontes = OxmlElement("w:rFonts")
@@ -70,35 +70,46 @@ def _run_times(tamanho_meio_pontos="24"):
     rpr.append(fontes)
     rpr.append(sz)
     rpr.append(sz_cs)
+    if italico:
+        ital = OxmlElement("w:i")
+        rpr.append(ital)
+        ital_cs = OxmlElement("w:iCs")
+        rpr.append(ital_cs)
     run.append(rpr)
     return run
 
 
-def adicionar_campo_pageref(paragraph, bookmark):
-    """Campo PAGEREF. O Word recalcula a página ao abrir o arquivo."""
-    r_inicio = _run_times()
+def adicionar_campo_pageref(paragraph, bookmark, italico=False, formato=None):
+    """Campo PAGEREF. O Word recalcula a página ao abrir o arquivo.
+
+    `formato` é um comutador do Word (ex.: ``roman`` para algarismos minúsculos).
+    """
+    r_inicio = _run_times(italico=italico)
     fld_inicio = OxmlElement("w:fldChar")
     fld_inicio.set(qn("w:fldCharType"), "begin")
     fld_inicio.set(qn("w:dirty"), "true")
     r_inicio.append(fld_inicio)
 
-    r_instr = _run_times()
+    r_instr = _run_times(italico=italico)
     instr = OxmlElement("w:instrText")
     instr.set(qn("xml:space"), "preserve")
-    instr.text = f" PAGEREF {bookmark} \\h "
+    comando = f" PAGEREF {bookmark} \\h "
+    if formato:
+        comando = f" PAGEREF {bookmark} \\h \\* {formato} "
+    instr.text = comando
     r_instr.append(instr)
 
-    r_sep = _run_times()
+    r_sep = _run_times(italico=italico)
     fld_sep = OxmlElement("w:fldChar")
     fld_sep.set(qn("w:fldCharType"), "separate")
     r_sep.append(fld_sep)
 
-    r_texto = _run_times()
+    r_texto = _run_times(italico=italico)
     texto = OxmlElement("w:t")
     texto.text = "0"
     r_texto.append(texto)
 
-    r_fim = _run_times()
+    r_fim = _run_times(italico=italico)
     fld_fim = OxmlElement("w:fldChar")
     fld_fim.set(qn("w:fldCharType"), "end")
     r_fim.append(fld_fim)

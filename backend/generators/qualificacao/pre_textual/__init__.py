@@ -4,7 +4,7 @@ from .folha_rosto import build_folha_rosto
 from .folha_aprovacao import build_folha_aprovacao
 from .listas_ilustracoes import build_lista_ilustracoes
 from .listas_siglas import build_lista_siglas
-from .listas_simbolos import build_lista_simbolos
+from .simbolos import build_lista_simbolos
 from .sumario import build_sumario
 
 def build_todos_pre_textuais(doc, metadata, assets_dir="assets"):
@@ -41,10 +41,10 @@ def build_todos_pre_textuais(doc, metadata, assets_dir="assets"):
         (LEGENDA_TABELA_1, BM_TABELA_1),
         (LEGENDA_TABELA_2, BM_TABELA_2),
     ])
-    build_lista_siglas(doc, metadata.get("siglas", []))
+    build_lista_siglas(doc, metadata.get("siglas", []), quebrar=False)
 
     if metadata.get("simbolos"):
-        build_lista_simbolos(doc, metadata)
+        build_lista_simbolos(doc, metadata, quebrar=False)
 
     build_sumario(doc, {"metadata": metadata, "projeto": metadata.get("projeto", {}), "resultados": {}})
 

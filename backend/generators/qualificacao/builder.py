@@ -35,7 +35,7 @@ from .pre_textual.folha_rosto import build_folha_rosto
 from .pre_textual.folha_aprovacao import build_folha_aprovacao
 from .pre_textual.listas_ilustracoes import build_lista_ilustracoes
 from .pre_textual.listas_siglas import build_lista_siglas, normalizar_siglas
-from .pre_textual.listas_simbolos import build_lista_simbolos
+from .pre_textual.simbolos import build_lista_simbolos, normalizar_simbolos
 from .pre_textual.sumario import build_sumario
 from .estrutura import numeracao_secoes
 from .textual.apresentacao import build_apresentacao, build_quadro_estrutura
@@ -242,7 +242,6 @@ def gerar_documento_qualificacao(
     sec_2 = doc.add_section(WD_SECTION.NEW_PAGE)
     _paginar(sec_2, "roman", 4)
 
-    listas_sumario = []
     iniciado = False
 
     def abrir_elemento():
@@ -254,17 +253,19 @@ def gerar_documento_qualificacao(
     ilustracoes = list(quadros) + list(tabelas)
     if ilustracoes:
         abrir_elemento()
-        listas_sumario.extend(build_lista_ilustracoes(doc, ilustracoes, quebrar=False))
+        build_lista_ilustracoes(doc, ilustracoes)
+        # A lista já encerra com uma quebra; o próximo elemento não deve inserir outra.
+        iniciado = False
     if normalizar_siglas(siglas):
         abrir_elemento()
-        entrada = build_lista_siglas(doc, siglas, quebrar=False)
-        if entrada:
-            listas_sumario.append(entrada)
-    if simbolos:
+        build_lista_siglas(doc, siglas, quebrar=False)
+        # A lista já encerra com uma quebra; o próximo elemento não deve inserir outra.
+        iniciado = False
+    if normalizar_simbolos(simbolos):
         abrir_elemento()
-        entrada = build_lista_simbolos(doc, simbolos, quebrar=False)
-        if entrada:
-            listas_sumario.append(entrada)
+        build_lista_simbolos(doc, simbolos, quebrar=False)
+        # A lista já encerra com uma quebra; o próximo elemento não deve inserir outra.
+        iniciado = False
 
     abrir_elemento()
     build_sumario(
@@ -272,14 +273,14 @@ def gerar_documento_qualificacao(
         dados,
         apendices=apendices,
         anexos=anexos,
-        listas=listas_sumario,
         quebrar=False,
     )
 
     # =========================================================================
-    # SEÇÃO 3: Parte textual, a partir da Apresentação (arábica, a partir de 1)
+    # SEÇÃO 3: Parte textual, a partir da Apresentação (arábica, a partir de 1).
+    # O sumário já fecha com quebra de página; a seção contínua evita página em branco.
     # =========================================================================
-    sec_3 = doc.add_section(WD_SECTION.NEW_PAGE)
+    sec_3 = doc.add_section(WD_SECTION.CONTINUOUS)
     _paginar(sec_3, "decimal", 1)
     numeros = numeracao_secoes(dados["projeto"])
 
