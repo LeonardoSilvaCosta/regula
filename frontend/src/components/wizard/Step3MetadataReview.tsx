@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Card } from "@/components/ui/Card";
 import type { ParseResponse, PTTItem } from "@/lib/api";
@@ -9,6 +9,19 @@ import type { components } from "@/types/api";
 
 type Metadata = components["schemas"]["DocumentMetadata"];
 type BancaMember = components["schemas"]["BancaMember"];
+
+export const AREA_CONCENTRACAO_PADRAO = "Segurança Pública, Justiça, Conflitos e Cidadania";
+
+export const LINHAS_PESQUISA = [
+  "Políticas, Gestão, Direitos Humanos, Criminalidade e Tecnologia da Informação",
+  "Segurança Pública, Criminologia e Sistema de Justiça Criminal",
+] as const;
+
+type LinhaPesquisa = (typeof LINHAS_PESQUISA)[number];
+
+function linhaOficial(valor: string): LinhaPesquisa | "" {
+  return LINHAS_PESQUISA.find((linha) => linha === valor) ?? "";
+}
 
 const ABAS = [
   { id: "gerais", label: "Dados gerais" },
@@ -27,8 +40,6 @@ const SUBTITULO_PLACEHOLDER =
   "Modelos de aprendizado de máquina para predição de desfechos relacionados à saúde mental de policiais militares do Pará a partir de prontuários psicossociais";
 const AUTOR_PLACEHOLDER = "Leonardo da Silva Costa";
 const ANO_PLACEHOLDER = "2026";
-const AREA_PLACEHOLDER = "Segurança Pública, Justiça, Conflitos e Cidadania";
-const LINHA_PLACEHOLDER = "Políticas, Gestão, Direitos Humanos, Criminalidade e Tecnologia da Informação";
 const INSTITUICAO_ORIENTADOR_PLACEHOLDER = "Universidade Federal do Pará";
 const COORDENADOR_PLACEHOLDER = "Prof. Dr. Edson Marcos Leal Soares Ramos";
 const ORIENTADOR_PLACEHOLDER = "Prof. Dr. Renato Hidaka Torres";
@@ -106,6 +117,14 @@ export function Step3MetadataReview({
 }) {
   const [aba, setAba] = useState<Aba>("gerais");
   const [aviso, setAviso] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (data.metadata.area_concentracao === AREA_CONCENTRACAO_PADRAO) return;
+    onChange({
+      ...data,
+      metadata: { ...data.metadata, area_concentracao: AREA_CONCENTRACAO_PADRAO },
+    });
+  }, [data, onChange]);
 
   function patchMetadata(partial: Partial<Metadata>) {
     onChange({ ...data, metadata: { ...data.metadata, ...partial } });
@@ -226,23 +245,32 @@ export function Step3MetadataReview({
                 onChange={(event) => patchMetadata({ ano: event.target.value })}
               />
             </label>
-            <label className="text-sm">
-              Área de concentração <span className="text-[#6b645a]">(opcional)</span>
+            <label className="text-sm sm:col-span-2">
+              Área de concentração
               <input
-                className={campo}
-                placeholder={AREA_PLACEHOLDER}
-                value={data.metadata.area_concentracao}
-                onChange={(event) => patchMetadata({ area_concentracao: event.target.value })}
+                readOnly
+                aria-readonly="true"
+                className={`${campo} cursor-default bg-[#f7f4ee] text-[#4a453c]`}
+                value={AREA_CONCENTRACAO_PADRAO}
               />
             </label>
-            <label className="text-sm">
-              Linha de pesquisa <span className="text-[#6b645a]">(opcional)</span>
-              <input
+            <label className="text-sm sm:col-span-2">
+              Linha de pesquisa <span className="text-red-800">*</span>
+              <select
+                required
                 className={campo}
-                placeholder={LINHA_PLACEHOLDER}
-                value={data.metadata.linha_pesquisa}
+                value={linhaOficial(data.metadata.linha_pesquisa)}
                 onChange={(event) => patchMetadata({ linha_pesquisa: event.target.value })}
-              />
+              >
+                <option value="" disabled>
+                  Selecione a linha de pesquisa
+                </option>
+                {LINHAS_PESQUISA.map((linha) => (
+                  <option key={linha} value={linha}>
+                    {linha}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
         </Card>
@@ -515,6 +543,11 @@ export function Step3MetadataReview({
             if (!data.metadata.titulo.trim() || !data.metadata.autor.trim() || !data.metadata.ano.trim() || !data.metadata.local.trim()) {
               setAba("gerais");
               setAviso("Informe título, autor, ano e local.");
+              return;
+            }
+            if (!linhaOficial(data.metadata.linha_pesquisa)) {
+              setAba("gerais");
+              setAviso("Selecione a linha de pesquisa do PPGSP/UFPA.");
               return;
             }
             if (!data.metadata.orientador.trim()) {
