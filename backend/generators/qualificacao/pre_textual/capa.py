@@ -98,3 +98,20 @@ def build_capa(doc, metadata, assets_dir="assets"):
         r_aut.italic = True
         r_aut.font.size = Pt(14)
         r_aut.font.color.rgb = RGBColor(120, 120, 120)
+
+    # -------------------------------------------------------------
+    # (viii) Local e ano no corpo da capa (não no rodapé)
+    # -------------------------------------------------------------
+    local = (metadata.get("local") or "Belém-Pará").strip()
+    ano = (metadata.get("ano") or "2026").strip()
+
+    p_loc = doc.add_paragraph()
+    p_loc.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_loc.paragraph_format.line_spacing = 1.0
+    p_loc.paragraph_format.space_before = Pt(140)  # Distribui na base da página A4 sem transbordar
+    p_loc.paragraph_format.space_after = Pt(0)
+
+    r_loc = p_loc.add_run(f"{local}\n{ano}")
+    r_loc.font.name = "Times New Roman"
+    r_loc.font.size = Pt(12)
+    r_loc.bold = True

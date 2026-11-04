@@ -119,9 +119,14 @@ def aplicar_rodape_local_ano(section, local="Belém-Pará", ano="2026"):
 
 
 def limpar_rodape(section):
-    section.footer.is_linked_to_previous = False
-    if section.footer.paragraphs:
-        _limpar_paragrafo(section.footer.paragraphs[0])
+    """Esvazia o rodapé e desvincula da seção anterior (capa não leva local/ano aqui)."""
+    footer = section.footer
+    footer.is_linked_to_previous = False
+    for paragrafo in footer.paragraphs:
+        _limpar_paragrafo(paragrafo)
+        paragrafo.paragraph_format.space_before = Pt(0)
+        paragrafo.paragraph_format.space_after = Pt(0)
+        paragrafo.paragraph_format.line_spacing = 1.0
 
 def insert_brasao(doc, assets_dir="assets"):
     """Insere a imagem do Brasão da UFPA centralizada."""

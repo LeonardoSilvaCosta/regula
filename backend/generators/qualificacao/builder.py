@@ -221,15 +221,16 @@ def gerar_documento_qualificacao(
     apply_base_styles(doc)
 
     # =========================================================================
-    # Capa e folha de rosto: local e ano no extremo inferior (rodapé da seção)
-    # Folha de aprovação segue sem esse rodapé e sem número visível
+    # Capa: local e ano no corpo. Rodapé da seção fica vazio.
+    # Folha de rosto mantém local e ano no rodapé.
+    # Folha de aprovação segue sem esse rodapé e sem número visível.
     # =========================================================================
-    local = dados["metadata"].get("local", "Belém-Pará")
-    ano = dados["metadata"].get("ano", "2026")
+    local = dados["metadata"].get("local") or "Belém-Pará"
+    ano = dados["metadata"].get("ano") or "2026"
 
     sec_capa = _secao_sem_numero(doc, primeira=True)
+    limpar_rodape(sec_capa)
     build_capa(doc, dados["metadata"], assets_dir=assets_dir)
-    aplicar_rodape_local_ano(sec_capa, local, ano)
 
     sec_rosto = _secao_sem_numero(doc)
     build_folha_rosto(doc, dados["metadata"], assets_dir=assets_dir)
