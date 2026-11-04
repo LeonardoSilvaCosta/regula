@@ -13,6 +13,7 @@ from app.schemas.document import (
     AcademicLevel,
     BancaMember,
     DocumentMetadata,
+    DocumentSections,
     DocumentType,
     LacunaItem,
     ParseResponse,
@@ -41,6 +42,53 @@ def _siglas(metadata: dict[str, Any]) -> list[tuple[str, str]]:
     return pares
 
 
+def _linhas(valor: Any) -> list[str]:
+    if valor is None:
+        return []
+    if isinstance(valor, str):
+        texto = valor.strip()
+        return [texto] if texto else []
+    if isinstance(valor, dict):
+        if "texto_percurso" in valor:
+            return _linhas(valor.get("texto_percurso"))
+        return []
+    if isinstance(valor, list):
+        linhas: list[str] = []
+        for item in valor:
+            linhas.extend(_linhas(item))
+        return linhas
+    texto = str(valor).strip()
+    return [texto] if texto else []
+
+
+def _texto(valor: Any) -> str:
+    if isinstance(valor, str):
+        return valor.strip()
+    return "\n\n".join(_linhas(valor))
+
+
+def _sections(dados: dict[str, Any]) -> DocumentSections:
+    projeto = dict(dados.get("projeto") or {})
+    return DocumentSections(
+        apresentacao=_linhas(dados.get("apresentacao")),
+        introducao=_linhas(projeto.get("introducao")),
+        justificativa=_linhas(projeto.get("justificativa")),
+        problema=_linhas(projeto.get("problema")),
+        revisao=_linhas(projeto.get("revisao")),
+        objetivo_geral=_texto(projeto.get("objetivo_geral")),
+        objetivos_especificos=_linhas(projeto.get("objetivos_especificos")),
+        hipotese=_linhas(projeto.get("hipotese")),
+        metodologia_natureza=_linhas(projeto.get("metodologia_natureza")),
+        metodologia_locus=_texto(projeto.get("metodologia_locus")),
+        metodologia_participantes=_texto(projeto.get("metodologia_participantes")),
+        metodologia_fontes=_linhas(projeto.get("metodologia_fontes")),
+        metodologia_coleta=_linhas(projeto.get("metodologia_coleta")),
+        metodologia_etica=_texto(projeto.get("metodologia_etica")),
+        metodologia_analise=_texto(projeto.get("metodologia_analise")),
+        referencias=_linhas(dados.get("referencias")),
+    )
+
+
 def _banca(metadata: dict[str, Any]) -> list[BancaMember]:
     membros = []
     for membro in metadata.get("banca") or []:
@@ -53,6 +101,24 @@ def _banca(metadata: dict[str, Any]) -> list[BancaMember]:
             )
         )
     return membros
+
+
+def _metadata(metadata: dict[str, Any], banca_bruta: list[dict[str, Any]]) -> DocumentMetadata:
+    """Campos vazios no Word preservam os defaults canônicos do schema."""
+    informado = {
+        "titulo": str(metadata.get("titulo") or ""),
+        "subtitulo": str(metadata.get("subtitulo") or ""),
+        "autor": str(metadata.get("autor") or ""),
+        "orientador": str(metadata.get("orientador") or ""),
+        "coorientador": _coorientador(metadata, banca_bruta),
+        "coordenador": str(metadata.get("coordenador") or ""),
+        "ano": str(metadata.get("ano") or ""),
+        "local": str(metadata.get("local") or ""),
+        "area_concentracao": str(metadata.get("area_concentracao") or ""),
+        "linha_pesquisa": str(metadata.get("linha_pesquisa") or ""),
+        "data_aprovacao": str(metadata.get("data_aprovacao") or ""),
+    }
+    return DocumentMetadata(**{chave: valor for chave, valor in informado.items() if valor})
 
 
 def estruturar_parse(
@@ -71,18 +137,8 @@ def estruturar_parse(
         documento_id=documento_id,
         tipo_documento=DocumentType.qualificacao,
         nivel=nivel,
-        metadata=DocumentMetadata(
-            titulo=str(metadata.get("titulo") or ""),
-            subtitulo=str(metadata.get("subtitulo") or ""),
-            autor=str(metadata.get("autor") or ""),
-            orientador=str(metadata.get("orientador") or ""),
-            coorientador=_coorientador(metadata, banca_bruta),
-            coordenador=str(metadata.get("coordenador") or ""),
-            ano=str(metadata.get("ano") or ""),
-            local=str(metadata.get("local") or ""),
-            area_concentracao=str(metadata.get("area_concentracao") or ""),
-            linha_pesquisa=str(metadata.get("linha_pesquisa") or ""),
-        ),
+        metadata=_metadata(metadata, banca_bruta),
+        sections=_sections(dados),
         banca=_banca(metadata),
         siglas=siglas,
         ptts=ptts,
