@@ -88,7 +88,14 @@ _CLASSE_PTT = (
     ("aplicativo", "Software Registrável", "Aplicativo"),
     ("manual", "Manual/Protocolo", "Manual"),
     ("protocolo", "Manual/Protocolo", "Protocolo"),
+    ("llm", "Ferramenta Tecnológica", "Modelo de Linguagem"),
+    ("modelo de linguagem", "Ferramenta Tecnológica", "Modelo de Linguagem"),
+    ("modelo", "Ferramenta Tecnológica", "Modelo de IA"),
 )
+
+_AREA_PADRAO = "Segurança Pública, Justiça, Conflitos e Cidadania"
+_LINHA_TECNOLOGIA = "Políticas, Gestão, Direitos Humanos, Criminalidade e Tecnologia da Informação"
+_COORDENADOR_PADRAO = "Prof. Dr. Edson Marcos Leal Soares Ramos"
 
 _CAMPOS_PTT = {
     "titulo": "titulo",
@@ -286,8 +293,8 @@ def _destino_meta(rotulo, aliases):
 
 
 def _quebra_de_pagina(paragrafo):
-    xml = paragrafo._p.xml
-    return 'w:type="page"' in xml or "w:lastRenderedPageBreak" in xml
+    """Quebra explícita. lastRenderedPageBreak aparece em quase todo parágrafo e não separa a capa."""
+    return 'w:type="page"' in paragrafo._p.xml
 
 
 def _zona_explicita(texto):
@@ -327,7 +334,41 @@ def _fim_pretextual(texto):
     # Número de seção (1, 2, 10). Ano de quatro dígitos não encerra a capa.
     if re.match(r"^(?:[1-9]|1\d)(?:\s|\.|$)", (texto or "").strip()) and not re.match(r"^5(?:\s|\.|$)", (texto or "").strip()):
         return True
-    return any(chave in limpo for chave in ("resumo", "abstract", "sumario", "dedicatoria", "agradec", "epigrafe", "lista de", "introdu"))
+    if re.match(r"^1(?:\s|\.|\)|-|–)+\s*consideracoes gerais\b", _sem_acento(texto or "")):
+        return True
+    return any(chave in limpo for chave in (
+        "resumo", "abstract", "sumario", "dedicatoria", "agradec", "epigrafe", "lista de", "introdu", "apresenta",
+    ))
+
+
+def _inicio_corpo(texto):
+    """Primeiro título do corpo encerra a capa mesmo sem quebra de página."""
+    bruto = (texto or "").strip()
+    if not bruto or len(bruto) > 180:
+        return False
+    limpo = _sem_acento(_titulo_limpo(bruto))
+    if limpo in ("introducao", "apresentacao") or limpo.startswith(("introducao ", "apresentacao ")):
+        return True
+    return bool(re.match(r"^1(?:\s|\.|\)|-|–)+\s*consideracoes gerais\b", _sem_acento(bruto)))
+
+
+def _marca_rosto(texto):
+    baixo = _sem_acento(texto)
+    return (
+        "area de concentracao" in baixo
+        or "linha de pesquisa" in baixo
+        or "requisito parcial" in baixo
+        or "colegiado do programa" in baixo
+    )
+
+
+def _marca_aprovacao(texto):
+    baixo = _sem_acento(texto)
+    return (
+        "banca examinadora" in baixo
+        or "folha de aprovacao" in baixo
+        or "data de aprovacao" in baixo
+    )
 
 
 def _linha_institucional(texto):
@@ -528,10 +569,16 @@ def _ler_capa(textos, rodape=None):
         if _linha_institucional(linha):
             continue
         palavras = linha.split()
-        if not autor and _e_nome_proprio(linha) and 2 <= len(palavras) <= 6 and ":" not in linha:
+        if (
+            not autor
+            and not _e_caixa_alta(linha)
+            and _e_nome_proprio(linha)
+            and 2 <= len(palavras) <= 6
+            and ":" not in linha
+        ):
             autor = linha.strip()
             continue
-        if not autor and (_e_caixa_alta(linha) or ":" in linha):
+        if _e_caixa_alta(linha) or ":" in linha:
             titulo_linhas.append(linha.strip())
     titulo, subtitulo = _partir_titulo(" ".join(titulo_linhas))
     return {
@@ -565,10 +612,10 @@ def _ler_folha_rosto(textos):
     for linha in linhas:
         baixo = _sem_acento(linha)
         if "coorientador" in baixo:
-            _guardar_meta(meta, "coorientador", _valor_apos_dois_pontos(_RE_COORIENTADOR.search(linha)))
+            _guardar_meta(meta, "coorientador", _valor_apos_dois_pontos(_RE_COORIENTADOR.search(linha)).rstrip("."))
             continue
         if "orientador" in baixo:
-            _guardar_meta(meta, "orientador", _valor_apos_dois_pontos(_RE_ORIENTADOR.search(linha)))
+            _guardar_meta(meta, "orientador", _valor_apos_dois_pontos(_RE_ORIENTADOR.search(linha)).rstrip("."))
             continue
         if "area de concentracao" in baixo:
             _guardar_meta(meta, "area_concentracao", _valor_apos_dois_pontos(_RE_AREA.search(linha)))
@@ -840,14 +887,16 @@ def parse_projeto_docx(caminho_docx):
         atual = nome
         secoes_ordem.append({"chave": nome, "titulo": titulo, "paragrafos": []})
 
+    def avancar_pagina():
+        """Uma quebra só troca de frente se a página atual já tiver texto."""
+        nonlocal frente, rotulo_pendente
+        if frente == "capa" and linhas_capa:
+            frente = "folha_rosto"
+        elif frente == "folha_rosto" and linhas_rosto:
+            frente = "folha_aprovacao"
+        rotulo_pendente = None
+
     for tipo, bloco in _iterar_blocos(documento):
-        if quebra_pendente:
-            if frente == "capa":
-                frente = "folha_rosto"
-            elif frente == "folha_rosto":
-                frente = "folha_aprovacao"
-            rotulo_pendente = None
-            quebra_pendente = False
         if tipo == "t":
             matriz = _matriz(bloco)
             if not matriz:
@@ -861,11 +910,17 @@ def parse_projeto_docx(caminho_docx):
             else:
                 tabelas.append(matriz)
             continue
-        if _quebra_de_pagina(bloco):
-            quebra_pendente = True
+        tem_quebra = _quebra_de_pagina(bloco)
         texto = bloco.text.strip()
         if not texto:
+            if tem_quebra and not quebra_pendente:
+                quebra_pendente = True
             continue
+        if quebra_pendente:
+            avancar_pagina()
+            quebra_pendente = False
+        if tem_quebra:
+            quebra_pendente = True
         zona = _zona_explicita(texto)
         if zona:
             frente = zona
@@ -873,19 +928,16 @@ def parse_projeto_docx(caminho_docx):
             if zona == "siglas":
                 abrir("siglas", _titulo_limpo(texto) or texto)
             continue
-        if frente in ("capa", "folha_rosto", "folha_aprovacao") and _e_titulo(bloco) and _fim_pretextual(texto):
-            # Caixa alta da capa não classifica como seção; só INTRODUÇÃO,
-            # APRESENTAÇÃO e os demais pré-textuais nomeados encerram a frente.
-            if not _e_caixa_alta(texto) or _classificar(texto) in ("introducao", "apresentacao"):
-                frente = "corpo"
-                rotulo_pendente = None
-        baixo = _sem_acento(texto)
-        if frente != "corpo" and (
-            "banca examinadora" in baixo
-            or "folha de aprovacao" in baixo
-            or "data de aprovacao" in baixo
-        ):
+        if frente in ("capa", "folha_rosto", "folha_aprovacao") and _inicio_corpo(texto):
+            frente = "corpo"
+            rotulo_pendente = None
+        elif frente in ("capa", "folha_rosto", "folha_aprovacao") and _e_titulo(bloco) and _fim_pretextual(texto):
+            frente = "corpo"
+            rotulo_pendente = None
+        elif frente != "corpo" and _marca_aprovacao(texto):
             frente = "folha_aprovacao"
+        elif frente == "capa" and _marca_rosto(texto):
+            frente = "folha_rosto"
         if atual == "ptts" and not _e_secao_5(texto) and (_e_subitem_ptt(texto) or _e_produto_nomeado(texto)):
             baldes["ptts"].append(_ptt_de_linha(texto, len(baldes["ptts"]) + 1))
             continue
@@ -977,6 +1029,33 @@ def parse_projeto_docx(caminho_docx):
     ]
 
     banca = _banca_de(meta_rotulos, membros_aprovacao)
+    sem_rosto = not linhas_rosto and not rosto
+    sem_aprovacao = not linhas_aprovacao and not tabelas_aprovacao and not membros_aprovacao
+    if sem_rosto and sem_aprovacao:
+        if not meta_rotulos.get("area_concentracao"):
+            meta_rotulos["area_concentracao"] = _AREA_PADRAO
+        if not meta_rotulos.get("coordenador"):
+            meta_rotulos["coordenador"] = _COORDENADOR_PADRAO
+        if not meta_rotulos.get("linha_pesquisa"):
+            corpus = _sem_acento(" ".join(
+                texto
+                for nome, linhas in baldes.items()
+                if nome != "ptts"
+                for texto in linhas
+            ))
+            if any(pista in corpus for pista in (
+                "inteligencia artificial", "aprendizado de maquina", "aprendizado",
+                "tecnologia", "dados", "algoritm", "software", "llm", "modelo",
+            )):
+                meta_rotulos["linha_pesquisa"] = _LINHA_TECNOLOGIA
+
+    for item in ptts:
+        if not item.get("autoria"):
+            item["autoria"] = meta_rotulos.get("autor", "")
+        if not item.get("impacto"):
+            item["impacto"] = "Alto"
+        if not item.get("ano"):
+            item["ano"] = meta_rotulos.get("ano", "")
 
     return {
         "metadata": {
