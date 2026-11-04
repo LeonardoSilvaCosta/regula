@@ -11,7 +11,7 @@ from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.section import WD_ORIENT, WD_SECTION
 
-from core.styles import apply_base_styles, aplicar_idioma_pt_br, aplicar_rodape_local_ano, limpar_rodape, set_page_margins
+from core.styles import apply_base_styles, aplicar_idioma_pt_br, limpar_rodape, set_page_margins
 from core.xml_utils import configure_section_page_numbers, add_page_number_field, continuar_numeracao
 from core.campos import habilitar_atualizacao_de_campos
 from core.atualizar_campos import atualizar_campos_word
@@ -221,20 +221,16 @@ def gerar_documento_qualificacao(
     apply_base_styles(doc)
 
     # =========================================================================
-    # Capa: local e ano no corpo. Rodapé da seção fica vazio.
-    # Folha de rosto mantém local e ano no rodapé.
+    # Capa e folha de rosto: local e ano no corpo. Rodapé das seções fica vazio.
     # Folha de aprovação segue sem esse rodapé e sem número visível.
     # =========================================================================
-    local = dados["metadata"].get("local") or "Belém-Pará"
-    ano = dados["metadata"].get("ano") or "2026"
-
     sec_capa = _secao_sem_numero(doc, primeira=True)
     limpar_rodape(sec_capa)
     build_capa(doc, dados["metadata"], assets_dir=assets_dir)
 
     sec_rosto = _secao_sem_numero(doc)
+    limpar_rodape(sec_rosto)
     build_folha_rosto(doc, dados["metadata"], assets_dir=assets_dir)
-    aplicar_rodape_local_ano(sec_rosto, local, ano)
 
     sec_aprov = _secao_sem_numero(doc)
     limpar_rodape(sec_aprov)

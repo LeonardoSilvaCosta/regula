@@ -17,6 +17,7 @@ import {
   type ParseResponse,
 } from "@/lib/api";
 import type { components } from "@/types/api";
+import mockPreenchimento from "@/fixtures/preenchimento-direto-mock.json";
 
 type DocumentType = components["schemas"]["DocumentType"];
 type WizardStep = 1 | 2 | 3 | 4;
@@ -158,8 +159,15 @@ export default function Home() {
   }
 
   function iniciarPreenchimentoDireto() {
-    setParsedData(criarEstadoVazio(tipoDocumento, nivel));
-    setSubtitulo("");
+    const exemplo = mockPreenchimento as ParseResponse;
+    setParsedData({
+      ...criarEstadoVazio(tipoDocumento, nivel),
+      ...exemplo,
+      documento_id: "",
+      tipo_documento: tipoDocumento,
+      nivel,
+    });
+    setSubtitulo(exemplo.metadata.subtitulo ?? "");
     setError(null);
     setFileHint(null);
     setDownloaded(false);

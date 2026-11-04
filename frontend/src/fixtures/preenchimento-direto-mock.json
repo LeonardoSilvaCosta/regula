@@ -1,0 +1,134 @@
+{
+  "documento_id": "",
+  "tipo_documento": "qualificacao",
+  "nivel": "mestrado",
+  "metadata": {
+    "titulo": "Violência doméstica e o fluxo de atendimento no Centro Integrado de Atenção Psicossocial",
+    "subtitulo": "um estudo de caso em Belém",
+    "autor": "Maria Helena Costa Ribeiro",
+    "orientador": "Prof. Dr. João Batista Almeida",
+    "coorientador": "Profa. Dra. Ana Paula Ferreira",
+    "coordenador": "Prof. Dr. Edson Marcos Leal Soares Ramos",
+    "ano": "2026",
+    "local": "Belém-Pará",
+    "area_concentracao": "Segurança Pública, Justiça, Conflitos e Cidadania",
+    "linha_pesquisa": "Políticas, Gestão, Direitos Humanos, Criminalidade e Tecnologia da Informação",
+    "data_aprovacao": "Belém, Pará, 15 de março de 2026."
+  },
+  "sections": {
+    "apresentacao": [
+      "Este relatório de qualificação registra o percurso da pesquisa de mestrado desenvolvida no Programa de Pós-Graduação em Segurança Pública da Universidade Federal do Pará. A escolha do tema decorre da atuação profissional da autora no atendimento a mulheres em situação de violência doméstica.",
+      "O texto organiza o problema, os objetivos, a hipótese e o desenho metodológico que orientarão a coleta e a análise até a defesa da dissertação."
+    ],
+    "introducao": [
+      "A violência doméstica contra a mulher permanece como um dos principais desafios da segurança pública no Brasil. Em Belém, o encaminhamento das vítimas percorre delegacias especializadas, serviços de saúde e equipamentos de atenção psicossocial, com tempos de resposta e registros ainda desiguais.",
+      "O Centro Integrado de Atenção Psicossocial (CIAP) concentra parte desse fluxo. Compreender como os casos entram, circulam e saem do serviço permite identificar gargalos que atrasam a proteção e a produção de prova."
+    ],
+    "justificativa": [
+      "A pesquisa interessa à gestão da segurança pública porque descreve um ponto de articulação entre polícia, saúde e assistência. Os achados podem subsidiar protocolos de encaminhamento e a qualificação dos registros usados pela rede de proteção.",
+      "No plano acadêmico, o estudo contribui para a linha de políticas, gestão e direitos humanos ao tratar o atendimento psicossocial como etapa do sistema de justiça criminal, e não apenas como cuidado clínico isolado."
+    ],
+    "problema": [
+      "De que modo o fluxo de atendimento do CIAP organiza o encaminhamento de mulheres em situação de violência doméstica em Belém, e quais fatores institucionais atrasam a proteção e o registro desses casos?"
+    ],
+    "revisao": [
+      "A literatura sobre violência doméstica destaca a Lei n. 11.340/2006 e a rede de serviços especializados como marco de proteção. Estudos locais apontam subnotificação, revitimização e descontinuidade entre o boletim de ocorrência e o cuidado em saúde.",
+      "Trabalhos sobre gestão de fluxos em segurança pública mostram que a fragmentação de sistemas de informação reduz a capacidade de acompanhar o caso ao longo da rede. Este relatório adota essa leitura para examinar o CIAP."
+    ],
+    "objetivo_geral": "Analisar o fluxo de atendimento de mulheres em situação de violência doméstica no CIAP, em Belém, identificando os fatores institucionais que atrasam a proteção e o registro dos casos.",
+    "objetivos_especificos": [
+      "Descrever as etapas do encaminhamento desde o primeiro contato até o desfecho no CIAP.",
+      "Identificar os registros produzidos em cada etapa e os sistemas em que são lançados.",
+      "Mapear os intervalos de tempo entre o registro inicial e o atendimento psicossocial.",
+      "Caracterizar os entraves relatados por profissionais da rede de proteção."
+    ],
+    "hipotese": [
+      "O atraso na proteção está associado à descontinuidade entre o registro policial e o prontuário do CIAP, e não apenas à falta de vagas no serviço."
+    ],
+    "metodologia_natureza": [
+      "Pesquisa aplicada, de abordagem qualitativa, com estratégia de estudo de caso. O desenho é descritivo-explicativo e se apoia em análise documental e entrevistas semiestruturadas."
+    ],
+    "metodologia_locus": "Centro Integrado de Atenção Psicossocial vinculado à rede de proteção à mulher em Belém, Pará, no período de 2024 a 2025.",
+    "metodologia_participantes": "Profissionais que atuam no fluxo (psicologia, serviço social e gestão do CIAP) e registros institucionais anonimizados de encaminhamentos. A amostra é intencional, até a saturação das categorias.",
+    "metodologia_fontes": [
+      "Normas internas de encaminhamento, livros de registro e planilhas de produção do CIAP.",
+      "Entrevistas semiestruturadas com profissionais da rede, mediante termo de consentimento."
+    ],
+    "metodologia_coleta": [
+      "A coleta documental ocorrerá nas dependências do serviço, com fichas de extração padronizadas e sem identificação nominal das usuárias.",
+      "As entrevistas serão gravadas com autorização, transcritas e devolvidas aos participantes para conferência."
+    ],
+    "metodologia_etica": "O projeto será submetido ao Comitê de Ética em Pesquisa. Os dados pessoais serão tratados conforme a Lei n. 13.709/2018, com acesso restrito à pesquisadora e descarte seguro ao fim do estudo.",
+    "metodologia_analise": "Análise de conteúdo temática, com categorias definidas a partir do fluxo (entrada, registro, encaminhamento e desfecho) e apoio de planilha de codificação.",
+    "referencias": [
+      "BRASIL. Lei n. 11.340, de 7 de agosto de 2006. Cria mecanismos para coibir a violência doméstica e familiar contra a mulher. Diário Oficial da União, Brasília, DF, 8 ago. 2006.",
+      "BRASIL. Lei n. 13.709, de 14 de agosto de 2018. Lei Geral de Proteção de Dados Pessoais. Diário Oficial da União, Brasília, DF, 15 ago. 2018.",
+      "UNIVERSIDADE FEDERAL DO PARÁ. Resolução n. 009/2025-PPGSP. Belém: PPGSP, 2025."
+    ]
+  },
+  "banca": [
+    {
+      "nome": "Prof. Dr. João Batista Almeida",
+      "titulacao": "Doutor",
+      "instituicao": "Universidade Federal do Pará",
+      "funcao": "Orientador(a)"
+    },
+    {
+      "nome": "Profa. Dra. Ana Paula Ferreira",
+      "titulacao": "Doutora",
+      "instituicao": "Universidade Federal do Pará",
+      "funcao": "Coorientador(a)"
+    },
+    {
+      "nome": "Prof. Dr. Carlos Eduardo Lima",
+      "titulacao": "Doutor",
+      "instituicao": "Universidade Federal do Pará",
+      "funcao": "Avaliador(a) Interno(a)"
+    },
+    {
+      "nome": "Profa. Dra. Helena Souza Martins",
+      "titulacao": "Doutora",
+      "instituicao": "Universidade Federal do Amazonas",
+      "funcao": "Avaliador(a) Externo(a)"
+    }
+  ],
+  "siglas": [
+    ["UFPA", "Universidade Federal do Pará"],
+    ["PPGSP", "Programa de Pós-Graduação em Segurança Pública"],
+    ["CIAP", "Centro Integrado de Atenção Psicossocial"],
+    ["LGPD", "Lei Geral de Proteção de Dados Pessoais"]
+  ],
+  "ptts": [
+    {
+      "num": "1",
+      "nome": "Protocolo de encaminhamento",
+      "autoria": "Maria Helena Costa Ribeiro",
+      "tipo": "Processo ou tecnologia e produto ou material não patenteável",
+      "subtipo": "Protocolo",
+      "titulo": "Protocolo de encaminhamento de casos de violência doméstica no CIAP",
+      "ano": "2026",
+      "coautoria": "Não",
+      "projeto": "Pesquisa de mestrado PPGSP/UFPA",
+      "financiamento": "Não",
+      "financiador": "",
+      "demanda": "Espontânea",
+      "impacto": "Alto",
+      "justificativa_impacto": "Organiza o tempo entre o registro e o atendimento psicossocial.",
+      "inovacao": "Médio",
+      "justificativa_inovacao": "Integra campos de registro policial e prontuário do serviço.",
+      "complexidade": "Médio",
+      "justificativa_complexidade": "Exige articulação entre duas instituições da rede.",
+      "validacao": "Em validação",
+      "divulgacao": "Relatório técnico interno",
+      "abrangencia": "Local",
+      "publico_usuario": "Profissionais do CIAP e da rede de proteção"
+    }
+  ],
+  "lacunas": [],
+  "conformidade_ptt": {
+    "valido": true,
+    "total": 1,
+    "prop_alta": 1,
+    "mensagem": "Dados de exemplo para teste do preenchimento direto."
+  }
+}

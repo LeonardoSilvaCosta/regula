@@ -165,8 +165,10 @@ def build_folha_rosto(doc, metadata, assets_dir="assets"):
     orientador = metadata.get("orientador", "").strip()
     coorientador = metadata.get("coorientador", "").strip()
 
-    _paragrafo_campo(doc, "Área de Concentração", area, space_before=0)
-    _paragrafo_campo(doc, "Linha de Pesquisa", linha, space_before=12)
+    area_txt = area if area.endswith(".") else f"{area}."
+    linha_txt = linha if linha.endswith(".") else f"{linha}."
+    _paragrafo_campo(doc, "Área de Concentração", area_txt, space_before=0)
+    _paragrafo_campo(doc, "Linha de Pesquisa", linha_txt, space_before=6)
     if orientador:
         _paragrafo_campo(doc, "Orientador(a)", orientador, space_before=10)
     else:
@@ -179,3 +181,18 @@ def build_folha_rosto(doc, metadata, assets_dir="assets"):
         )
     if coorientador:
         _paragrafo_campo(doc, "Coorientador(a)", coorientador, space_before=10)
+
+    # (xi) e (xii) Local e ano no corpo, na base da página (não no rodapé)
+    local = (metadata.get("local") or "Belém-Pará").strip()
+    ano = (metadata.get("ano") or "2026").strip()
+
+    p_loc = doc.add_paragraph()
+    p_loc.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_loc.paragraph_format.line_spacing = 1.0
+    p_loc.paragraph_format.space_before = Pt(72)
+    p_loc.paragraph_format.space_after = Pt(0)
+
+    r_loc = p_loc.add_run(f"{local} {ano}" if " " in ano else f"{local}\n{ano}")
+    r_loc.font.name = "Times New Roman"
+    r_loc.font.size = Pt(12)
+    r_loc.bold = True

@@ -186,13 +186,15 @@ def build_folha_aprovacao(doc, metadata, assets_dir="assets"):
     # 5. Local e Data
     _paragrafo_vazio(doc)
     ano = metadata.get("ano", "2026")
-    p_dt = doc.add_paragraph()
-    p_dt.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    p_dt.paragraph_format.space_before = Pt(0)
-    p_dt.paragraph_format.space_after = Pt(0)
-    r_d = p_dt.add_run(f"Belém, Pará, ____ de _______________ de {ano}.")
-    r_d.font.name = "Times New Roman"
-    r_d.font.size = Pt(12)
+    data_txt = f"Belém, Pará, ____ de _______________ de {ano}."
+    p_data = doc.add_paragraph()
+    p_data.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    p_data.paragraph_format.line_spacing = 1.0
+    p_data.paragraph_format.space_before = Pt(12)
+    p_data.paragraph_format.space_after = Pt(18)
+    r_data = p_data.add_run(data_txt)
+    r_data.font.name = "Times New Roman"
+    r_data.font.size = Pt(12)
     _paragrafo_vazio(doc)
 
     # 6. Coordenador (Times 12, como o cabeçalho institucional)
