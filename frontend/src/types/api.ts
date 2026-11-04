@@ -112,6 +112,8 @@ export interface components {
              * @default
              */
             titulo: string;
+            /** Subtitulo */
+            subtitulo?: string;
             /**
              * Autor
              * @default

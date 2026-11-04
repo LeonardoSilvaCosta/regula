@@ -84,17 +84,8 @@ export default function Home() {
         ...data,
         tipo_documento: tipoDocumento,
         nivel,
-        banca: data.banca.map((membro) => {
-          const papel = membro.funcao.toLowerCase();
-          const avaliador =
-            papel.includes("avali") ||
-            papel.includes("extern") ||
-            (papel.includes("intern") && !papel.includes("orient"));
-          if (!avaliador) return membro;
-          return { ...membro, nome: "", instituicao: "" };
-        }),
       });
-      setSubtitulo("");
+      setSubtitulo(data.metadata.subtitulo ?? "");
       setDownloaded(false);
       setStep(2);
     } catch (err) {

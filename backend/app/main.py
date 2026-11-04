@@ -30,6 +30,17 @@ app.add_middleware(
 app.include_router(api_router, prefix="/api/v1")
 
 
+@app.get("/")
+def root():
+    return {
+        "name": "Regula API",
+        "health": "/health",
+        "docs": "/docs",
+        "openapi": "/openapi.json",
+        "api": "/api/v1",
+    }
+
+
 @app.get("/health")
 def health_check():
     return {"status": "ok"}

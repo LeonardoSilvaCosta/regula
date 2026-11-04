@@ -27,6 +27,7 @@ class BancaMember(BaseModel):
 
 class DocumentMetadata(BaseModel):
     titulo: str = ""
+    subtitulo: str = ""
     autor: str = ""
     orientador: str = ""
     coorientador: str = ""

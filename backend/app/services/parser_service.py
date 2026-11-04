@@ -73,6 +73,7 @@ def estruturar_parse(
         nivel=nivel,
         metadata=DocumentMetadata(
             titulo=str(metadata.get("titulo") or ""),
+            subtitulo=str(metadata.get("subtitulo") or ""),
             autor=str(metadata.get("autor") or ""),
             orientador=str(metadata.get("orientador") or ""),
             coorientador=_coorientador(metadata, banca_bruta),
