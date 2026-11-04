@@ -48,9 +48,10 @@ def validar_ptts(ptts: list[PTTItem], nivel: AcademicLevel) -> PTTValidationResu
 
 
 def _revisao(pedido: GenerateRequest) -> dict:
-    """Metadados, banca, siglas e PTTs confirmados no Passo 3."""
+    """Metadados, seções, banca, siglas e PTTs confirmados no Passo 3."""
     return {
         "metadata": pedido.metadata.model_dump(),
+        "sections": pedido.sections.model_dump(),
         "banca": [membro.model_dump() for membro in pedido.banca],
         "siglas": [list(par) for par in pedido.siglas],
         "ptts": [item.model_dump() for item in pedido.ptts],
@@ -61,12 +62,11 @@ def gerar_buffer(pedido: GenerateRequest) -> BytesIO:
     """
     Aciona o builder do tipo pedido e devolve o DOCX em memória.
 
-    O corpo segue o .docx enviado no campo Documento de origem. Capa, folha de
-    rosto, folha de aprovação, siglas e fichas de PTT usam os dados revisados no Passo 3.
+    Com documento_id, o corpo parte do .docx enviado. Sem ele, capa, seções,
+    banca, siglas e fichas de PTT saem só dos dados revisados no Passo 3.
     """
-    if not pedido.documento_id.strip():
-        raise FileNotFoundError("Documento de origem não encontrado. Analise o arquivo novamente.")
-    entrada = caminho_upload(pedido.documento_id)
+    entrada = caminho_upload(pedido.documento_id) if pedido.documento_id.strip() else None
+    caminho_entrada = str(entrada) if entrada is not None else None
 
     assets = BACKEND_DIR / "assets"
     revisao = _revisao(pedido)
@@ -76,7 +76,7 @@ def gerar_buffer(pedido: GenerateRequest) -> BytesIO:
     try:
         if pedido.tipo_documento == DocumentType.qualificacao:
             gerar_documento_qualificacao(
-                str(entrada),
+                caminho_entrada,
                 saida,
                 nivel=pedido.nivel.value,
                 assets_dir=str(assets),
@@ -84,17 +84,19 @@ def gerar_buffer(pedido: GenerateRequest) -> BytesIO:
             )
         elif pedido.tipo_documento == DocumentType.dissertacao:
             gerar_documento_dissertacao(
-                str(entrada),
+                caminho_entrada,
                 saida,
                 assets_dir=str(assets),
                 metadata=revisao["metadata"],
+                revisao=revisao,
             )
         else:
             gerar_documento_tese(
-                str(entrada),
+                caminho_entrada,
                 saida,
                 assets_dir=str(assets),
                 metadata=revisao["metadata"],
+                revisao=revisao,
             )
         buffer = BytesIO(Path(saida).read_bytes())
     finally:

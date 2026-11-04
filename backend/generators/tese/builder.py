@@ -7,7 +7,25 @@ from core.styles import apply_base_styles, set_page_margins, insert_brasao, inse
 from generators.qualificacao.parser import parse_projeto_docx
 from core.xml_utils import add_page_number_field, configure_section_page_numbers
 
-def gerar_documento_tese(caminho_entrada, caminho_saida, assets_dir="assets", metadata=None):
+def _dados_sem_arquivo(metadata, revisao):
+    """Documento montado só com metadata e seções revisadas, sem .docx de origem."""
+    revisao = revisao or {}
+    secoes = revisao.get("sections") or {}
+    return {
+        "metadata": dict(metadata or revisao.get("metadata") or {}),
+        "apresentacao": {"texto_percurso": list(secoes.get("apresentacao") or [])},
+        "referencias": list(secoes.get("referencias") or []),
+        "secoes": [],
+    }
+
+
+def gerar_documento_tese(
+    caminho_entrada,
+    caminho_saida,
+    assets_dir="assets",
+    metadata=None,
+    revisao=None,
+):
     """
     Estrutura de Tese de Doutorado:
     - Mesma estrutura de 4 capítulos da dissertação.
@@ -17,8 +35,11 @@ def gerar_documento_tese(caminho_entrada, caminho_saida, assets_dir="assets", me
     doc = docx.Document()
     apply_base_styles(doc)
 
-    dados = parse_projeto_docx(caminho_entrada)
-    revisado = metadata or {}
+    if caminho_entrada is None:
+        dados = _dados_sem_arquivo(metadata, revisao)
+    else:
+        dados = parse_projeto_docx(caminho_entrada)
+    revisado = metadata or (revisao or {}).get("metadata") or {}
     extraido = dados.get("metadata") or {}
 
     def campo(chave):

@@ -3,6 +3,9 @@ Orquestrador do Relatório de Qualificação com arquitetura de 3 seções Word 
 conforme a Resolução nº 009/2025-PPGSP/UFPA.
 """
 
+import copy
+import os
+
 import docx
 from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -86,8 +89,60 @@ def _paginar(section, formato, inicio):
     add_page_number_field(run)
 
 
+_CHAVES_PROJETO = (
+    "introducao",
+    "justificativa",
+    "problema",
+    "revisao",
+    "objetivo_geral",
+    "objetivos_especificos",
+    "hipotese",
+    "metodologia_natureza",
+    "metodologia_locus",
+    "metodologia_participantes",
+    "metodologia_fontes",
+    "metodologia_coleta",
+    "metodologia_etica",
+    "metodologia_analise",
+)
+
+_DADOS_VAZIOS = {
+    "metadata": {},
+    "apresentacao": {"texto_percurso": [], "quadro_1": []},
+    "projeto": {
+        "introducao": [],
+        "justificativa": [],
+        "problema": [],
+        "revisao": [],
+        "objetivo_geral": "",
+        "objetivos_especificos": [],
+        "hipotese": [],
+        "metodologia_natureza": [],
+        "metodologia_locus": "",
+        "metodologia_participantes": "",
+        "metodologia_fontes": [],
+        "metodologia_coleta": [],
+        "metodologia_etica": "",
+        "metodologia_analise": "",
+        "tabela_1": {"linhas": []},
+        "tabela_2": {"linhas": []},
+        "ptts": [],
+        "cronograma": [],
+        "ano": "2026",
+    },
+    "resultados": {"artigos": []},
+    "referencias": [],
+    "pos_textual": {"apendices": [], "anexos": []},
+    "secoes_nao_mapeadas": [],
+}
+
+
+def _valor_preenchido(valor):
+    return valor is not None and valor != "" and valor != []
+
+
 def _mesclar_revisao(dados, revisao):
-    """Sobrepõe no documento os metadados confirmados no Passo 3."""
+    """Sobrepõe no documento os metadados e as seções confirmados no Passo 3."""
     if not revisao:
         return
     meta = dados.setdefault("metadata", {})
@@ -99,6 +154,21 @@ def _mesclar_revisao(dados, revisao):
         meta["banca"] = list(revisao.get("banca") or [])
     if "siglas" in revisao:
         meta["siglas"] = [list(par) for par in (revisao.get("siglas") or [])]
+    secoes = revisao.get("sections") or {}
+    if secoes:
+        projeto = dados.setdefault("projeto", {})
+        for chave in _CHAVES_PROJETO:
+            if chave not in secoes or not _valor_preenchido(secoes[chave]):
+                continue
+            projeto[chave] = secoes[chave]
+        if _valor_preenchido(secoes.get("apresentacao")):
+            bloco = dados.setdefault("apresentacao", {})
+            if not isinstance(bloco, dict):
+                bloco = {}
+                dados["apresentacao"] = bloco
+            bloco["texto_percurso"] = list(secoes["apresentacao"])
+        if _valor_preenchido(secoes.get("referencias")):
+            dados["referencias"] = list(secoes["referencias"])
     if "ptts" not in revisao:
         return
     projeto = dados.setdefault("projeto", {})
@@ -123,7 +193,10 @@ def gerar_documento_qualificacao(
     assets_dir="assets",
     revisao=None,
 ):
-    dados = parse_projeto_docx(caminho_entrada)
+    if not caminho_entrada or not os.path.exists(caminho_entrada):
+        dados = copy.deepcopy(_DADOS_VAZIOS)
+    else:
+        dados = parse_projeto_docx(caminho_entrada)
     _mesclar_revisao(dados, revisao)
     nivel_norm = nivel.lower()
     dados["metadata"]["nivel"] = nivel_norm

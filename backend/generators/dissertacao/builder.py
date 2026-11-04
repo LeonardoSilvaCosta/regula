@@ -12,12 +12,33 @@ def _campo(revisado, extraido, chave):
     return (revisado.get(chave) or extraido.get(chave) or "").strip()
 
 
-def gerar_documento_dissertacao(caminho_entrada, caminho_saida, assets_dir="assets", metadata=None):
+def _dados_sem_arquivo(metadata, revisao):
+    """Documento montado só com metadata e seções revisadas, sem .docx de origem."""
+    revisao = revisao or {}
+    secoes = revisao.get("sections") or {}
+    return {
+        "metadata": dict(metadata or revisao.get("metadata") or {}),
+        "apresentacao": {"texto_percurso": list(secoes.get("apresentacao") or [])},
+        "referencias": list(secoes.get("referencias") or []),
+        "secoes": [],
+    }
+
+
+def gerar_documento_dissertacao(
+    caminho_entrada,
+    caminho_saida,
+    assets_dir="assets",
+    metadata=None,
+    revisao=None,
+):
     doc = docx.Document()
     apply_base_styles(doc)
 
-    dados = parse_projeto_docx(caminho_entrada)
-    revisado = metadata or {}
+    if caminho_entrada is None:
+        dados = _dados_sem_arquivo(metadata, revisao)
+    else:
+        dados = parse_projeto_docx(caminho_entrada)
+    revisado = metadata or (revisao or {}).get("metadata") or {}
     extraido = dados.get("metadata") or {}
     titulo_trabalho = _campo(revisado, extraido, "titulo")
     autor = _campo(revisado, extraido, "autor")
