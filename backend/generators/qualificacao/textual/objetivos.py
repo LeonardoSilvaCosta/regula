@@ -9,7 +9,9 @@ Subseções:
 from docx.shared import Cm, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
+from core.xml_utils import adicionar_bookmark
 from ..formato import adicionar_titulo
+from ..pre_textual.sumario import registrar_entrada
 
 
 def build_objetivos(doc, dados_projeto):
@@ -24,10 +26,10 @@ def build_objetivos(doc, dados_projeto):
     """
 
     def add_sec_title(txt, bookmark=None):
-        adicionar_titulo(doc, txt, bookmark=bookmark, primario=True)
+        return adicionar_titulo(doc, txt, bookmark=bookmark, primario=True)
 
     def add_sub_title(txt, bookmark=None):
-        adicionar_titulo(doc, txt, bookmark=bookmark, primario=False)
+        return adicionar_titulo(doc, txt, bookmark=bookmark, primario=False)
 
     def add_body_p(txt):
         """Parágrafo regular: Times 12, recuo 1,27 cm, entrelinhas 1,5, espaçamento 0pt."""
@@ -58,12 +60,16 @@ def build_objetivos(doc, dados_projeto):
     # -------------------------------------------------------------------------
     # 2. OBJETIVOS (Título Primário)
     # -------------------------------------------------------------------------
-    add_sec_title("2. OBJETIVOS", "sec_2")
+    p_obj = add_sec_title("2. OBJETIVOS", "sec_2")
+    adicionar_bookmark(p_obj, "_TOC_OBJETIVOS")
+    registrar_entrada(doc, "2. OBJETIVOS", 1, "_TOC_OBJETIVOS")
 
     # -------------------------------------------------------------------------
     # 2.1. OBJETIVO GERAL
     # -------------------------------------------------------------------------
-    add_sub_title("2.1. OBJETIVO GERAL", "sec_2_1")
+    p_obj_geral = add_sub_title("2.1. OBJETIVO GERAL", "sec_2_1")
+    adicionar_bookmark(p_obj_geral, "_TOC_OBJETIVO_GERAL")
+    registrar_entrada(doc, "2.1. OBJETIVO GERAL", 2, "_TOC_OBJETIVO_GERAL")
     objetivo_geral = dados_projeto.get("objetivo_geral", "")
     if objetivo_geral and str(objetivo_geral).strip():
         add_body_p(str(objetivo_geral).strip())
@@ -77,7 +83,9 @@ def build_objetivos(doc, dados_projeto):
     # -------------------------------------------------------------------------
     # 2.2. OBJETIVOS ESPECÍFICOS
     # -------------------------------------------------------------------------
-    add_sub_title("2.2. OBJETIVOS ESPECÍFICOS", "sec_2_2")
+    p_obj_esp = add_sub_title("2.2. OBJETIVOS ESPECÍFICOS", "sec_2_2")
+    adicionar_bookmark(p_obj_esp, "_TOC_OBJETIVOS_ESPECIFICOS")
+    registrar_entrada(doc, "2.2. OBJETIVOS ESPECÍFICOS", 2, "_TOC_OBJETIVOS_ESPECIFICOS")
     objetivos_especificos = dados_projeto.get("objetivos_especificos", [])
     if objetivos_especificos:
         for oe in objetivos_especificos:

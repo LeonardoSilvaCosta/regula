@@ -1,8 +1,32 @@
 """Utilitários XML para controle avançado de paginação e bordas de tabelas."""
 import re
 
-from docx.oxml import OxmlElement
+from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import qn
+
+_WML = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+_BOOKMARK_ID_COUNTER = 100
+
+
+def adicionar_bookmark(p, nome_bookmark: str):
+    """Insere bookmarkStart/End com w:id inteiro sequencial único no documento."""
+    global _BOOKMARK_ID_COUNTER
+    _BOOKMARK_ID_COUNTER += 1
+    bm_id = str(_BOOKMARK_ID_COUNTER)
+
+    start_elem = parse_xml(
+        f'<w:bookmarkStart xmlns:w="{_WML}" w:id="{bm_id}" w:name="{nome_bookmark}"/>'
+    )
+    end_elem = parse_xml(
+        f'<w:bookmarkEnd xmlns:w="{_WML}" w:id="{bm_id}"/>'
+    )
+
+    p_pr = p._p.find(qn("w:pPr"))
+    if p_pr is not None:
+        p_pr.addnext(start_elem)
+    else:
+        p._p.insert(0, start_elem)
+    p._p.append(end_elem)
 
 _ILLEGAL_OOXML = re.compile(r"[\x00-\x08\x0B-\x0C\x0E-\x1F\uFFFE\uFFFF]")
 _FRAC_LATEX = re.compile(r"(?:\\frac|\x0crac|rac)\{([^}]*)\}\{([^}]*)\}")

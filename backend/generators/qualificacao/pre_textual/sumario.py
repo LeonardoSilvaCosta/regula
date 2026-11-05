@@ -18,6 +18,10 @@ from ..estrutura import itens_do_sumario
 _BOOKMARK_TOC = {
     "sec_apresentacao": "_TOC_APRESENTACAO",
     "sec_1": "_TOC_CONSIDERACOES",
+    "sec_1_1": "_TOC_INTRODUCAO",
+    "sec_2": "_TOC_OBJETIVOS",
+    "sec_2_1": "_TOC_OBJETIVO_GERAL",
+    "sec_2_2": "_TOC_OBJETIVOS_ESPECIFICOS",
     "sec_metodologia": "_TOC_METODOLOGIA",
     "sec_produtos": "_TOC_PRODUTOS",
     "sec_cronograma": "_TOC_CRONOGRAMA",
@@ -111,12 +115,12 @@ def preencher_sumario(doc):
         titulo = reserva["titulo"]
         bookmark = reserva["bookmark"]
         registrado = por_bookmark.get(bookmark) or {}
-        pagina = paginas.get(bookmark) or registrado.get("pagina") or 1
+        pagina_resolvida = paginas.get(bookmark) or registrado.get("pagina") or 1
         _escrever_linha(
             reserva["paragrafo"],
             titulo,
             bookmark,
-            pagina,
+            pagina_resolvida,
             nivel=registrado.get("nivel", reserva["nivel"]),
         )
 
@@ -143,12 +147,17 @@ def _escrever_linha(paragraph, titulo, bookmark, pagina, nivel=1):
     r_txt.bold = nivel == 1 or _primaria(titulo)
     r_txt.font.name = "Times New Roman"
     r_txt.font.size = Pt(12)
+    pagina_resolvida = max(1, int(pagina or 1))
+    if apresentacao:
+        texto_pagina = _texto_pagina(pagina_resolvida, romana=True)
+    else:
+        texto_pagina = str(pagina_resolvida)
     adicionar_campo_pageref(
         paragraph,
         bookmark,
         italico=apresentacao,
         formato="roman" if apresentacao else None,
-        resultado=_texto_pagina(pagina, romana=apresentacao),
+        resultado=texto_pagina,
     )
 
 

@@ -11,6 +11,7 @@ Subseções:
 from docx.shared import Cm, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
+from core.xml_utils import adicionar_bookmark
 from ..formato import adicionar_titulo
 from ..pre_textual.sumario import registrar_entrada
 
@@ -35,7 +36,7 @@ def build_consideracoes_gerais(doc, dados_secao):
         return paragrafo
 
     def add_sub_title(txt, bookmark=None):
-        adicionar_titulo(doc, txt, bookmark=bookmark, primario=False)
+        return adicionar_titulo(doc, txt, bookmark=bookmark, primario=False)
 
     def add_body_p(txt):
         """Parágrafo textual padrão: Times 12, recuo 1,27 cm, entrelinhas 1,5, espaçamento 0pt."""
@@ -71,7 +72,9 @@ def build_consideracoes_gerais(doc, dados_secao):
     # -------------------------------------------------------------------------
     # 1.1. INTRODUÇÃO
     # -------------------------------------------------------------------------
-    add_sub_title("1.1. INTRODUÇÃO", "sec_1_1")
+    p_intro = add_sub_title("1.1. INTRODUÇÃO", "sec_1_1")
+    adicionar_bookmark(p_intro, "_TOC_INTRODUCAO")
+    registrar_entrada(doc, "1.1. INTRODUÇÃO", 2, "_TOC_INTRODUCAO")
     introducao_paragrafos = dados_secao.get("introducao", [])
     if introducao_paragrafos:
         for par in introducao_paragrafos:

@@ -3,7 +3,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Pt
 
-_bookmark_seq = 0
+from core.xml_utils import adicionar_bookmark as _inserir_bookmark
 
 BOOKMARKS_TITULO = {
     "APRESENTAÇÃO": "sec_apresentacao",
@@ -33,20 +33,7 @@ BOOKMARKS_TITULO = {
 
 def adicionar_bookmark(paragraph, nome):
     """Insere bookmarkStart/End no parágrafo para PAGEREF."""
-    global _bookmark_seq
-    _bookmark_seq += 1
-    ident = str(_bookmark_seq)
-    inicio = OxmlElement("w:bookmarkStart")
-    inicio.set(qn("w:id"), ident)
-    inicio.set(qn("w:name"), nome)
-    fim = OxmlElement("w:bookmarkEnd")
-    fim.set(qn("w:id"), ident)
-    p_pr = paragraph._p.find(qn("w:pPr"))
-    if p_pr is not None:
-        p_pr.addnext(inicio)
-    else:
-        paragraph._p.insert(0, inicio)
-    paragraph._p.append(fim)
+    _inserir_bookmark(paragraph, nome)
 
 
 def ancorar_paragrafo(paragraph, texto, bookmark=None):
