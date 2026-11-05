@@ -79,10 +79,11 @@ def _run_times(tamanho_meio_pontos="24", italico=False):
     return run
 
 
-def adicionar_campo_pageref(paragraph, bookmark, italico=False, formato=None):
+def adicionar_campo_pageref(paragraph, bookmark, italico=False, formato=None, resultado="0"):
     """Campo PAGEREF. O Word recalcula a página ao abrir o arquivo.
 
     `formato` é um comutador do Word (ex.: ``roman`` para algarismos minúsculos).
+    `resultado` é o número visível enquanto o campo não foi atualizado.
     """
     r_inicio = _run_times(italico=italico)
     fld_inicio = OxmlElement("w:fldChar")
@@ -106,7 +107,7 @@ def adicionar_campo_pageref(paragraph, bookmark, italico=False, formato=None):
 
     r_texto = _run_times(italico=italico)
     texto = OxmlElement("w:t")
-    texto.text = "0"
+    texto.text = str(resultado)
     r_texto.append(texto)
 
     r_fim = _run_times(italico=italico)

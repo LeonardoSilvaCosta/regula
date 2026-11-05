@@ -68,6 +68,11 @@ def numeracao_secoes(projeto):
 
 def eh_documental(projeto):
     projeto = projeto or {}
+    participantes = projeto.get("metodologia_participantes")
+    if isinstance(participantes, str) and participantes.strip():
+        return False
+    if isinstance(participantes, (list, tuple)) and any(str(item).strip() for item in participantes):
+        return False
     tipo = (projeto.get("tipo_desenho") or "").strip().lower()
     return "documental" in tipo or "bibliogr" in tipo or bool(projeto.get("metodologia_fontes"))
 

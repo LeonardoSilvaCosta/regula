@@ -10,6 +10,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from core.campos import ancorar_paragrafo
 from core.ptt_schema import formatar_ficha_22_itens
 from ..formato import adicionar_titulo
+from ..pre_textual.sumario import registrar_entrada
 
 _ROTULOS_JUSTIFICATIVA = {
     "XIV. Justificativa do Impacto": "Justificativa do Impacto – até 50 palavras",
@@ -48,8 +49,11 @@ def build_produtos(doc, dados_projeto, numero=5):
       - dados_projeto: Dicionário contendo a chave 'ptts' (lista de dicionários dos produtos)
     """
 
-    def add_sec_title(txt, bookmark=None):
-        adicionar_titulo(doc, txt, bookmark=bookmark, primario=True)
+    def add_sec_title(txt, bookmark=None, toc=None):
+        paragrafo = adicionar_titulo(doc, txt, bookmark=bookmark, primario=True)
+        if toc:
+            registrar_entrada(doc, txt, 1, toc, paragrafo)
+        return paragrafo
 
     def add_sub_title(txt, bookmark=None):
         adicionar_titulo(doc, txt, bookmark=bookmark, primario=False)
@@ -83,7 +87,7 @@ def build_produtos(doc, dados_projeto, numero=5):
     # -------------------------------------------------------------------------
     # 5. PROPOSTA DE PRODUTOS
     # -------------------------------------------------------------------------
-    add_sec_title(f"{numero}. PROPOSTA DE PRODUTOS", "sec_produtos")
+    add_sec_title(f"{numero}. PROPOSTA DE PRODUTOS", "sec_produtos", toc="_TOC_PRODUTOS")
     add_body_p(
         "Em cumprimento à Resolução nº 007/2025-PPGSP e ao Art. 1º, II, item 5 da Resolução nº 009/2025, "
         "apresentam-se as propostas dos produtos técnicos e tecnológicos a serem desenvolvidos:"

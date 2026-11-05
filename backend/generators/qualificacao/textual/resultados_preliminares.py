@@ -21,6 +21,7 @@ from ...common.referencias import (
     titulo_referencias,
 )
 from ..formato import adicionar_lacuna, adicionar_paragrafo
+from ..pre_textual.sumario import registrar_entrada
 
 _TOPICOS_RESUMO = (
     ("Importância do Estudo", ("importancia", "importância", "relevanc")),
@@ -52,7 +53,8 @@ def build_resultados_preliminares(doc, dados_resultados, numero=7, metadata=None
     metadata = metadata or {}
     if isinstance(dados_resultados, dict):
         metadata = {**metadata, **(dados_resultados.get("metadata") or {})}
-    _titulo_secao(doc, f"{numero}. RESULTADOS PRELIMINARES", bookmark="sec_resultados")
+    titulo = _titulo_secao(doc, f"{numero}. RESULTADOS PRELIMINARES", bookmark="sec_resultados")
+    registrar_entrada(doc, f"{numero}. RESULTADOS PRELIMINARES", 1, "_TOC_RESULTADOS", titulo)
     artigos = [artigo for artigo in artigos_de(dados_resultados) if artigo_tem_conteudo(artigo)]
     if not artigos:
         adicionar_paragrafo(

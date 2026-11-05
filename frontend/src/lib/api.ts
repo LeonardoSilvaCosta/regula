@@ -5,6 +5,7 @@ export const API_BASE_URL =
 
 export type AcademicLevel = components["schemas"]["AcademicLevel"];
 export type PTTItem = components["schemas"]["PTTItem"];
+export type ArtigoQuadro = components["schemas"]["ArtigoQuadro"];
 export type PTTValidationResult = components["schemas"]["PTTValidationResult"];
 
 export interface DocumentSections {
@@ -18,26 +19,33 @@ export interface DocumentSections {
   hipotese?: string[];
   metodologia_natureza?: string[];
   metodologia_locus?: string;
-  metodologia_participantes?: string;
+  metodologia_participantes?: string[];
   metodologia_fontes?: string[];
   metodologia_coleta?: string[];
-  metodologia_etica?: string;
-  metodologia_analise?: string;
+  metodologia_etica?: string[];
+  metodologia_analise?: string[];
+  tabela_1?: { linhas: string[][] };
+  tabela_2?: { linhas: string[][] };
   referencias?: string[];
 }
 
 type SchemaParseResponse = components["schemas"]["ParseResponse"];
 type SchemaGenerateRequest = components["schemas"]["GenerateRequest"];
 
+export type CronogramaAtividade = { nome: string; meses: number[] };
+
 export type ParseResponse = Omit<SchemaParseResponse, "metadata"> & {
   metadata: components["schemas"]["DocumentMetadata"] & {
     data_aprovacao?: string;
   };
   sections: DocumentSections;
+  cronograma?: CronogramaAtividade[];
 };
 
 export type GenerateRequest = SchemaGenerateRequest & {
   sections: DocumentSections;
+  artigos?: ArtigoQuadro[];
+  cronograma?: CronogramaAtividade[];
 };
 
 export class ApiError extends Error {

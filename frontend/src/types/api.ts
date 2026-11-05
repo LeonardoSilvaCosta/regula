@@ -181,6 +181,7 @@ export interface components {
             ][];
             /** Ptts */
             ptts?: components["schemas"]["PTTItem"][];
+            artigos?: components["schemas"]["ArtigoQuadro"][];
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -340,6 +341,29 @@ export interface components {
             abrangencia: string;
             /** @default Estado, Município, Comunidade */
             publico_usuario: string;
+            /** @default */
+            objetivo_especifico: string;
+            /** @default Qualitativo/Quantitativo Exploratório Descritivo */
+            tipo_estudo: string;
+            /** @default */
+            fontes: string;
+            /** @default Em produção */
+            status: string;
+        };
+        /** ArtigoQuadro */
+        ArtigoQuadro: {
+            /** @default */
+            titulo: string;
+            /** @default */
+            objetivo_especifico: string;
+            /** @default Qualitativo/Quantitativo Exploratório Descritivo */
+            tipo_estudo: string;
+            /** @default */
+            fontes: string;
+            /** @default Em produção */
+            status: string;
+            /** @default Artigo */
+            subtipo: string;
         };
         /** PTTValidationResult */
         PTTValidationResult: {
@@ -371,6 +395,7 @@ export interface components {
             ][];
             /** Ptts */
             ptts: components["schemas"]["PTTItem"][];
+            artigos?: components["schemas"]["ArtigoQuadro"][];
             /** Lacunas */
             lacunas: components["schemas"]["LacunaItem"][];
             conformidade_ptt: components["schemas"]["PTTValidationResult"];

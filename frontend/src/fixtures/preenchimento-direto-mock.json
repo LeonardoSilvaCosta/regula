@@ -3,79 +3,309 @@
   "tipo_documento": "qualificacao",
   "nivel": "mestrado",
   "metadata": {
-    "titulo": "Violência doméstica e o fluxo de atendimento no Centro Integrado de Atenção Psicossocial",
-    "subtitulo": "um estudo de caso em Belém",
-    "autor": "Maria Helena Costa Ribeiro",
-    "orientador": "Prof. Dr. João Batista Almeida",
-    "coorientador": "Profa. Dra. Ana Paula Ferreira",
+    "titulo": "Modelos de aprendizado de máquina multimodais para predição de desfechos relacionados à saúde mental de policiais militares do Pará a partir de prontuários psicossociais",
+    "subtitulo": "",
+    "autor": "Leonardo da Silva Costa",
+    "orientador": "Prof. Dr. Edson Marcos Leal Soares Ramos",
+    "coorientador": "Prof. Dr. Renato Hidaka Torres",
     "coordenador": "Prof. Dr. Edson Marcos Leal Soares Ramos",
     "ano": "2026",
     "local": "Belém-Pará",
     "area_concentracao": "Segurança Pública, Justiça, Conflitos e Cidadania",
     "linha_pesquisa": "Políticas, Gestão, Direitos Humanos, Criminalidade e Tecnologia da Informação",
-    "data_aprovacao": "Belém, Pará, 15 de março de 2026."
+    "data_aprovacao": "Belém, Pará, 15 de dezembro de 2026."
   },
   "sections": {
     "apresentacao": [
-      "Este relatório de qualificação registra o percurso da pesquisa de mestrado desenvolvida no Programa de Pós-Graduação em Segurança Pública da Universidade Federal do Pará. A escolha do tema decorre da atuação profissional da autora no atendimento a mulheres em situação de violência doméstica.",
-      "O texto organiza o problema, os objetivos, a hipótese e o desenho metodológico que orientarão a coleta e a análise até a defesa da dissertação."
+      "A elaboração deste Relatório de Qualificação reflete a convergência orgânica entre a minha trajetória profissional como Oficial da Polícia Militar do Pará, a formação técnica interdisciplinar em Psicologia e Engenharia de Software, e o compromisso acadêmico com a pesquisa aplicada no âmbito do Mestrado Profissional em Segurança Pública do Instituto de Ciências Exatas e Naturais da Universidade Federal do Pará (PPGSP/UFPA).",
+      "(i) Percurso profissional vinculado à proposta de pesquisa",
+      "Minha trajetória institucional consolidou-se na Polícia Militar do Pará (PMPA), onde atuo no posto de Capitão do Quadro Complementar de Oficiais Policiais Militares (QCOPM), exercendo a especialidade de Psicólogo junto ao Centro Integrado de Atenção Psicossocial (CIAP). O CIAP é a unidade corporativa responsável pela assistência biopsicossocial a um efetivo superior a 16 mil policiais militares da ativa, além de policiais da reserva remunerada, reformados e seus dependentes legais em todo o território paraense.",
+      "Ao longo de anos de atuação direta nas rotinas ambulatoriais, de acolhimento em crises agudas e de perícias funcionais, deparei-me com a severa limitação imposta pelos fluxos tradicionais de assistência à saúde mental nas corporações armadas. O modelo histórico é essencialmente reativo: o profissional da segurança pública costuma chegar ao atendimento formal quando os recursos psíquicos de enfrentamento já se encontram esgotados, materializados em licenças médicas prolongadas, afastamentos compulsórios do porte de arma, incidentes disciplinares graves ou tentativas de autoextermínio. Essa constatação evidenciou a urgência de ferramentas que permitissem antecipar a deterioração psíquica antes do colapso funcional.",
+      "Paralelamente à formação clínica, graduei-me em Engenharia de Software, competência que me permitiu conceber, arquitetar e liderar o desenvolvimento do CIAP WEB, o sistema institucional informatizado de gestão clínica e prontuários eletrônicos do CIAP/PMPA. A implantação dessa plataforma viabilizou a padronização digital de milhares de atendimentos multidisciplinares (psicologia, serviço social e psiquiatria), gerando uma massa informacional longitudinal de dados estruturados e evoluções narrativas em texto livre. Essa vivência direta me posicionou na intersecção singular entre a vivência do estresse policial, a prática clínica do acolhimento em saúde mental e a engenharia de dados aplicada, motivando o desenvolvimento de uma esteira preditiva e ética voltada à preservação da vida policial militar.",
+      "(ii) Percurso acadêmico no curso e produção científica",
+      "Ingressei no Programa de Pós-Graduação em Segurança Pública (PPGSP/UFPA) na turma de Mestrado Profissional de 2026, vinculando-me à Linha de Pesquisa Políticas, Gestão, Direitos Humanos, Criminalidade e Tecnologia da Informação, sob a orientação do Prof. Dr. Edson Marcos Leal Soares Ramos.",
+      "Durante o percurso formativo no curso, integralizei os componentes curriculares obrigatórios e optativos com foco em Metodologia da Pesquisa em Segurança Pública, Métodos Quantitativos Aplicados, Tópicos Especiais em Tecnologia e Inovação em Defesa Social e Seminários de Dissertação. Integro ativamente o grupo de pesquisa em métodos quantitativos aplicados à segurança pública da UFPA, dedicando-me ao estudo de técnicas avançadas de Aprendizado de Máquina, Processamento de Linguagem Natural (PLN), auditoria algorítmica e Inteligência Artificial Explicável (XAI).",
+      "No que tange à produção científica e técnica vinculada ao Currículo Lattes, destaco a publicação de artigos e comunicações científicas sobre saúde ocupacional nas forças armadas e de segurança pública, desenvolvimento de sistemas computacionais para a gestão de defesa social e formulação de notas técnicas institucionais. O presente projeto sintetiza esse itinerário acadêmico, estruturando a dissertação no modelo de dois artigos científicos interdependentes associados a um ecossistema aplicado de seis produtos tecnológicos.",
+      "(iii) Apresentação da estrutura do trabalho",
+      "A estrutura global da investigação e dos produtos que compõem esta dissertação de mestrado profissional é apresentada no Quadro 1, detalhando o encadeamento lógico entre os objetivos específicos, as tipologias de produtos técnicos e acadêmicos, a abordagem metodológica e as respectivas fontes empíricas:",
+      "Quadro 1 – Estrutura dos principais itens da dissertação de mestrado profissional\n| Título | Objetivo Geral | Objetivos Específicos | Tipo de Produto | Tipo de Estudo | Fontes | Status |\n| :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n| Modelos de Aprendizado de Máquina Multimodais para Predição de Desfechos Relacionados à Saúde Mental de Policiais Militares do Pará a partir de Prontuários Psicossociais | Desenvolver e avaliar uma esteira metodológica e computacional baseada na fusão de dados multimodais de prontuários psicossociais para a predição de desfechos de saúde mental em policiais militares do Pará. | (i) Consolidar a taxonomia clínica institucional e mapear a epidemiologia descritiva dos atendimentos e padrões léxicos de sofrimento no corpus rotulado do CIAP/PMPA. | Artigo 1: Epidemiologia Descritiva e Marcadores Clínico-Léxicos em Prontuários Psicossociais da Polícia Militar do Pará | Quantitativo Exploratório Descritivo | Base CIAP | Em redação |\n| | | (ii) Modelar arquiteturas preditivas multimodais (árvores e redes neurais) com janelas deslizantes e interpretabilidade por SHAP para antecipação de crises psicossociais agudas. | Artigo 2: Predição Multimodal de Risco à Saúde Mental Policial: Fusão de Dados Longitudinais e Texto Clínico | Quantitativo Empírico Analítico | Base CIAP | Em produção |\n| | | (iii) Sintetizar o perfil sociodemográfico, funcional e a distribuição temporal dos atendimentos do CIAP em recurso visual de gestão. | Infográfico 1: Panorama Epidemiológico-Institucional do CIAP/PMPA | Técnico Didático Visual | Base CIAP | Em produção |\n| | | (iv) Mapear graficamente os principais termos, queixas somáticas e estressores operacionais que antecedem quadros de colapso psíquico. | Infográfico 2: Guia Clínico-Léxico de Sinais e Sintomas em Evoluções de Enfermagem e Psicologia | Técnico Didático Visual | Base CIAP | Em produção |\n| | | (v) Implementar aplicação computacional conteinerizada para ingestão de prontuários, predição multimodal de risco em 90 dias e emissão de explicações locais explicáveis. | Software / Microsserviço: API de Predição e Suporte à Decisão Clínica | Tecnológico / Software | Base CIAP | Em produção |\n| | | (vi) Gerar conjunto de dados fidedigno derivado da base empírica com aplicação de privacidade diferencial para garantia de ciência aberta e reprodutibilidade. | Base de Dados Sintética: Repositório Anonimizado de Prontuários Psicológicos Militares | Tecnológico / Base de Dados | Base CIAP | Em produção |\n| | | (vii) Formalizar o manual metodológico com critérios de desfechos de crise, tipificação de estressores e protocolo de rotulagem pericial com adjudicação técnica. | Codebook Operacional: Protocolo de Anotação e Estratificação de Risco Psicossocial | Tecnológico / Protocolo Técnico | CIAP / Peritos | Concluído |\n| | | (viii) Configurar modelo aberto de linguagem executado localmente (on-premise) para realce visual automatizado de sentenças críticas em notas narrativas. | Modelo LLM Local: Módulo de Grifagem Clínica Assistida (Clinical Highlighting) | Tecnológico / IA Local | Base CIAP | Em produção |",
+      "Fonte: Elaborado pelo autor (2026)."
     ],
     "introducao": [
-      "A violência doméstica contra a mulher permanece como um dos principais desafios da segurança pública no Brasil. Em Belém, o encaminhamento das vítimas percorre delegacias especializadas, serviços de saúde e equipamentos de atenção psicossocial, com tempos de resposta e registros ainda desiguais.",
-      "O Centro Integrado de Atenção Psicossocial (CIAP) concentra parte desse fluxo. Compreender como os casos entram, circulam e saem do serviço permite identificar gargalos que atrasam a proteção e a produção de prova."
+      "A preservação da integridade psíquica dos profissionais que integram as forças de segurança pública consolidou-se, nas últimas décadas, como um imperativo de gestão estratégica, impactando diretamente a eficácia operacional, a redução dos índices de letalidade e vitimização policial, a sustentabilidade da seguridade pública e a salvaguarda irrevogável dos direitos humanos fundamentais. No exercício cotidiano de suas atribuições constitucionais, o policial militar encontra-se submetido rotineiramente a estressores operacionais de natureza aguda e extrema — compreendendo o confronto armado iminente, o risco permanente de morte violenta e o contato reiterado com cenas de destruição e sofrimento humano — conjugados a estressores organizacionais crônicos, caracterizados por jornadas de serviço extenuantes, rígida hierarquia disciplinar, cobranças operacionais assimétricas e frequente sobrecarga funcional (SOUSA; BARROSO; RIBEIRO, 2022; SANTOS et al., 2024).",
+      "Esse ecossistema laboral hostil desencadeia elevada prevalência de morbidades psíquicas severas, com destaque alarmante para a Síndrome de Burnout, o Transtorno de Estresse Pós-Traumático (TEPT), episódios depressivos maiores, transtornos de ansiedade generalizada e taxas desproporcionais de ideação e condutas suicidas (UGWU; IDEMUDIA, 2025; HANSEN et al., 2025). No cenário nacional, os modelos institucionais vigentes de assistência à saúde mental nas corporações operam quase invariavelmente sob uma dinâmica preponderantemente reativa (SOUSA; BARROSO; RIBEIRO, 2022). Em regra, as intervenções psicossociais especializadas ocorrem somente após a consumação de um colapso emocional explícito, culminando em afastamentos prolongados sob Licença para Tratamento de Saúde (LTS), inaptidão cautelar para o porte de arma de fogo ou em desfechos letais evitáveis (CRUZ et al., 2026; GIANVECCHIO; JORGE, 2022).",
+      "A literatura recente aponta que a transição de um paradigma assistencial reativo e fragmentado para uma estrutura contínua de vigilância proativa e estratificação de risco é obstaculizada pelas limitações intrínsecas dos instrumentos tradicionais de triagem (YANG; BRANSCUM; KINCL, 2022). Avaliações psicológicas esporádicas e inventários psicométricos transversais aplicados em intervalos de anos falham em captar a volatilidade das crises emocionais, além de esbarrarem na cultura do estigma corporativo, que induz os policiais a ocultarem deliberadamente seus sintomas durante entrevistas clínicas formais por receio de desarmamento, restrições na carreira ou discriminação por parte de pares e superiores hierárquicos.",
+      "No âmbito da Polícia Militar do Pará (PMPA), os atendimentos biopsicossociais são centralizados e executados pelo Centro Integrado de Atenção Psicossocial (CIAP). O sistema informatizado de prontuários do CIAP reúne um expressivo acervo longitudinal que integra dados estruturados (atributos sociodemográficos, patentes, lotações geográficas, histórico de afastamentos e afastamentos por LTS) e dados não estruturados de natureza qualitativa (notas narrativas de evolução clínica elaboradas por psicólogos, assistentes sociais e psiquiatras). Embora represente uma fonte informacional robusta sobre a vida funcional e psíquica da tropa, esse repositório permanece amplamente subutilizado sob a ótica analítica da ciência de dados, restringindo-se historicamente ao arquivamento burocrático e a consultas retrospectivas individualizadas.",
+      "No campo da psiquiatria computacional e da informática em saúde, os avanços nas técnicas de Aprendizado de Máquina (Machine Learning - ML) e Processamento de Linguagem Natural (PLN) abriram novas fronteiras metodológicas para a extração automatizada de conhecimento a partir de grandes volumes textuais (CARRASCO-RIBELLES et al., 2023; MSOSA et al., 2023). Estudos empíricos evidenciam que os códigos estruturados tradicionais (a exemplo da CID-10) omitem a quase totalidade das manifestações precoces de risco, enquanto as notas narrativas livres contêm marcadores sutis de esgotamento, distúrbios graves de sono, somatizações e desajustes relacionais que antecedem as crises psiquiátricas graves (ADEKKANATTU et al., 2024; GARRIGA et al., 2023).",
+      "Além disso, a literatura contemporânea demonstra que o sofrimento psíquico não se comporta de forma estática ou binária, mas ao longo de um continuum dinâmico de vulnerabilidade — transitando gradualmente do estado hígido para faixas de risco silencioso, sintomas subclínicos e, finalmente, a crise aguda instalada. A captura desse gradiente evolutivo exige arquiteturas preditivas multimodais capazes de fundir séries temporais de dados tabulares longitudinais com representações semânticas contextuais densas extraídas por modelos neurais do tipo Transformers (MENG et al., 2021; FENG et al., 2025; ULLAH; REDDY, 2026). É no desenvolvimento e na avaliação dessa abordagem no ecossistema da segurança pública que se insere o presente trabalho."
     ],
     "justificativa": [
-      "A pesquisa interessa à gestão da segurança pública porque descreve um ponto de articulação entre polícia, saúde e assistência. Os achados podem subsidiar protocolos de encaminhamento e a qualificação dos registros usados pela rede de proteção.",
-      "No plano acadêmico, o estudo contribui para a linha de políticas, gestão e direitos humanos ao tratar o atendimento psicossocial como etapa do sistema de justiça criminal, e não apenas como cuidado clínico isolado."
+      "A justificativa acadêmica e científica desta pesquisa repousa na superação de uma lacuna relevante na confluência entre a Ciência da Computação, a Saúde Ocupacional e a Gestão em Segurança Pública. Conquanto a literatura internacional registre avanços expressivos no emprego de inteligência artificial aplicada a Registros Eletrônicos de Saúde (Electronic Health Records - EHR) para estratificação de risco psiquiátrico (CARRASCO-RIBELLES et al., 2023; GARRIGA et al., 2022), pesquisas voltadas à modelagem preditiva multimodal focada em forças policiais na América Latina e no Sul Global são praticamente inexistentes. A grande maioria dos algoritmos preditivos consolidados na saúde civil utiliza biomarcadores hospitalares, exames laboratoriais contínuos e históricos farmacológicos que não guardam correspondência com os registros psicossociais institucionais das corporações de segurança (CHEBBAWI; TABAA; BADIR, 2026). A presente investigação contribui para a fronteira do conhecimento ao validar algoritmos de PLN de última geração em língua portuguesa (como o BERTimbau) integrados a modelos em árvore baseados em gradiente (Gradient Boosting) adaptados à semântica clínica e às particularidades institucionais da atividade militar estadual (GARRIGA et al., 2023; AFTAB et al., 2025).",
+      "Sob a ótica institucional e social, o projeto responde diretamente à missão finalística do Mestrado Profissional do PPGSP/UFPA, vocacionado à produção de soluções tecnológicas orientadas a problemas reais das instituições do Estado. O adoecimento psíquico na Polícia Militar do Pará acarreta consequências graves em múltiplas dimensões: gera sofrimento pessoal e familiar aos agentes, acarreta custos previdenciários e assistenciais elevados decorrentes de afastamentos e reformas prematuras e, fundamentalmente, retira policiais qualificados do serviço operacional de rua, fragilizando a prestação do policiamento ostensivo e a segurança da sociedade paraense. Desenvolver ferramentas capazes de alertar precocemente sobre a escalada do risco psíquico viabiliza intervenções terapêuticas oportunas, acolhendo o profissional antes que o quadro evolua para incidentes críticos ou desfechos fatais (JEEVITHA; PRIYA, 2025; SHARADA et al., 2025).",
+      "A viabilidade técnica e gerencial do trabalho fundamenta-se na entrega de soluções aplicadas, incluindo um microsserviço de classificação algorítmica e um modelo de grifagem clínica que operam em ambiente estritamente local (on-premise), sem conexão com servidores externos, respeitando rigorosamente a governança de dados da corporação. Cumpre enfatizar o alinhamento ético deste estudo: os algoritmos e ferramentas desenvolvidos possuem destinação exclusivamente preventiva, médica e de suporte ao cuidado biopsicossocial do CIAP. Estabelece-se como salvaguarda inegociável a vedação terminante de qualquer uso dos escores preditivos para finalidades administrativas, correcionais, disciplinares, punitivas ou impeditivas de promoções e direitos na carreira policial militar."
     ],
     "problema": [
-      "De que modo o fluxo de atendimento do CIAP organiza o encaminhamento de mulheres em situação de violência doméstica em Belém, e quais fatores institucionais atrasam a proteção e o registro desses casos?"
+      "Considerando o acúmulo de estressores ocupacionais na atividade policial militar, o caráter tardio das triagens tradicionais e o potencial não explorado dos prontuários eletrônicos do CIAP/PMPA, formula-se o seguinte problema de pesquisa:",
+      "De que maneira modelos de Aprendizado de Máquina baseados em dados multimodais (notas clínicas narrativas e dados estruturados) podem contribuir para a identificação precoce de fatores de risco e quadros de adoecimento em saúde mental em policiais militares a partir dos prontuários psicossociais institucionais do CIAP/PMPA?"
     ],
     "revisao": [
-      "A literatura sobre violência doméstica destaca a Lei n. 11.340/2006 e a rede de serviços especializados como marco de proteção. Estudos locais apontam subnotificação, revitimização e descontinuidade entre o boletim de ocorrência e o cuidado em saúde.",
-      "Trabalhos sobre gestão de fluxos em segurança pública mostram que a fragmentação de sistemas de informação reduz a capacidade de acompanhar o caso ao longo da rede. Este relatório adota essa leitura para examinar o CIAP."
+      "DA LITERATURA / REFERENCIAL TEÓRICO",
+      "A fundamentação teórica desta investigação estrutura-se em quatro eixos conceituais interdependentes:",
+      "1.4.1. Adoecimento Mental e Vulnerabilidade Ocupacional na Atividade Policial Militar",
+      "A literatura contemporânea em saúde ocupacional tipifica o trabalho policial como uma das atividades profissionais de mais elevado desgaste psicológico e risco biopsicossocial contínuo (SOUSA; BARROSO; RIBEIRO, 2022; DIAS; SIQUEIRA; FERREIRA, 2023). Policiais militares operam diariamente sob a iminência de confronto violento, contato direto com a morte e necessidade de manter permanente estado de alerta hipervigilante. Em meta-análise recente, Ugwu e Idemudia (2025) demonstraram que a exposição continuada a incidentes críticos funciona como preditor linear direto do desenvolvimento concomitante de Síndrome de Burnout e Transtorno de Estresse Pós-Traumático (TEPT), revelando uma sobreposição sintomática que amplia expressivamente a gravidade clínica e o risco funcional dos agentes.",
+      "No contexto brasileiro, pesquisas recentes registram índices alarmantes de exaustão emocional na tropa, atingindo patamares que oscilam entre 54% e 80% do efetivo analisado (SANTOS et al., 2024; LIMA et al., 2025). Essa conjuntura é agravada pela sensibilização neurobiológica cumulativa: a repetição crônica de microtraumas operacionais e conflitos organizacionais diminui progressivamente o limiar de resiliência psicológica do policial militar (HANSEN et al., 2025). Em estágios avançados, o sofrimento silenciado culmina em elevadas taxas de suicídio, fenômeno correlacionado à disponibilidade contínua de armas de fogo, desestruturação econômica e familiar, e ao receio de estigmatização ao buscar apoio institucional (CRUZ et al., 2026; MONTEIRO; SILVA, 2023; GIANVECCHIO; JORGE, 2022).",
+      "1.4.2. O Continuum do Sofrimento Psíquico e as Limitações dos Dados Estruturados",
+      "A prática psiquiátrica clássica operou tradicionalmente com diagnósticos categoriais dicotômicos. Entretanto, pesquisas recentes em psiquiatria computacional enfatizam que o sofrimento emocional deve ser concebido como um gradiente contínuo e heterogêneo. Conforme sistematizado na literatura médica, o indivíduo transita entre diferentes fases evolutivas: inicia-se em estado Hígido/Adaptado, evolui para Vulnerabilidade Silenciosa, atinge Sintomas Subclínicos Moderados e desemboca no Transtorno Pleno ou Crise Psiquiátrica Aguda (CARRASCO-RIBELLES et al., 2023).",
+      "Sistemas de triagem institucional que dependem exclusivamente de registros administrativos estruturados — como a concessão formal de licença médica (LTS) ou a codificação formal de uma CID psiquiátrica — atuam invariavelmente com atraso crítico (YANG; BRANSCUM; KINCL, 2022). O registro formal da CID ocorre comumente apenas quando a crise já desestruturou a capacidade funcional do policial. Além disso, os dados estruturados são amplamente afetados por subnotificação intencional decorrente do medo de desarmamento cautelar ou retaliação profissional (GIANVECCHIO; JORGE, 2022). Em estudo de referência com registros de saúde, Adekkanattu et al. (2024) comprovaram empiricamente que a análise restrita a dados tabulares omitiu até 90% dos indícios documentados de comportamento e ideação suicida em prontuários clínicos, os quais se encontravam registrados de forma detalhada unicamente no texto livre das notas de evolução redigidas pelos profissionais assistentes.",
+      "1.4.3. Processamento de Linguagem Natural e Mineração de Prontuários Clínicos",
+      "A extração de conhecimento latente presente nas evoluções em texto livre consolidou o Processamento de Linguagem Natural (PLN) como recurso fundamental na informática em saúde (CARRASCO-RIBELLES et al., 2023; LE GLAZ et al., 2021). A superação das técnicas clássicas de contagem lexical (como Bag-of-Words e TF-IDF) ocorreu com o advento dos modelos de autoatenção baseados na arquitetura Transformer (VASWANI et al., 2017; DEVLIN et al., 2018). Modelos de linguagem pré-treinados em língua portuguesa, como o BERTimbau, possibilitam capturar o significado semântico denso e as correlações contextuais de expressões clínicas complexas.",
+      "Na área da predição psiquiátrica em saúde pública, Garriga et al. (2022, 2023) demonstraram que modelos que fundem notas narrativas aos históricos clínicos atingem desempenho superior na antecipação de crises de saúde mental em horizontes prospectivos de curto prazo (alcançando AUROC de 0,865). Desempenho correlato foi registrado por Murikipudi et al. (2023) ao detectarem comportamentos autodestrutivos a partir de texto clínico com representações derivadas de modelos biomédicos especializados. Na predição precoce de transtornos de humor crônicos, Feng et al. (2025) verificaram que os dados narrativos textuais foram os maiores contribuidores isolados para o acerto do modelo com redes profundas (AUROC de 0,9029).",
+      "1.4.4. Modelagem Preditiva Multimodal, Séries Temporais e Inteligência Artificial Explicável (XAI)",
+      "A integração harmônica de dados clínicos tabulares heterogêneos com o texto narrativo não estruturado define o paradigma da Modelagem Multimodal (MENG et al., 2021; ULLAH; REDDY, 2026). Prontuários contêm atributos estáticos (dados demográficos), séries temporais irregulares (histórico de consultas e licenças) e anotações descritivas em texto livre. Em revisões abrangentes, comprova-se que arquiteturas com esquema de fusão intermediária (intermediate fusion) — nas quais as representações latentes do texto e os vetores de atributos numéricos são integrados em camadas internas de aprendizagem — superam sistematicamente arquiteturas unimodais ou de fusão tardia (late fusion) (ULLAH; REDDY, 2026).",
+      "Em tarefas preditivas sobre prontuários caracterizados por forte desbalanceamento de classes, algoritmos baseados em árvores de decisão impulsionadas por gradiente (Gradient Boosted Decision Trees, como XGBoost e Random Forest) demonstram eficiência computacional destacada, controle de sobreajuste (overfitting) e alta robustez (AFTAB et al., 2025; CHEBBAWI; TABAA; BADIR, 2026). Paralelamente, redes neurais densas e recorrentes permitem modelar a dependência temporal de sequências clínicas esparsas (RAJARAM et al., 2025; DHARANI; SUGANYA, 2026).",
+      "Por fim, a translação dessas tecnologias para ambientes de alta relevância social e clínica exige superar o paradigma dos modelos \"caixa-preta\" (RUDIN, 2019). O uso de métodos de interpretabilidade pós-hoc, com ênfase no cálculo dos valores de SHAP (SHapley Additive exPlanations), fundamentados na teoria dos jogos cooperativos, viabiliza mensurar a contribuição marginal de cada variável estruturada e de cada termo textual na pontuação final de risco predito para cada policial atendido, gerando transparência e confiança clínica (WANG et al., 2024; JEEVITHA; PRIYA, 2025)."
     ],
-    "objetivo_geral": "Analisar o fluxo de atendimento de mulheres em situação de violência doméstica no CIAP, em Belém, identificando os fatores institucionais que atrasam a proteção e o registro dos casos.",
+    "objetivo_geral": "Desenvolver e avaliar uma esteira metodológica e computacional baseada na fusão de dados multimodais de prontuários psicossociais para a predição de desfechos de saúde mental em policiais militares do Pará, estruturando as evidências em dois artigos científicos e consolidando um ecossistema de produtos técnicos aplicados de suporte à decisão clínica e vigilância assistencial no CIAP/PMPA.",
     "objetivos_especificos": [
-      "Descrever as etapas do encaminhamento desde o primeiro contato até o desfecho no CIAP.",
-      "Identificar os registros produzidos em cada etapa e os sistemas em que são lançados.",
-      "Mapear os intervalos de tempo entre o registro inicial e o atendimento psicossocial.",
-      "Caracterizar os entraves relatados por profissionais da rede de proteção."
+      "Estruturar e desidentificar a base de dados analítica de prontuários do CIAP/PMPA, implementando protocolos rigorosos de minimização, anonimização de identificadores diretos e mascaramento de entidades sensíveis em conformidade com a LGPD e as normas do CEP/Conep;",
+      "Definir o padrão-ouro taxonômico (*ground truth*) e os critérios operacionais da Escala de Vulnerabilidade e Risco Psicossocial (EVRP), mensurando a concordância interavaliadores independente entre peritos e estabelecendo regras técnicas de adjudicação clínica;",
+      "Caracterizar a epidemiologia descritiva dos atendimentos e os padrões léxicos de sofrimento psíquico, identificando a frequência e relevância de queixas somáticas, distúrbios de sono e estressores funcionais no acervo documental rotulado;",
+      "Conceber dois infográficos analíticos de síntese assistencial destinados à gestão e à equipe multidisciplinar do CIAP, traduzindo visualmente o perfil da tropa e os principais marcadores de adoecimento documentados;",
+      "Modelar atributos temporais dinâmicos por meio de janelas deslizantes (*rolling windows*) retrospectivas (6 a 12 meses) e prospectivas (30 a 90 dias), integrando representações contextuais densas extraídas pelo modelo BERTimbau às variáveis tabulares da corporação;",
+      "Comparar o desempenho preditivo e a calibração probabilística de algoritmos em árvores por gradiente (XGBoost, Random Forest) e redes neurais com fusão intermediária, utilizando particionamento temporal (*out-of-time*) e métricas de discriminação clínica (AUROC, AUPRC, Brier Score);",
+      "Auditar a interpretabilidade dos escores gerados por meio de valores de SHAP (*Explainable AI*), quantificando a importância marginal de atributos funcionais e expressões textuais para a validação da plausibilidade clínica junto aos profissionais de saúde;",
+      "Desenvolver uma aplicação de software modular conteinerizada em formato de microsserviço/API para automatizar a ingestão de registros, o cálculo do risco prospectivo e a geração de explicações visuais locais para a equipe técnica do CIAP;",
+      "Gerar uma base de dados sintética de prontuários com garantia de privacidade diferencial, assegurando a fidedignidade estatística do banco para replicação científica em conformidade com os preceitos de Ciência Aberta e sigilo institucional;",
+      "Implementar um modelo de linguagem de grande porte (LLM) aberto executado localmente (*on-premise*) para extração e realce visual automatizado de sentenças críticas em evoluções textuais, sob estritas salvaguardas éticas e de não punição."
     ],
     "hipotese": [
-      "O atraso na proteção está associado à descontinuidade entre o registro policial e o prontuário do CIAP, e não apenas à falta de vagas no serviço."
+      "OU QUESTÕES NORTEADORAS",
+      "Em consonância com as diretrizes do programa e o caráter exploratório-analítico da pesquisa, adotam-se as seguintes questões norteadoras:",
+      "Questão 1: Quais são os marcadores clínicos e expressões léxicas mais incidentes nas notas de evolução textual dos prontuários do CIAP/PMPA que sinalizam o agravamento de quadros de vulnerabilidade psíquica em policiais militares?\nQuestão 2: A fusão multimodal intermediária entre dados estruturados (histórico de afastamentos e atributos funcionais) e vetores semânticos densos (BERTimbau) proporciona ganho estatisticamente significativo de discriminação preditiva (AUROC e AUPRC) em relação a modelos unimodais tabulares na antecipação de crises psicossociais em 90 dias?\nQuestão 3: Os fatores de risco identificados pelos métodos de Inteligência Artificial Explicável (valores de SHAP) apresentam coerência teórica e plausibilidade clínica quando confrontados com o julgamento pericial e com a literatura especializada em estresse policial?"
     ],
     "metodologia_natureza": [
-      "Pesquisa aplicada, de abordagem qualitativa, com estratégia de estudo de caso. O desenho é descritivo-explicativo e se apoia em análise documental e entrevistas semiestruturadas."
+      "A presente pesquisa caracteriza-se como aplicada com foco em inovação tecnológica em segurança pública, conduzida sob delineamento empírico, quantitativo e analítico fundamentado em ciência de dados e engenharia de software em saúde. Trata-se de uma investigação exploratória e preditiva que combina abordagens de pesquisa documental retrospectiva, processamento de dados longitudinais de prontuários eletrônicos e validação pericial independente."
     ],
-    "metodologia_locus": "Centro Integrado de Atenção Psicossocial vinculado à rede de proteção à mulher em Belém, Pará, no período de 2024 a 2025.",
-    "metodologia_participantes": "Profissionais que atuam no fluxo (psicologia, serviço social e gestão do CIAP) e registros institucionais anonimizados de encaminhamentos. A amostra é intencional, até a saturação das categorias.",
+    "metodologia_locus": "DA PESQUISA\n\nO lócus de realização da pesquisa é o Centro Integrado de Atenção Psicossocial (CIAP) da Polícia Militar do Pará, sediado em Belém/PA. O CIAP é o órgão setorial responsável pelo planejamento, coordenação e execução das diretrizes de atenção biopsicossocial aos policiais militares da ativa, da reserva remunerada e aos seus respectivos dependentes em escala estadual.",
+    "metodologia_participantes": [
+      "PARTICIPANTES, UNIVERSO E DELINEAMENTO AMOSTRAL",
+      "O universo de investigação compreende o acervo longitudinal de prontuários eletrônicos do sistema informatizado do CIAP/PMPA.",
+      "Critérios de Inclusão e Elegibilidade\nForam incluídos no universo registros de atendimentos clínicos prestados a policiais militares titulares da ativa ou da reserva remunerada da PMPA, abrangendo notas narrativas de evolução com volume textual informativo superior a 30 caracteres.",
+      "Critérios de Exclusão\nForam excluídos do banco analítico registros referentes a dependentes civis, colaboradores voluntários, estagiários civis e quadros de outras forças (como Bombeiros Militares). Foram igualmente excluídos os atendimentos póstumos catalogados sob as demandas Suicídio e Óbito (militar) (n = 241). Essa exclusão fundamenta-se no fato de que tais registros consistiram em suporte funeral, previdenciário e acolhimento ao luto prestados à família enlutada após a ocorrência da morte, não configurando intervenção preventiva ou assistencial direcionada ao policial militar em vida.",
+      "Dessa filtragem resultou uma coorte populacional clínica viva de N = 5.706 atendimentos clínicos únicos, correspondendo a 2.644 policiais militares atendidos no período de 01 de janeiro de 2024 a 30 de setembro de 2026.",
+      "Cálculo Amostral (Fórmula de Cochran)\nPara determinar o tamanho amostral estatisticamente representativo destinado ao processo de rotulagem clínica pericial independente (ground truth), aplicou-se a formulação clássica de Cochran (1977) para populações finitas:",
+      "n₀ = (Z² · p · q) / e²",
+      "n = n₀ / (1 + (n₀ − 1) / N)",
+      "Considerando nível de confiança de 95% (Z = 1{,}96), proporção de máxima variabilidade (p = 0{,}50; q = 0{,}50) e margem de erro amostral de 5% (e = 0{,}05), obteve-se n_0 = 384{,}16. Aplicada a correção para a população finita de N = 5.706, calculou-se n = 360{,}22, delimitando a amostra em n = 360 prontuários clínicos (representando 6,3% da população total).",
+      "Estratificação da Amostra por Âncoras Clínico-Institucionais\nA seleção aleatória simples introduziria viés de desbalanceamento severo de classes, uma vez que casos psiquiátricos graves e ideações suicidas apresentam baixa prevalência basal em rotinas ambulatoriais. Para mitigar esse risco e assegurar poder estatístico discriminativo aos quatro níveis da Escala de Vulnerabilidade e Risco Psicossocial (EVRP), os 5.706 prontuários foram organizados em cinco macroestratos clínico-institucionais:",
+      "Estrato 1: Psiquiátrico Agudo (N_1 = 149 | 2,6% da população): Demandas motivadas por ideação suicida, tentativa de suicídio e surto psicótico. Constitui âncora clínica do Nível 3 (Crise Aguda);\nEstrato 2: Risco Moderado, Afastamento Funcional e Incidentes Críticos (N_2 = 1.432 | 25,1% da população): Casos com afastamento formal do trabalho (`tem_afastamento = true`), confrontos operacionais (ferimento por arma de fogo, letalidade) e mecanismos de enfrentamento desadaptativos (TEPT, uso nocivo de álcool/drogas, apostas, assédio, violência doméstica e relatórios em RSO);\nEstrato 3: Avaliações Psicológicas Administrativas (N_3 = 738 | 12,9% da população): Perícias psicotécnicas e administrativas formais (porte de arma, cursos, ingresso, reversão à ativa) com estrita ausência de afastamento (`tem_afastamento = false`). Na rotina técnica do CIAP, esses policiais passam por baterias psicométricas (TAS, TEADI, Palográfico), constituindo o grupo de controle empírico de higidez mental e adaptabilidade funcional (Nível 0 da EVRP);\nEstrato 4: Clínico Ambulatorial Sintomático e Situacional (N_4 = 1.624 | 28,5% da população): Demandas ambulatoriais sem afastamento, englobando ansiedade, depressão reativa, alterações de sono, conflitos familiares, estresse ocupacional e acolhimento no presídio militar (BEP). Alimenta os níveis intermediários (Níveis 1 e 2);\nEstrato 5: Rotina e Suporte Geral (N_5 = 1.763 | 30,9% da população): Atendimentos institucionais de acolhimento e triagens gerais sem especificações críticas.",
+      "A Tabela 1 apresenta a comparação entre a distribuição populacional real, a amostragem proporcional teórica e a alocação amostral otimizada e balanceada adotada para a rotulagem:",
+      "Tabela 1 – Distribuição Populacional da Coorte Viva e Alocação Amostral Estratificada (n = 360)\n| Macroestrato Metodológico | População Real (N_h) | Proporção (%) | Amostra Proporcional (n_h) | Amostra Otimizada Balanceada (n_h) | Papel na Escala EVRP / Anotação |\n| :--- | :---: | :---: | :---: | :---: | :--- |\n| 1. Psiquiátrico Agudo (Ideação, Tentativa, Surto) | 149 | 2,6% | 9 | 60 | Nível 3 (Crise Aguda) e Sinais Autodestrutivos |\n| 2. Risco Moderado / Afastamento / Incidente | 1.432 | 25,1% | 90 | 90 | Nível 2 (Risco Moderado) e Incidentes Críticos |\n| 3. Avaliações Psicológicas Adm. (PAF, Cursos) | 738 | 12,9% | 47 | 65 | Nível 0 (Adaptado / Controle de Higidez) |\n| 4. Clínico Ambulatorial Sintomático (Ansiedade, Sono) | 1.624 | 28,5% | 103 | 95 | Níveis 1 e 2 (Vulnerabilidade e Estresse) |\n| 5. Rotina Geral / Suporte Assistencial | 1.763 | 30,9% | 111 | 50 | Níveis 0 e 1 (Acolhimento e Triagem) |\n| Total Geral da Coorte Viva | 5.706 | 100,0% | 360 | 360 | Matriz de Confusão Equilibrada |",
+      "Fonte: Dados da pesquisa extraídos do banco analítico do CIAP (2026).",
+      "A redistribuição das cotas amostrais dentro do total de n = 360 fundamentou-se em três princípios técnicos:\n1. Poder estatístico na validação cruzada (5-Fold CV): Na alocação proporcional estrita, o Estrato 1 receberia apenas 9 prontuários, inviabilizando a avaliação de revocação (recall) para eventos de ideação e tentativa de suicídio. A alocação de 60 casos assegura média de 12 casos críticos por dobra de teste e 48 casos de treinamento;\n2. Princípio de Neyman sobre variabilidade interna: Estratos de maior heterogeneidade clínica e complexidade semântica demandam maior densidade, enquanto estratos burocráticos atingem rápida saturação informacional;\n3. Simetria da matriz e preservação de base de teste: A expansão do Estrato 3 (n_3 = 65) estabelece um contrapeso de controle de higidez mental em relação ao Estrato 1 (n_1 = 60). Além disso, alocar 60 dos 149 casos preserva 89 casos reais críticos como conjunto de teste temporal cego (holdout).",
+      "Auditoria Paramétrica de Tokens e Controle de Outliers (Método de Tukey)\nA seleção dos prontuários que integram a amostra de 360 prontuários foi auditada pela análise da distribuição de tokens (palavras) em cada evolução clínica, prevenindo que os modelos neurais desenvolvam o chamado viés de comprimento de sequência (sequence length bias). Os limiares de valores atípicos (outliers) foram calculados pelo método de Tukey (Q_3 + 1{,}5 \times \text{IQR}), conforme sistematizado na Tabela 2:",
+      "Tabela 2 – Métricas de Dispersão de Tokens por Prontuário e Limiares de Outliers (Método de Tukey)\n| Macroestrato Metodológico | N_h | Mín. | P10 | Q_1 | Mediana | Q_3 | P90 | Máx. | Limiar Outlier Superior | Casos Outliers (n$ e %) |\n| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n| 1. Psiquiátrico Agudo | 149 | 22 | 43 | 109 | 194 | 267 | 447 | 768 | > 504 | 5 (3,4%) |\n| 2. Risco Moderado / Afastamento | 1.432 | 4 | 13 | 45 | 108 | 201 | 455 | 1.306 | > 435 | 81 (5,7%) |\n| 3. Avaliações Administrativas | 738 | 4 | 7 | 13 | 23 | 42 | 366 | 1.217 | > 86 | 134 (18,2%) |\n| 4. Clínico Ambulatorial Sintomático | 1.624 | 4 | 18 | 63 | 124 | 211 | 400 | 1.219 | > 434 | 59 (3,6%) |\n| 5. Rotina Geral / Suporte | 1.763 | 6 | 21 | 59 | 109 | 186 | 362 | 2.083 | > 377 | 77 (4,4%) |",
+      "Fonte: Dados da pesquisa extraídos do banco analítico do CIAP (2026).",
+      "Esses parâmetros garantiram: (a) calibração da cauda superior no Estrato 1, distribuindo os 60 casos entre registros curtos (20%), interquartis (60%) e cauda longa (20%); (b) equalização do Estrato 3, incorporando laudos concisos da mediana e avaliações extensas de perícia que ultrapassam 86 tokens; e (c) controle da dispersão nos estratos intermediários, com 80% dos casos alocados no intervalo interquartil."
+    ],
     "metodologia_fontes": [
-      "Normas internas de encaminhamento, livros de registro e planilhas de produção do CIAP.",
-      "Entrevistas semiestruturadas com profissionais da rede, mediante termo de consentimento."
+      "O acervo informacional integra dados primários secundarizados provenientes do banco relacional transacional do sistema CIAP WEB (PostgreSQL), articulando variáveis estruturadas tabulares e anotações narrativas de evolução clínica em texto livre."
     ],
     "metodologia_coleta": [
-      "A coleta documental ocorrerá nas dependências do serviço, com fichas de extração padronizadas e sem identificação nominal das usuárias.",
-      "As entrevistas serão gravadas com autorização, transcritas e devolvidas aos participantes para conferência."
+      "DE DADOS E ROTULAGEM PERICIAL",
+      "A coleta documental e o pré-processamento estruturam-se nas seguintes etapas operacionais:",
+      "1. Extração e Pseudonimização: Extração direta do banco relacional de dados do CIAP/PMPA, dividida em variáveis estruturadas tabulares (idade, sexo, estado civil, patente, unidade de lotação, tempo de serviço, histórico de licenças LTS) e texto livre não estruturado (evoluções de atendimento psicológico e social);\n2. Higienização Textual: Remoção automatizada de cabeçalhos institucionais padronizados, códigos HTML, quebras residuais de linha e normalização de siglas institucionais;\n3. Anotação Supervisionada com Peritos: A amostra selecionada de 360 atendimentos é importada para a plataforma de anotação de dados Label Studio, executada em servidor local seguro. Dois oficiais peritos com ampla experiência clínica no CIAP (MAJ QCOPM Moura e CAP QCOPM Nathália) realizam a rotulagem independente às cegas de cada evolução, classificando os prontuários nos quatro níveis ordinais da EVRP (Nível 0: Adaptado; Nível 1: Vulnerabilidade Leve; Nível 2: Risco Moderado; Nível 3: Crise Aguda) e demarcando trechos (spans) associados a sinais autodestrutivos, distúrbios de sono e estressores de serviço;\n4. Tratamento de Discrepâncias e Adjudicação: O coeficiente Kappa de Cohen e o Kappa Ponderado são calculados para mensurar a concordância interavaliadores. Divergências menores (\\Delta\text{EVRP} = 1) adotam a regra da precaução clínica para acolhimento institucional e aplicação de rótulos suavizados (soft labels) no treinamento algorítmico. Divergências críticas (\\Delta\text{EVRP} \\ge 2) são submetidas a comitê de consenso e, persistindo o dissenso, adjudicadas pela coordenação da pesquisa."
     ],
-    "metodologia_etica": "O projeto será submetido ao Comitê de Ética em Pesquisa. Os dados pessoais serão tratados conforme a Lei n. 13.709/2018, com acesso restrito à pesquisadora e descarte seguro ao fim do estudo.",
-    "metodologia_analise": "Análise de conteúdo temática, com categorias definidas a partir do fluxo (entrada, registro, encaminhamento e desfecho) e apoio de planilha de codificação.",
+    "metodologia_etica": [
+      "E GOVERNANÇA DE DADOS",
+      "A condução da pesquisa pauta-se no rigor ético exigido para o tratamento de dados pessoais e sensíveis no setor público:",
+      "Conformidade com a LGPD e Normas Éticas: O protocolo atende integralmente à Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018) e às Resoluções nº 466/2012 e nº 510/2016 do Conselho Nacional de Saúde (CNS). O projeto tramita na Plataforma Brasil sob apreciação do Comitê de Ética em Pesquisa do Instituto de Ciências da Saúde da UFPA (CEP/ICS/UFPA), amparado por Termo de Anuência Institucional firmado pelo Comando Geral da PMPA;\nProtocolo de Anonimização e Chaves de Custódia: Identificadores pessoais diretos (nome do policial, número de matrícula funcional, CPF e nomes de familiares) são suprimidos e substituídos por identificadores alfanuméricos criptográficos gerados por função de dispersão unidirecional (hash SHA-256 com salvação segura). A tabela de chave de correspondência permanece sob custódia física e computacional exclusiva do CIAP/PMPA, sendo inacessível fora da infraestrutura da corporação. As anotações narrativas são submetidas a rotina automatizada de Reconhecimento de Entidades Nomeadas (NER) e expressões regulares para mascaramento de localidades, placas e menções nominais a terceiros;\nPrincípio da Não Punição e Finalidade Estritamente Assistencial: Fica formal e normativamente vedada a utilização de quaisquer predições, escores ou estimativas geradas pelos modelos computacionais para fins correcionais, abertura de procedimentos disciplinares, sindicâncias, avaliações punitivas de desempenho ou impedimentos à progressão na carreira policial. Os modelos atuam unicamente como ferramenta de apoio à decisão das equipes de saúde do CIAP."
+    ],
+    "metodologia_analise": [
+      "E ARQUITETURA COMPUTACIONAL",
+      "A esteira computacional de modelagem e análise de dados estrutura-se em cinco componentes:",
+      "1. Modelagem Temporal e Janelas Deslizantes (Rolling Windows)\nPara superar as limitações de análises estáticas e representar o processo contínuo de vulnerabilidade, o histórico de cada policial é modelado através de janelas temporais dinâmicas deslizantes:\nJanela de Observação (T_w): Intervalo retrospectivo de 6 a 12 meses anteriores a uma data de referência t_0, no qual são calculadas variáveis de frequência de atendimentos, intervalos médios entre consultas, histórico acumulado de licenças LTS e aceleração da busca por suporte;\nJanela de Predição (T_p): Horizonte temporal prospectivo de 90 dias (com análises de sensibilidade em 30 e 60 dias) subsequente a t_0, no qual se busca prever a transição para desfecho crítico de crise psicossocial ou afastamento psiquiátrico grave.",
+      "2. Processamento Textual e Vetorização Contextual\nAs anotações narrativas higienizadas passam por extração semântica com o modelo BERTimbau (BERT-Base Portuguese), treinado sobre expressivo acervo de língua portuguesa. O modelo gera vetores contextuais densos de dimensão d = 768 a partir das camadas de saída, representando o teor semântico e afetivo das anotações clínicas. Em paralelo, são computados índices baseados em dicionários léxicos especializados no domínio de estresse policial e psiquiatria ocupacional.",
+      "3. Estratégia de Fusão Multimodal Intermediária\nAdota-se o esquema de Fusão Intermediária (Intermediate Fusion):\nOs vetores de atributos temporais e tabulares passam por camadas densas de redução dimensional e normalização;\nOs vetores semânticos textuais derivados do BERTimbau são concatenados aos atributos tabulares latentes em uma camada intermediária de representação conjunta, permitindo que mecanismos de autoatenção atribuam pesos diferenciados às interações entre características do policial e o conteúdo descritivo das evoluções;\nO vetor multimodal consolidado alimenta a camada final de classificação probabilística de risco.",
+      "4. Treinamento de Modelos e Validação Temporal (Out-of-Time)\nSão treinadas e comparadas duas classes principais de classificadores:\nModelos em árvores baseados em gradiente: XGBoost e Random Forest;\nRedes neurais multimodais profundas com camadas densas e atenção temporal hierárquica.\nO particionamento de dados adota estritamente a divisão temporal cronológica (out-of-time validation): atendimentos do período inicial são alocados para treinamento e validação hiperparamétrica cruzada em 5 dobras, e os atendimentos mais recentes compõem o conjunto de teste independente, prevenindo o vazamento de informações futuras (data leakage). O desbalanceamento de classes é mitigado pela combinação de reponderação de perdas (Focal Loss) e balanceamento sintético de treino via algoritmo SMOTE-NC.",
+      "5. Métricas de Desempenho e Inteligência Artificial Explicável (SHAP)\nA avaliação dos modelos contempla métricas recomendadas para registros de saúde desbalanceados: AUROC, AUPRC, Sensibilidade clínica (Recall), Valor Preditivo Positivo e Brier Score (calibração de probabilidade). Para cada predição emitida, são calculados valores de SHAP (SHapley Additive exPlanations), permitindo decompor a pontuação de risco e identificar quais variáveis funcionais ou expressões narrativas justificaram o escore gerado, garantindo transparência e interpretabilidade à equipe assistencial."
+    ],
+    "tabela_1": {
+      "linhas": [
+        [
+          "1. Psiquiátrico Agudo (Ideação, Tentativa, Surto)",
+          "149",
+          "2,6%",
+          "9",
+          "60",
+          "Nível 3 (Crise Aguda)"
+        ],
+        [
+          "2. Risco Moderado / Afastamento / Incidente",
+          "1.432",
+          "25,1%",
+          "90",
+          "90",
+          "Nível 2 (Risco Moderado)"
+        ],
+        [
+          "3. Avaliações Psicológicas Adm. (sem afastamento)",
+          "738",
+          "12,9%",
+          "47",
+          "65",
+          "Nível 0 (Adaptado)"
+        ],
+        [
+          "4. Clínico Ambulatorial Sintomático",
+          "1.624",
+          "28,5%",
+          "103",
+          "95",
+          "Níveis 1 e 2"
+        ],
+        [
+          "5. Rotina Geral / Suporte Assistencial",
+          "1.763",
+          "30,9%",
+          "111",
+          "50",
+          "Níveis 0 e 1"
+        ],
+        [
+          "Total Geral da Coorte Viva PMPA",
+          "5.706",
+          "100,0%",
+          "360",
+          "360",
+          "Matriz equilibrada"
+        ]
+      ]
+    },
+    "tabela_2": {
+      "linhas": [
+        [
+          "1. Psiquiátrico Agudo",
+          "149",
+          "22",
+          "43",
+          "109",
+          "194",
+          "267",
+          "447",
+          "768",
+          "> 504",
+          "5 (3,4%)"
+        ],
+        [
+          "2. Risco Moderado / Afastamento",
+          "1.432",
+          "4",
+          "13",
+          "45",
+          "108",
+          "201",
+          "455",
+          "1.306",
+          "> 435",
+          "81 (5,7%)"
+        ],
+        [
+          "3. Avaliações Administrativas",
+          "738",
+          "4",
+          "7",
+          "13",
+          "23",
+          "42",
+          "366",
+          "1.217",
+          "> 86",
+          "134 (18,2%)"
+        ],
+        [
+          "4. Clínico Ambulatorial Sintomático",
+          "1.624",
+          "4",
+          "18",
+          "63",
+          "124",
+          "211",
+          "400",
+          "1.219",
+          "> 434",
+          "59 (3,6%)"
+        ],
+        [
+          "5. Rotina Geral / Suporte",
+          "1.763",
+          "6",
+          "21",
+          "59",
+          "109",
+          "186",
+          "362",
+          "2.083",
+          "> 377",
+          "77 (4,4%)"
+        ]
+      ]
+    },
     "referencias": [
-      "BRASIL. Lei n. 11.340, de 7 de agosto de 2006. Cria mecanismos para coibir a violência doméstica e familiar contra a mulher. Diário Oficial da União, Brasília, DF, 8 ago. 2006.",
-      "BRASIL. Lei n. 13.709, de 14 de agosto de 2018. Lei Geral de Proteção de Dados Pessoais. Diário Oficial da União, Brasília, DF, 15 ago. 2018.",
-      "UNIVERSIDADE FEDERAL DO PARÁ. Resolução n. 009/2025-PPGSP. Belém: PPGSP, 2025."
+      "ADEKKANATTU, P. et al. Deep learning for identifying personal and family history of suicidal thoughts and behaviors from EHRs. npj Digital Medicine, London, v. 7, n. 1, art. 260, p. 1-11, 2024. Disponível em: https://doi.org/10.1038/s41746-024-01266-7.",
+      "AFTAB, A. B. et al. GBRT++: A New Data-Driven Model for Predicting Self-Harming Behavior in Postpartum Depression. In: INTERNATIONAL CONFERENCE ON COMPUTER AND INFORMATION TECHNOLOGY (ICCIT), 28., 2025, Cox's Bazar. Proceedings [...]. Piscataway: IEEE, 2025. p. 5163-5168. Disponível em: https://doi.org/10.1109/ICCIT68739.2025.11490411.",
+      "ALVES, P. et al. A machine learning model using clinical notes to estimate PHQ-9 symptom severity scores in depressed patients. Journal of Affective Disorders, Amsterdam, v. 374, p. 119-127, 2025. Disponível em: https://doi.org/10.1016/j.jad.2025.01.152.",
+      "BRASIL. Presidência da República. Lei nº 13.709, de 14 de agosto de 2018. Dispõe sobre a proteção de dados pessoais e altera a Lei nº 12.965, de 23 de abril de 2014 (Lei Geral de Proteção de Dados Pessoais - LGPD). Diário Oficial da União: seção 1, Brasília, DF, 15 ago. 2018.",
+      "CARRASCO-RIBELLES, L. A. et al. Prediction models using artificial intelligence and longitudinal data from electronic health records: a systematic methodological review. Journal of the American Medical Informatics Association, Oxford, v. 30, n. 12, p. 2072-2082, 2023. Disponível em: https://doi.org/10.1093/jamia/ocad168.",
+      "CHEBBAWI, S.; TABAA, M.; BADIR, H. An Interpretable AI Framework to Predict Post-ICU Mental Health Risks employing EHR Data and Vitamin D Biomarkers. In: IEEE INTERNATIONAL MULTIDISCIPLINARY CONFERENCE ON ENGINEERING TECHNOLOGY (IMCET), 5., 2026, Beirute. Proceedings [...]. Piscataway: IEEE, 2026. p. 1-9. Disponível em: https://doi.org/10.1109/IMCET69180.2026.11503771.",
+      "COCHRAN, W. G. Sampling techniques. 3. ed. New York: John Wiley & Sons, 1977.",
+      "CONSELHO NACIONAL DE SAÚDE (CNS). Resolução nº 466, de 12 de dezembro de 2012. Aprova as diretrizes e normas regulamentadoras de pesquisas envolvendo seres humanos. Diário Oficial da União: seção 1, Brasília, DF, n. 12, p. 59-62, 13 jun. 2013.",
+      "CONSELHO NACIONAL DE SAÚDE (CNS). Resolução nº 510, de 7 de abril de 2016. Dispõe sobre as normas aplicáveis a pesquisas em Ciências Humanas e Sociais. Diário Oficial da União: seção 1, Brasília, DF, n. 98, p. 44-46, 24 maio 2016.",
+      "CRUZ, F. N. et al. Desvendando os Suicídios Entre Profissionais de Segurança Pública: um olhar sobre fatores operacionais e organizacionais. Sociedade e Estado, Brasília, v. 41, n. 1, art. e56366, 2026.",
+      "DEVLIN, J. et al. BERT: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805, p. 1-14, 2018.",
+      "DHARANI, S.; SUGANYA, T. S. Transformer-based NLP for Early Risk Prediction of Postpartum Depression from Maternal Textual and Voice Data. In: INTERNATIONAL CONFERENCE ON INVENTIVE RESEARCH IN COMPUTING APPLICATIONS (ICIRCA), 7., 2026, Coimbatore. Proceedings [...]. Piscataway: IEEE, 2026. p. 774-780. Disponível em: https://doi.org/10.1109/ICIRCA69024.2026.11570599.",
+      "DIAS, C. A.; SIQUEIRA, M. V. S.; FERREIRA, L. B. Análise socioclínica do contexto do trabalho e sua relação com o adoecimento mental de policiais militares do Distrito Federal. Cadernos EBAPE.BR, Rio de Janeiro, v. 21, n. 1, art. e2022-0095, 2023.",
+      "FENG, W. et al. Deep learning based prediction of depression and anxiety in patients with type 2 diabetes mellitus using regional electronic health records. International Journal of Medical Informatics, Shannon, v. 196, art. 105801, p. 1-10, 2025. Disponível em: https://doi.org/10.1016/j.ijmedinf.2025.105801.",
+      "GARRIGA, R. et al. Machine learning model to predict mental health crises from electronic health records. Nature Medicine, New York, v. 28, n. 6, p. 1240-1248, 2022. Disponível em: https://doi.org/10.1038/s41591-022-01811-5.",
+      "GARRIGA, R. et al. Combining clinical notes with structured electronic health records enhances the prediction of mental health crises. Cell Reports Medicine, Cambridge, v. 4, n. 11, art. 101260, p. 1-13, 2023. Disponível em: https://doi.org/10.1016/j.xcrm.2023.101260.",
+      "GIANVECCHIO, V. A. P.; JORGE, M. H. P. M. O suicídio no estado de São Paulo, Brasil: comparando dados da Segurança Pública e da Saúde. Ciência & Saúde Coletiva, Rio de Janeiro, v. 27, n. 6, p. 2427-2438, 2022. Disponível em: https://doi.org/10.1590/1413-81232022276.16112021.",
+      "HANSEN, N. B. et al. Exposure to critical incidents at work and development of posttraumatic stress among police officers: a 2-year prospective cohort study. European Journal of Work and Organizational Psychology, London, v. 34, n. 4, p. 451-473, 2025. Disponível em: https://doi.org/10.1080/1359432X.2025.2509679.",
+      "JEEVITHA, V.; PRIYA, R. Early Prediction of Postpartum Depression Using Machine Learning on Electronic Health Records. In: INTERNATIONAL CONFERENCE ON COMMUNICATION AND ELECTRONICS SYSTEMS (ICCES), 10., 2025, Coimbatore. Proceedings [...]. Piscataway: IEEE, 2025. p. 648-654. Disponível em: https://doi.org/10.1109/ICCES67310.2025.11337007.",
+      "KIM, J. et al. Mental COP: Mental Health Cohort Of Police officers in Korea. BMJ Open, London, v. 14, art. e082010, p. 1-11, 2024. Disponível em: https://doi.org/10.1136/bmjopen-2023-082010.",
+      "KOROL, S. et al. Demographic and cognitive risk factors for police mental disorder symptoms. The Police Journal: Theory, Practice and Principles, London, v. 94, n. 1, p. 40-57, 2021. Disponível em: https://doi.org/10.1177/0032258X19894619.",
+      "LE GLAZ, A. et al. Machine learning and natural language processing in mental health: Systematic review. Journal of Medical Internet Research, Toronto, v. 23, n. 5, art. e15708, p. 1-20, 2021. Disponível em: https://doi.org/10.2196/15708.",
+      "LIMA, A. G. T. et al. Exhaustion and Burnout Syndrome among Brazilian Military Police Officers Stationed in the Interior of Pernambuco. Texto & Contexto - Enfermagem, Florianópolis, v. 34, art. e20250013, 2025.",
+      "MARTINS, D. A.; SILVA, V. U. A. M. Suporte à decisão organizacional na gestão de resposta às emergências em saúde do trabalhador. Revista Técnica da Universidade Petrobras, Rio de Janeiro, v. 1, n. 7, p. 1-14, 2025. Disponível em: https://doi.org/10.70369/nsq62t65.",
+      "MENG, Y. et al. Bidirectional Representation Learning From Transformers Using Multimodal Electronic Health Record Data to Predict Depression. IEEE Journal of Biomedical and Health Informatics, Piscataway, v. 25, n. 8, p. 3121-3129, 2021. Disponível em: https://doi.org/10.1109/JBHI.2021.3063721.",
+      "MONTEIRO, V. F.; SILVA, S. S. C. Presença de Risco de Transtorno do Estresse Pós-Traumático em Policiais Militares Feridos por Arma de Fogo. Psicologia: Ciência e Profissão, Brasília, v. 43, art. e252098, 2023.",
+      "MORENO, A. F. et al. Resilience Training Programs with Police Forces: A Systematic Review. Journal of Police and Criminal Psychology, New York, v. 39, p. 227-252, 2024. Disponível em: https://doi.org/10.1007/s11896-023-09633-y.",
+      "MSOSA, Y. J. et al. Trustworthy Data and AI Environments for Clinical Prediction: Application to Crisis-Risk in People With Depression. IEEE Journal of Biomedical and Health Informatics, Piscataway, v. 27, n. 11, p. 5588-5598, 2023. Disponível em: https://doi.org/10.1109/JBHI.2023.3312011.",
+      "MURIKIPUDI, M. et al. CMTN: A Convolutional Multi-Level Transformer to Identify Suicidal Behaviors Using Clinical Notes. In: IEEE ANNUAL COMPUTERS, SOFTWARE, AND APPLICATIONS CONFERENCE (COMPSAC), 47., 2023, Turim. Proceedings [...]. Piscataway: IEEE, 2023. p. 1519-1524. Disponível em: https://doi.org/10.1109/COMPSAC57700.2023.00234.",
+      "PARÁ. Polícia Militar do Pará. Manual de Procedimentos do Centro Integrado de Atenção Psicossocial (CIAP). Belém: PMPA, 2024.",
+      "RAJARAM, G. et al. An Advanced Transfer Learning Framework for Early Prediction of Mental Health Disabilities with Deep Feature Extraction. In: INTERNATIONAL CONFERENCE ON TRENDS IN ELECTRONICS AND INFORMATICS (ICOEI), 8., 2025, Tirunelveli. Proceedings [...]. Piscataway: IEEE, 2025. p. 1406-1412. Disponível em: https://doi.org/10.1109/ICOEI65986.2025.11013632.",
+      "RUDIN, C. Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead. Nature Machine Intelligence, London, v. 1, n. 5, p. 206-215, 2019. Disponível em: https://doi.org/10.1038/s42256-019-0048-x.",
+      "SANTOS, J. S. et al. Factors associated with Burnout Syndrome in police officers: a scoping review. Revista Brasileira de Enfermagem, Brasília, v. 77, n. 2, art. e20230444, p. 1-10, 2024. Disponível em: https://doi.org/10.1590/0034-7167-2023-0444.",
+      "SHARADA, K. et al. Machine Learning Models for Early Suicide Risk Assessment and Intervention. In: IEEE INTERNATIONAL CONFERENCE ON INNOVATE FOR HUMANITARIAN: TECH SOLUTIONS FOR GLOBAL CHALLENGE (ICIH), 2025, Bengaluru. Proceedings [...]. Piscataway: IEEE, 2025. p. 1-6. Disponível em: https://doi.org/10.1109/ICIH67754.2025.11608490.",
+      "SOUSA, R. C.; BARROSO, S. M.; RIBEIRO, A. C. S. Aspectos de saúde mental investigados em policiais: uma revisão integrativa. Saúde e Sociedade, São Paulo, v. 31, n. 2, art. e2201008pt, p. 1-16, 2022. Disponível em: https://doi.org/10.1590/S0104-12902022201008pt.",
+      "UGWU, L. E.; IDEMUDIA, E. S. Burnout and Post-traumatic Stress Disorders in Police Officers: Systematic Review and Meta-analysis. Journal of Police and Criminal Psychology, New York, v. 40, p. 645-658, 2025. Disponível em: https://doi.org/10.1007/s11896-024-09713-7.",
+      "ULLAH, M. T.; REDDY, E. S. Multi-Modal Deep Learning for Personalized Risk Stratification in Perimenopausal Women. In: INTERNATIONAL CONFERENCE ON AUGMENTED INTELLIGENCE AND SUSTAINABLE SYSTEMS (ICAISS), 4., 2026, Trichy. Proceedings [...]. Piscataway: IEEE, 2026. p. 899-905. Disponível em: https://doi.org/10.1109/ICAISS68683.2026.11525624.",
+      "UNIVERSIDADE FEDERAL DO PARÁ (UFPA). Resolução nº 007/2025-PPGSP/UFPA, de 24 de novembro de 2025 (Revisada em 25 de fevereiro de 2026). Estabelece normas sobre os produtos técnicos e tecnológicos no âmbito do PPGSP/UFPA. Belém: ICEN/UFPA, 2026.",
+      "UNIVERSIDADE FEDERAL DO PARÁ (UFPA). Resolução nº 009/2025-PPGSP/UFPA, de 24 de novembro de 2025 (Revisada em 25 de fevereiro de 2026). Estabelece normas sobre o Modelo do Relatório de Qualificação no âmbito do PPGSP/UFPA. Belém: ICEN/UFPA, 2026.",
+      "VASWANI, A. et al. Attention is all you need. In: ADVANCES IN NEURAL INFORMATION PROCESSING SYSTEMS (NIPS), 30., 2017, Long Beach. Proceedings [...]. Cambridge: MIT Press, 2017. p. 5998-6008.",
+      "WANG, G. et al. Interpretable Artificial Intelligence for Healthcare: Enhancing Clinical Trust through SHAP and LIME. Journal of Healthcare Informatics Research, New York, v. 8, p. 112-130, 2024.",
+      "YANG, L.; BRANSCUM, A.; KINCL, L. Understanding occupational safety and health surveillance: expert consensus on components, attributes and example measures for an evaluation framework. BMC Public Health, London, v. 22, art. 498, p. 1-13, 2022. Disponível em: https://doi.org/10.1186/s12889-022-12895-6."
     ]
   },
   "banca": [
     {
-      "nome": "Prof. Dr. João Batista Almeida",
+      "nome": "Prof. Dr. Edson Marcos Leal Soares Ramos",
       "titulacao": "Doutor",
       "instituicao": "Universidade Federal do Pará",
       "funcao": "Orientador(a)"
     },
     {
-      "nome": "Profa. Dra. Ana Paula Ferreira",
-      "titulacao": "Doutora",
+      "nome": "Prof. Dr. Renato Hidaka Torres",
+      "titulacao": "Doutor",
       "instituicao": "Universidade Federal do Pará",
       "funcao": "Coorientador(a)"
     },
@@ -86,49 +316,460 @@
       "funcao": "Avaliador(a) Interno(a)"
     },
     {
-      "nome": "Profa. Dra. Helena Souza Martins",
-      "titulacao": "Doutora",
-      "instituicao": "Universidade Federal do Amazonas",
+      "nome": "Prof. Dr. Membro Externo da Banca",
+      "titulacao": "Doutor",
+      "instituicao": "Polícia Militar do Pará / Instituição Convidada",
       "funcao": "Avaliador(a) Externo(a)"
     }
   ],
   "siglas": [
-    ["UFPA", "Universidade Federal do Pará"],
-    ["PPGSP", "Programa de Pós-Graduação em Segurança Pública"],
-    ["CIAP", "Centro Integrado de Atenção Psicossocial"],
-    ["LGPD", "Lei Geral de Proteção de Dados Pessoais"]
+    [
+      "AAS",
+      "Amostragem Aleatória Simples"
+    ],
+    [
+      "ABNT",
+      "Associação Brasileira de Normas Técnicas"
+    ],
+    [
+      "API",
+      "Application Programming Interface (Interface de Programação de Aplicação)"
+    ],
+    [
+      "AUPRC",
+      "Area Under the Precision-Recall Curve (Área sob a Curva de Precisão-Revocação)"
+    ],
+    [
+      "AUROC",
+      "Area Under the Receiver Operating Characteristic Curve (Área sob a Curva ROC)"
+    ],
+    [
+      "BEP",
+      "Batalhão de Polícia de Guarda / Presídio Militar Estadual"
+    ],
+    [
+      "BERT",
+      "Bidirectional Encoder Representations from Transformers"
+    ],
+    [
+      "CAPES",
+      "Coordenação de Aperfeiçoamento de Pessoal de Nível Superior"
+    ],
+    [
+      "CEP",
+      "Comitê de Ética em Pesquisa"
+    ],
+    [
+      "CIAP",
+      "Centro Integrado de Atenção Psicossocial da PMPA"
+    ],
+    [
+      "CID-10",
+      "Classificação Internacional de Doenças e Problemas Relacionados à Saúde (10ª Revisão)"
+    ],
+    [
+      "CNS",
+      "Conselho Nacional de Saúde"
+    ],
+    [
+      "CONEP",
+      "Comissão Nacional de Ética em Pesquisa"
+    ],
+    [
+      "CVLI",
+      "Crimes Violentos Letais Intencionais"
+    ],
+    [
+      "DNN",
+      "Deep Neural Network (Rede Neural Profunda)"
+    ],
+    [
+      "DSM-5",
+      "Manual Diagnóstico e Estatístico de Transtornos Mentais (5ª Edição)"
+    ],
+    [
+      "EHR",
+      "Electronic Health Records (Registros Eletrônicos de Saúde / Prontuários Eletrônicos)"
+    ],
+    [
+      "EVRP",
+      "Escala de Vulnerabilidade e Risco Psicossocial"
+    ],
+    [
+      "FAS",
+      "Fundo de Assistência Social da PMPA"
+    ],
+    [
+      "ICEN",
+      "Instituto de Ciências Exatas e Naturais"
+    ],
+    [
+      "INPI",
+      "Instituto Nacional da Propriedade Industrial"
+    ],
+    [
+      "IQR",
+      "Interquartile Range (Intervalo Interquartil: Q_3 - Q_1)"
+    ],
+    [
+      "LGPD",
+      "Lei Geral de Proteção de Dados Pessoais (Lei Federal nº 13.709/2018)"
+    ],
+    [
+      "LLM",
+      "Large Language Model (Modelo de Linguagem de Grande Porte)"
+    ],
+    [
+      "LTS",
+      "Licença para Tratamento de Saúde"
+    ],
+    [
+      "ML",
+      "Machine Learning (Aprendizado de Máquina)"
+    ],
+    [
+      "NER",
+      "Named Entity Recognition (Reconhecimento de Entidades Nomeadas)"
+    ],
+    [
+      "PAF",
+      "Projétil de Arma de Fogo / Porte de Arma de Fogo"
+    ],
+    [
+      "PLN / NLP",
+      "Processamento de Linguagem Natural (Natural Language Processing)"
+    ],
+    [
+      "PMPA",
+      "Polícia Militar do Pará"
+    ],
+    [
+      "POP",
+      "Procedimento Operacional Padrão"
+    ],
+    [
+      "PPGSP",
+      "Programa de Pós-Graduação em Segurança Pública da UFPA"
+    ],
+    [
+      "RMB",
+      "Região Metropolitana de Belém"
+    ],
+    [
+      "RSO",
+      "Relatório de Serviço Operacional"
+    ],
+    [
+      "SHAP",
+      "SHapley Additive exPlanations"
+    ],
+    [
+      "SMOTE-NC",
+      "Synthetic Minority Over-sampling Technique for Nominal and Continuous"
+    ],
+    [
+      "TEALT",
+      "Teste de Atenção Alternada"
+    ],
+    [
+      "TEADI",
+      "Teste de Atenção Dividida"
+    ],
+    [
+      "TEPT",
+      "Transtorno de Estresse Pós-Traumático"
+    ],
+    [
+      "TAS",
+      "Teste de Atenção Sustentada"
+    ],
+    [
+      "TCLE",
+      "Termo de Consentimento Livre e Esclarecido"
+    ],
+    [
+      "TF-IDF",
+      "Term Frequency - Inverse Document Frequency"
+    ],
+    [
+      "UFPA",
+      "Universidade Federal do Pará"
+    ],
+    [
+      "XAI",
+      "Explainable Artificial Intelligence (Inteligência Artificial Explicável)"
+    ],
+    [
+      "XGBoost",
+      "Extreme Gradient Boosting"
+    ]
   ],
   "ptts": [
     {
       "num": "1",
-      "nome": "Protocolo de encaminhamento",
-      "autoria": "Maria Helena Costa Ribeiro",
-      "tipo": "Processo ou tecnologia e produto ou material não patenteável",
-      "subtipo": "Protocolo",
-      "titulo": "Protocolo de encaminhamento de casos de violência doméstica no CIAP",
+      "nome": "Infográfico Epidemiológico-Institucional dos Atendimentos do CIAP",
+      "autoria": "Leonardo da Silva Costa",
+      "tipo": "Material Didático e Instrucional",
+      "subtipo": "Infográfico Analítico",
+      "titulo": "Panorama Epidemiológico-Institucional dos Atendimentos Psicossociais na Polícia Militar do Pará",
       "ano": "2026",
-      "coautoria": "Não",
-      "projeto": "Pesquisa de mestrado PPGSP/UFPA",
+      "coautoria": "Prof. Dr. Edson Marcos Leal Soares Ramos (Docente); Prof. Dr. Renato Hidaka Torres (Docente)",
+      "projeto": "Modelos de Inteligência Artificial e Métodos Quantitativos Aplicados à Gestão e Saúde Ocupacional na Segurança Pública",
+      "financiamento": "Não",
+      "financiador": "",
+      "demanda": "Espontânea",
+      "impacto": "Médio",
+      "justificativa_impacto": "O infográfico sintetiza a distribuição temporal e sociodemográfica dos atendimentos no CIAP, permitindo aos gestores da Polícia Militar visualizar a sobrecarga psicológica por comando e posto. Essa visualização subsidia a alocação preventiva de equipes multidisciplinares e orienta o planejamento estratégico de suporte em saúde aos policiais militares da ativa.",
+      "inovacao": "Médio",
+      "justificativa_inovacao": "A inovação repousa na consolidação gráfica inédita de dados de prontuários eletrônicos psicossociais da segurança pública paraense, traduzindo métricas institucionais dispersas em representações visuais acessíveis de epidemiologia descritiva, superando relatórios burocráticos tradicionais por meio de design instrucional estruturado e contextualizado à atividade policial militar.",
+      "complexidade": "Médio",
+      "justificativa_complexidade": "A elaboração exigiu higienização de banco relacional com milhares de registros de atendimento da PMPA, cálculo de métricas paramétricas populacionais, controle de variáveis de lotação institucional e compatibilização de design visual voltado a públicos técnicos e operacionais, demandando integração entre ciência de dados e comunicação em saúde.",
+      "validacao": "Depósito e disponibilização no Portal eduCAPES e aprovação pelo Colegiado Técnico do CIAP/PMPA com emissão de atestado de utilidade institucional.",
+      "divulgacao": "Repositório Institucional da UFPA e Portal eduCAPES (http://educapes.capes.gov.br).",
+      "abrangencia": "Estadual / Regional.",
+      "publico_usuario": "Gestores da PMPA, comando de policiamento regional, equipes multidisciplinares do CIAP e profissionais de segurança pública."
+    },
+    {
+      "num": "2",
+      "nome": "Infográfico Clínico-Léxico de Marcadores de Sofrimento Psíquico",
+      "autoria": "Leonardo da Silva Costa",
+      "tipo": "Material Didático e Instrucional",
+      "subtipo": "Guia Gráfico-Instrucional / Infográfico",
+      "titulo": "Guia Clínico-Léxico: Marcadores Narrativos de Sofrimento Psíquico em Prontuários da Segurança Pública",
+      "ano": "2026",
+      "coautoria": "Prof. Dr. Edson Marcos Leal Soares Ramos (Docente); Prof. Dr. Renato Hidaka Torres (Docente)",
+      "projeto": "Modelos de Inteligência Artificial e Métodos Quantitativos Aplicados à Gestão e Saúde Ocupacional na Segurança Pública",
+      "financiamento": "Não",
+      "financiador": "",
+      "demanda": "Espontânea",
+      "impacto": "Médio",
+      "justificativa_impacto": "O material fornece aos profissionais de psicologia e assistência social da PMPA uma síntese visual dos padrões léxicos e somatizações que frequentemente antecedem o agravamento de crises psíquicas. O produto aprimora a sensibilidade da escuta clínica e padroniza a identificação de alertas silenciosos na rotina ambulatorial.",
+      "inovacao": "Médio",
+      "justificativa_inovacao": "Inova ao integrar achados de mineração de texto computacional com categorizações clínicas clássicas da psiquiatria, estruturando um guia visual das expressões narrativas associadas a estressores específicos do trabalho armado, tais como perturbação de sono e hipervigilância, até então documentadas apenas de forma assistemática nos prontuários.",
+      "complexidade": "Médio",
+      "justificativa_complexidade": "Apresenta complexidade média por articular análise computacional de frequência léxica, seleção criteriosa de termos representativos do corpus clínico, correspondência taxonômica com o DSM-5 e validação de pertinência clínica com peritos de saúde mental da corporação, exigindo domínio interdisciplinar entre informática médica e psicologia.",
+      "validacao": "Depósito no Portal eduCAPES e incorporação formal aos manuais de acolhimento do Centro Integrado de Atenção Psicossocial da PMPA.",
+      "divulgacao": "Repositório Institucional da UFPA e Portal eduCAPES (http://educapes.capes.gov.br).",
+      "abrangencia": "Estadual / Regional.",
+      "publico_usuario": "Psicólogos, psiquiatras, assistentes sociais e técnicos de saúde do CIAP e órgãos congêneres de defesa social."
+    },
+    {
+      "num": "3",
+      "nome": "Software / API de Predição Multimodal e Suporte à Decisão Clínica",
+      "autoria": "Leonardo da Silva Costa",
+      "tipo": "Tecnologia/Software Aplicado",
+      "subtipo": "Software / Aplicativo Computacional (API / Microsserviço)",
+      "titulo": "Esteira de Classificação de Novos Prontuários e Suporte à Decisão Clínica (ECP-CIAP)",
+      "ano": "2027",
+      "coautoria": "Prof. Dr. Edson Marcos Leal Soares Ramos (Docente); Prof. Dr. Renato Hidaka Torres (Docente)",
+      "projeto": "Modelos de Inteligência Artificial e Métodos Quantitativos Aplicados à Gestão e Saúde Ocupacional na Segurança Pública",
       "financiamento": "Não",
       "financiador": "",
       "demanda": "Espontânea",
       "impacto": "Alto",
-      "justificativa_impacto": "Organiza o tempo entre o registro e o atendimento psicossocial.",
+      "justificativa_impacto": "O software transforma a assistência psicossocial da PMPA de um modelo reativo para uma vigilância preventiva contínua. Ao calcular probabilidades de crise e exibir explicações clínicas por SHAP, orienta intervenções precoces do CIAP, diminuindo afastamentos laborais crônicos e prevenindo eventos extremos de suicídio na corporação.",
+      "inovacao": "Alto",
+      "justificativa_inovacao": "Apresenta alta inovação ao implementar pioneiramente em forças policiais brasileiras uma arquitetura de fusão intermediária multimodal acoplando modelos Transformers em língua portuguesa e algoritmos em árvore, integrando Inteligência Artificial Explicável diretamente aos fluxos institucionais de saúde mental sob rígidas salvaguardas éticas de privacidade.",
+      "complexidade": "Alta",
+      "justificativa_complexidade": "Apresenta elevada complexidade técnica por envolver engenharia de software conteinerizada em Docker, pré-processamento automatizado de séries temporais clínicas esparsas, vetorização densa de texto clínico, inferência probabilística calibrada e renderização em tempo real de gráficos de explicabilidade algorítmica executados em infraestrutura institucional local.",
+      "validacao": "Registro formal de Programa de Computador no Instituto Nacional da Propriedade Industrial (INPI) e implantação no ambiente de servidores locais do CIAP/PMPA com termo de homologação técnica.",
+      "divulgacao": "Repositório institucional de código da UFPA/PMPA e documentação técnica aberta via Git institucional.",
+      "abrangencia": "Estadual com potencial de replicação Nacional para demais corporações militares e civis.",
+      "publico_usuario": "Equipe técnica multidisciplinar e diretoria de saúde do CIAP/PMPA."
+    },
+    {
+      "num": "4",
+      "nome": "Base de Dados Sintética de Prontuários Psicossociais Militares",
+      "autoria": "Leonardo da Silva Costa",
+      "tipo": "Base de Dados Técnico-Científica",
+      "subtipo": "Repositório de Dados Sintéticos e Anonimizados",
+      "titulo": "Banco de Dados Clínicos Sintéticos para Pesquisa em Saúde Mental na Segurança Pública (SynMental-PMPA)",
+      "ano": "2027",
+      "coautoria": "Prof. Dr. Edson Marcos Leal Soares Ramos (Docente); Prof. Dr. Renato Hidaka Torres (Docente)",
+      "projeto": "Modelos de Inteligência Artificial e Métodos Quantitativos Aplicados à Gestão e Saúde Ocupacional na Segurança Pública",
+      "financiamento": "Não",
+      "financiador": "",
+      "demanda": "Espontânea",
+      "impacto": "Médio",
+      "justificativa_impacto": "A base sintética atende aos preceitos da Ciência Aberta, permitindo que pesquisadores acadêmicos desenvolvam e auditem modelos de saúde mental policial sem vulnerar a privacidade dos servidores militares. Promove a reprodutibilidade científica e incentiva a produção de novas tecnologias de proteção à vida policial.",
       "inovacao": "Médio",
-      "justificativa_inovacao": "Integra campos de registro policial e prontuário do serviço.",
+      "justificativa_inovacao": "Inova ao aplicar modelos generativos tabulares e salvaguardas de privacidade diferencial sobre prontuários de segurança pública, gerando um conjunto de dados artificial que replica com fidedignidade as correlações multivariadas reais do CIAP, preservando o sigilo sem perda da utilidade analítica para benchmark de algoritmos preditivos.",
       "complexidade": "Médio",
-      "justificativa_complexidade": "Exige articulação entre duas instituições da rede.",
-      "validacao": "Em validação",
-      "divulgacao": "Relatório técnico interno",
-      "abrangencia": "Local",
-      "publico_usuario": "Profissionais do CIAP e da rede de proteção"
+      "justificativa_complexidade": "A complexidade decorre da modelagem probabilística multivariada com preservação de distribuições marginais empíricas, calibração de parâmetros de ruído diferencial (ε, δ) para garantia de não identificação e testes formais de similaridade estatística entre a base sintética e os dados reais de atendimento da PMPA.",
+      "validacao": "Depósito em repositório de dados abertos da pesquisa (como Zenodo ou Mendeley Data) acompanhado de relatório de validação de privacidade aprovado por comitê técnico.",
+      "divulgacao": "Repositório internacional de dados abertos (Zenodo) com atribuição de DOI público.",
+      "abrangencia": "Nacional e Internacional.",
+      "publico_usuario": "Comunidade científica, pesquisadores em inteligência artificial em saúde e gestores de segurança pública."
+    },
+    {
+      "num": "5",
+      "nome": "Codebook Operacional Consolidado de Risco Psicossocial",
+      "autoria": "Leonardo da Silva Costa",
+      "tipo": "Manual, Protocolo ou Norma Técnica",
+      "subtipo": "Procedimento Operacional Padrão (POP) e Guia Taxonômico",
+      "titulo": "Codebook Operacional para Estratificação de Risco Psicossocial em Policiais Militares (Manual de Anotação da EVRP)",
+      "ano": "2026",
+      "coautoria": "Prof. Dr. Edson Marcos Leal Soares Ramos (Docente); Prof. Dr. Renato Hidaka Torres (Docente)",
+      "projeto": "Modelos de Inteligência Artificial e Métodos Quantitativos Aplicados à Gestão e Saúde Ocupacional na Segurança Pública",
+      "financiamento": "Não",
+      "financiador": "",
+      "demanda": "Espontânea",
+      "impacto": "Médio",
+      "justificativa_impacto": "O manual padroniza a rotina de avaliação pericial e documental do CIAP, instituindo critérios uniformes e objetivos para classificar o sofrimento psíquico dos policiais. Elimina discrepâncias entre avaliadores, assegura comparabilidade histórica dos atendimentos e serve como balizador metodológico para a rotulagem de sistemas inteligentes em saúde militar.",
+      "inovacao": "Médio",
+      "justificativa_inovacao": "Apresenta caráter inovador ao sistematizar uma escala de risco psicossocial especificamente calibrada para as idiossincrasias da caserna, associando marcadores semânticos de notas clínicas livres a regras formais de precaução assistencial e critérios estatísticos de consenso interavaliadores para mitigação de ruído na anotação.",
+      "complexidade": "Médio",
+      "justificativa_complexidade": "A complexidade decorre da conciliação de diretrizes internacionais de psicometria com a realidade funcional policial, construção de árvore de decisão clínica para casos limítrofes, delimitação de diretrizes de adjudicação pericial e condução de testes de confiabilidade estatística (Kappa de Cohen) com peritos de saúde.",
+      "validacao": "Publicação formal pelo CIAP/PMPA como Instrução Técnica de Procedimento e depósito no Portal eduCAPES com registro de ISBN/ISSN.",
+      "divulgacao": "Portal eduCAPES e Boletim Geral da Polícia Militar do Pará.",
+      "abrangencia": "Estadual / Regional.",
+      "publico_usuario": "Oficiais peritos em psicologia e serviço social, equipes de saúde militar e comissões de perícia médica."
+    },
+    {
+      "num": "6",
+      "nome": "Modelo de LLM Local para Grifagem Clínica Assistida (*Clinical Highlighting*)",
+      "autoria": "Leonardo da Silva Costa",
+      "tipo": "Tecnologia/Software Aplicado",
+      "subtipo": "Módulo de Inteligência Artificial Local / Tecnologia Não Patenteável",
+      "titulo": "Módulo Local de Grifagem e Triagem Semântica de Prontuários Psicossociais (LLM-CIAP Local)",
+      "ano": "2027",
+      "coautoria": "Prof. Dr. Edson Marcos Leal Soares Ramos (Docente); Prof. Dr. Renato Hidaka Torres (Docente)",
+      "projeto": "Modelos de Inteligência Artificial e Métodos Quantitativos Aplicados à Gestão e Saúde Ocupacional na Segurança Pública",
+      "financiamento": "Não",
+      "financiador": "",
+      "demanda": "Espontânea",
+      "impacto": "Alto",
+      "justificativa_impacto": "A ferramenta acelera a análise clínica de extensos prontuários acumulados, destacando automaticamente fragmentos textuais críticos de esgotamento e desespero. Isso permite que a equipe multidisciplinar identifique rapidamente sinais de risco iminente durante o atendimento presencial, potencializando o tempo dedicado à intervenção terapêutica humana.",
+      "inovacao": "Alto",
+      "justificativa_inovacao": "Inova ao viabilizar o uso de Modelos de Linguagem de Grande Porte (LLMs) ajustados para o domínio clínico policial em infraestrutura totalmente isolada da internet (on-premise), combinando capacidade semântica avançada de extração de trechos (spans) com garantia absoluta de inviolabilidade dos dados de saúde da corporação.",
+      "complexidade": "Alta",
+      "justificativa_complexidade": "A complexidade reside na otimização e quantização de modelos abertos de parâmetros bilionários para execução eficiente em hardware corporativo restrito, elaboração de engenharia de prompts estruturados com salvaguardas de confiabilidade e validação cega da acurácia de extração em relação ao padrão-ouro pericial anotado no Label Studio.",
+      "validacao": "Registro de Programa de Computador no INPI e integração homologada no sistema institucional CIAP WEB.",
+      "divulgacao": "Repositório institucional e servidores locais da Polícia Militar do Pará.",
+      "abrangencia": "Estadual / Regional.",
+      "publico_usuario": "Psicólogos, médicos peritos e assistentes sociais do CIAP/PMPA."
+    }
+  ],
+  "cronograma": [
+    {
+      "nome": "Cumprimento de Disciplinas do PPGSP",
+      "meses": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "nome": "Aprofundamento do Referencial Teórico",
+      "meses": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "nome": "Construção do Codebook com Peritos do CIAP",
+      "meses": [
+        4,
+        5
+      ]
+    },
+    {
+      "nome": "Tramitação Ética no CEP/ICS/UFPA",
+      "meses": [
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "nome": "Exame de Qualificação do Projeto",
+      "meses": [
+        8
+      ]
+    },
+    {
+      "nome": "Extração, Higienização e Anonimização",
+      "meses": [
+        9,
+        10
+      ]
+    },
+    {
+      "nome": "Rotulagem Pericial e Cálculo de Concordância",
+      "meses": [
+        10,
+        11
+      ]
+    },
+    {
+      "nome": "Engenharia de Features e Modelagem Multimodal",
+      "meses": [
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "nome": "Treinamento, Calibração e Análise SHAP",
+      "meses": [
+        14,
+        15,
+        16
+      ]
+    },
+    {
+      "nome": "Desenvolvimento dos Produtos Tecnológicos",
+      "meses": [
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "nome": "Redação dos Artigos 1 e 2 da Dissertação",
+      "meses": [
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "nome": "Revisão Final e Depósito da Dissertação",
+      "meses": [
+        21,
+        22
+      ]
+    },
+    {
+      "nome": "Defesa Final da Dissertação de Mestrado",
+      "meses": [
+        23,
+        24
+      ]
     }
   ],
   "lacunas": [],
   "conformidade_ptt": {
-    "valido": true,
-    "total": 1,
-    "prop_alta": 1,
-    "mensagem": "Dados de exemplo para teste do preenchimento direto."
+    "valido": false,
+    "total": 6,
+    "prop_alta": 0.3333333333333333,
+    "mensagem": "Mock gerado a partir de relatorio_qualificacao_ppgsp_leonardo_costa.md (6 PTTs, 2 impacto Alto)."
   }
 }

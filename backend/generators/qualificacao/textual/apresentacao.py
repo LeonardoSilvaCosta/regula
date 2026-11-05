@@ -15,9 +15,9 @@ from ..formato import (
     adicionar_paragrafo,
     adicionar_titulo,
     escrever_fonte,
-    escrever_legenda_quadro_1,
 )
-from ..legendas import BM_QUADRO_1, legenda_quadro_1
+from ..legendas import BM_QUADRO_1
+from ..pre_textual.sumario import registrar_entrada
 
 
 _COLUNAS = [
@@ -43,7 +43,8 @@ _ALINHAMENTO = [
 
 
 def build_apresentacao(doc, dados_apresentacao, metadata):
-    adicionar_titulo(doc, "APRESENTAÇÃO", bookmark="sec_apresentacao")
+    titulo = adicionar_titulo(doc, "APRESENTAÇÃO", bookmark="sec_apresentacao")
+    registrar_entrada(doc, "APRESENTAÇÃO", 1, "_TOC_APRESENTACAO", titulo)
 
     texto_percurso = (dados_apresentacao or {}).get("texto_percurso", [])
     if texto_percurso:
@@ -57,32 +58,105 @@ def build_apresentacao(doc, dados_apresentacao, metadata):
         )
 
 
-def build_quadro_estrutura(doc, dados_apresentacao, metadata, objetivo_geral=""):
+_TIPO_ESTUDO = "Qualitativo/Quantitativo Exploratório Descritivo"
+_STATUS = "Em produção"
+_ROMANOS = (
+    "i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x",
+    "xi", "xii", "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx",
+)
+
+
+def _romano(indice):
+    if 1 <= indice <= len(_ROMANOS):
+        return _ROMANOS[indice - 1]
+    return str(indice)
+
+
+def _texto_item(item, chave):
+    if isinstance(item, dict):
+        return str(item.get(chave) or "").strip()
+    return str(getattr(item, chave, "") or "").strip()
+
+
+def _linhas_produtos(metadata, objetivo_geral, artigos, ptts, fontes_padrao):
+    titulo = str((metadata or {}).get("titulo") or (metadata or {}).get("titulo_curto") or "").strip()
+    objetivo = str(objetivo_geral or "").strip()
+    fontes_base = str(fontes_padrao or "").strip() or "SIAC"
+    linhas = []
+    ordem = 1
+    for artigo in artigos or []:
+        titulo_item = _texto_item(artigo, "titulo")
+        linhas.append([
+            titulo,
+            objetivo,
+            f"({_romano(ordem)}) {_texto_item(artigo, 'objetivo_especifico')}",
+            f"Artigo {ordem}: {titulo_item}",
+            _texto_item(artigo, "tipo_estudo") or _TIPO_ESTUDO,
+            _texto_item(artigo, "fontes") or fontes_base,
+            _texto_item(artigo, "status") or _STATUS,
+        ])
+        ordem += 1
+    numero_ptt = 1
+    for item in ptts or []:
+        titulo_item = _texto_item(item, "titulo") or _texto_item(item, "nome")
+        subtipo = _texto_item(item, "subtipo") or _texto_item(item, "tipo") or "PTT"
+        num = _texto_item(item, "num") or str(numero_ptt)
+        linhas.append([
+            titulo,
+            objetivo,
+            f"({_romano(ordem)}) {_texto_item(item, 'objetivo_especifico')}",
+            f"{subtipo} {num} – {titulo_item}",
+            _texto_item(item, "tipo_estudo") or _TIPO_ESTUDO,
+            _texto_item(item, "fontes") or fontes_base,
+            _texto_item(item, "status") or _STATUS,
+        ])
+        ordem += 1
+        numero_ptt += 1
+    return linhas
+
+
+def build_quadro_estrutura(
+    doc,
+    dados_apresentacao,
+    metadata,
+    objetivo_geral="",
+    ptts=None,
+    artigos=None,
+    fontes_padrao="",
+):
     p_qtit = doc.add_paragraph()
     p_qtit.alignment = WD_ALIGN_PARAGRAPH.LEFT
     p_qtit.paragraph_format.space_before = Pt(18)
     p_qtit.paragraph_format.space_after = Pt(4)
     p_qtit.paragraph_format.line_spacing = 1.0
-    escrever_legenda_quadro_1(p_qtit, legenda_quadro_1(metadata))
+    titulo_trabalho = str((metadata or {}).get("titulo") or "").strip()
+    run_titulo = p_qtit.add_run(
+        f'Quadro 1 - Estrutura dos principais itens da dissertação/tese “{titulo_trabalho}”.'
+    )
+    run_titulo.bold = True
+    run_titulo.font.name = "Times New Roman"
+    run_titulo.font.size = Pt(11)
     adicionar_bookmark(p_qtit, BM_QUADRO_1)
 
-    linhas = _preparar_linhas(
-        (dados_apresentacao or {}).get("quadro_1") or [],
-        metadata,
-        objetivo_geral,
-    )
+    linhas = _linhas_produtos(metadata, objetivo_geral, artigos, ptts, fontes_padrao)
+    if not linhas:
+        linhas = _preparar_linhas(
+            (dados_apresentacao or {}).get("quadro_1") or [],
+            metadata,
+            objetivo_geral,
+        )
     if not linhas:
         adicionar_lacuna(doc, "[Quadro 1 não informado no projeto.]")
         return
 
     _montar_quadro(doc, linhas)
-    ano = (metadata or {}).get("ano", "2026")
+    mes_ano = str((metadata or {}).get("mes_ano") or (metadata or {}).get("ano") or "2026").strip()
     p_fonte = doc.add_paragraph()
     p_fonte.alignment = WD_ALIGN_PARAGRAPH.LEFT
     p_fonte.paragraph_format.space_before = Pt(2)
     p_fonte.paragraph_format.space_after = Pt(18)
     p_fonte.paragraph_format.line_spacing = 1.0
-    escrever_fonte(p_fonte, f"Fonte: Construção do(a) Autor(a). {ano}.")
+    escrever_fonte(p_fonte, f"Fonte: Construção do(a) Autor(a). {mes_ano}.")
 
 
 def _preparar_linhas(linhas, metadata, objetivo_geral=""):

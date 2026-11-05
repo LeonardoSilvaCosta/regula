@@ -17,6 +17,7 @@ from ...common.referencias import (
     ordenar_referencias,
 )
 from ..estrutura import rotulo_pos
+from ..pre_textual.sumario import registrar_entrada
 
 
 def rotulo_e_corpo(item):
@@ -85,7 +86,8 @@ def build_pos_textual(doc, referencias, apendices=None, anexos=None):
     # 1. REFERÊNCIAS (Obrigatório - Art. 1º, III, 1)
     # -------------------------------------------------------------------------
     doc.add_page_break()
-    adicionar_titulo_referencias(doc, "REFERÊNCIAS", bookmark="sec_referencias")
+    titulo_referencias = adicionar_titulo_referencias(doc, "REFERÊNCIAS", bookmark="sec_referencias")
+    registrar_entrada(doc, "REFERÊNCIAS", 1, "_TOC_REFERENCIAS", titulo_referencias)
 
     if referencias:
         for ref in ordenar_referencias(referencias):

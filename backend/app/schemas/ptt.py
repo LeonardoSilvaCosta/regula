@@ -37,6 +37,10 @@ class PTTItem(BaseModel):
     divulgacao_url: str = ""
     abrangencia: str = "Local"
     publico_usuario: str = "Estado, Município, Comunidade"
+    objetivo_especifico: str = ""
+    tipo_estudo: str = "Qualitativo/Quantitativo Exploratório Descritivo"
+    fontes: str = ""
+    status: str = "Em produção"
 
     @model_validator(mode="before")
     @classmethod
@@ -62,6 +66,17 @@ class PTTItem(BaseModel):
         elif divulgacao and not url:
             self.divulgacao_url = divulgacao
         return self
+
+
+class ArtigoQuadro(BaseModel):
+    """Linha de artigo científico usada no Quadro 1 da Apresentação."""
+
+    titulo: str = ""
+    objetivo_especifico: str = ""
+    tipo_estudo: str = "Qualitativo/Quantitativo Exploratório Descritivo"
+    fontes: str = ""
+    status: str = "Em produção"
+    subtipo: str = "Artigo"
 
 
 class PTTValidationResult(BaseModel):

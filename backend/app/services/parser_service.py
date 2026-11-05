@@ -18,7 +18,7 @@ from app.schemas.document import (
     LacunaItem,
     ParseResponse,
 )
-from app.schemas.ptt import PTTItem
+from app.schemas.ptt import ArtigoQuadro, PTTItem
 from app.services.builder_service import validar_ptts
 from app.services.upload_store import guardar
 
@@ -80,13 +80,34 @@ def _sections(dados: dict[str, Any]) -> DocumentSections:
         hipotese=_linhas(projeto.get("hipotese")),
         metodologia_natureza=_linhas(projeto.get("metodologia_natureza")),
         metodologia_locus=_texto(projeto.get("metodologia_locus")),
-        metodologia_participantes=_texto(projeto.get("metodologia_participantes")),
+        metodologia_participantes=_linhas(projeto.get("metodologia_participantes")),
         metodologia_fontes=_linhas(projeto.get("metodologia_fontes")),
         metodologia_coleta=_linhas(projeto.get("metodologia_coleta")),
-        metodologia_etica=_texto(projeto.get("metodologia_etica")),
-        metodologia_analise=_texto(projeto.get("metodologia_analise")),
+        metodologia_etica=_linhas(projeto.get("metodologia_etica")),
+        metodologia_analise=_linhas(projeto.get("metodologia_analise")),
         referencias=_linhas(dados.get("referencias")),
     )
+
+
+def _artigos(dados: dict[str, Any]) -> list[ArtigoQuadro]:
+    from generators.qualificacao.estrutura import artigos_de
+
+    itens: list[ArtigoQuadro] = []
+    for artigo in artigos_de(dados.get("resultados") or {}):
+        itens.append(
+            ArtigoQuadro(
+                titulo=str(artigo.get("titulo") or ""),
+                objetivo_especifico=str(
+                    artigo.get("objetivo_especifico") or artigo.get("objetivo") or ""
+                ),
+                tipo_estudo=str(artigo.get("tipo_estudo") or "")
+                or "Qualitativo/Quantitativo Exploratório Descritivo",
+                fontes=str(artigo.get("fontes") or ""),
+                status=str(artigo.get("status") or "") or "Em produção",
+                subtipo=str(artigo.get("subtipo") or "Artigo"),
+            )
+        )
+    return itens
 
 
 def _banca(metadata: dict[str, Any]) -> list[BancaMember]:
@@ -142,6 +163,7 @@ def estruturar_parse(
         banca=_banca(metadata),
         siglas=siglas,
         ptts=ptts,
+        artigos=_artigos(dados),
         lacunas=[LacunaItem.model_validate(item) for item in lacunas_brutas],
         conformidade_ptt=conformidade,
     )

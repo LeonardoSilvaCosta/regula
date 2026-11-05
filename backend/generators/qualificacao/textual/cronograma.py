@@ -12,6 +12,7 @@ from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 from core.xml_utils import set_cell_border
 from core.campos import adicionar_bookmark
 from ..formato import adicionar_lacuna, adicionar_paragrafo, escrever_fonte, escrever_legenda
+from ..pre_textual.sumario import registrar_entrada
 from ..legendas import BM_QUADRO_2, legenda_quadro_2
 
 
@@ -51,7 +52,8 @@ NOMES_DOUTORADO = [
 
 def build_cronograma(doc, dados_projeto, nivel="mestrado", ano_referencia="2026", numero=6):
     is_doutorado = str(nivel).strip().lower() in ["doutorado", "tese"]
-    _titulo_secao(doc, f"{numero}. CRONOGRAMA", bookmark="sec_cronograma")
+    titulo = _titulo_secao(doc, f"{numero}. CRONOGRAMA", bookmark="sec_cronograma")
+    registrar_entrada(doc, f"{numero}. CRONOGRAMA", 1, "_TOC_CRONOGRAMA", titulo)
     adicionar_paragrafo(
         doc,
         "O cronograma a seguir sistematiza a distribuição temporal estimada para a execução "

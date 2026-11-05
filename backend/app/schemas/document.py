@@ -25,6 +25,10 @@ class BancaMember(BaseModel):
     )
 
 
+class TabelaMetodologia(BaseModel):
+    linhas: list[list[str]] = Field(default_factory=list)
+
+
 class DocumentSections(BaseModel):
     """Textos das seções normativas da Resolução 009/2025, independentes do Word."""
 
@@ -38,12 +42,19 @@ class DocumentSections(BaseModel):
     hipotese: list[str] = Field(default_factory=list)
     metodologia_natureza: list[str] = Field(default_factory=list)
     metodologia_locus: str = ""
-    metodologia_participantes: str = ""
+    metodologia_participantes: list[str] = Field(default_factory=list)
     metodologia_fontes: list[str] = Field(default_factory=list)
     metodologia_coleta: list[str] = Field(default_factory=list)
-    metodologia_etica: str = ""
-    metodologia_analise: str = ""
+    metodologia_etica: list[str] = Field(default_factory=list)
+    metodologia_analise: list[str] = Field(default_factory=list)
+    tabela_1: TabelaMetodologia | None = None
+    tabela_2: TabelaMetodologia | None = None
     referencias: list[str] = Field(default_factory=list)
+
+
+class CronogramaAtividade(BaseModel):
+    nome: str = ""
+    meses: list[int] = Field(default_factory=list)
 
 
 class DocumentMetadata(BaseModel):
@@ -77,9 +88,11 @@ class ParseResponse(BaseModel):
     banca: list[BancaMember]
     siglas: list[tuple[str, str]]
     ptts: list["PTTItem"]
+    artigos: list["ArtigoQuadro"] = Field(default_factory=list)
     lacunas: list[LacunaItem]
     conformidade_ptt: "PTTValidationResult"
     sections: DocumentSections = Field(default_factory=DocumentSections)
+    cronograma: list[CronogramaAtividade] = Field(default_factory=list)
 
 
 class GenerateRequest(BaseModel):
@@ -96,9 +109,11 @@ class GenerateRequest(BaseModel):
     banca: list[BancaMember] = Field(default_factory=list)
     siglas: list[tuple[str, str]] = Field(default_factory=list)
     ptts: list["PTTItem"] = Field(default_factory=list)
+    artigos: list["ArtigoQuadro"] = Field(default_factory=list)
+    cronograma: list[CronogramaAtividade] = Field(default_factory=list)
 
 
-from app.schemas.ptt import PTTItem, PTTValidationResult  # noqa: E402
+from app.schemas.ptt import ArtigoQuadro, PTTItem, PTTValidationResult  # noqa: E402
 
 
 class ValidatePTTRequest(BaseModel):

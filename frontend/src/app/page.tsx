@@ -52,11 +52,11 @@ function criarEstadoVazio(tipo: DocumentType, nivel: AcademicLevel): ParseRespon
       hipotese: [],
       metodologia_natureza: [],
       metodologia_locus: "",
-      metodologia_participantes: "",
+      metodologia_participantes: [],
       metodologia_fontes: [],
       metodologia_coleta: [],
-      metodologia_etica: "",
-      metodologia_analise: "",
+      metodologia_etica: [],
+      metodologia_analise: [],
       referencias: [],
     },
     banca: [
@@ -71,6 +71,7 @@ function criarEstadoVazio(tipo: DocumentType, nivel: AcademicLevel): ParseRespon
       ["PMPA", "Polícia Militar do Pará"],
     ],
     ptts: [],
+    artigos: [],
     lacunas: [],
     conformidade_ptt: {
       valido: false,
@@ -202,6 +203,8 @@ export default function Home() {
         banca: parsedData.banca,
         siglas: parsedData.siglas,
         ptts: parsedData.ptts,
+        artigos: parsedData.artigos ?? [],
+        cronograma: parsedData.cronograma ?? [],
       });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");

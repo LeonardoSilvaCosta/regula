@@ -4,11 +4,12 @@ do Projeto de Qualificação conforme o Art. 1º, II, item 4 da Resolução nº 
 Suporta tanto Pesquisas de Campo/Empíricas (4.1) quanto Pesquisas Documentais/Bibliográficas (4.2).
 """
 
-from docx.shared import Cm, Pt
+from docx.shared import Cm, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from ..estrutura import eh_documental
 from ..formato import adicionar_titulo
+from ..pre_textual.sumario import registrar_entrada
 from ..legendas import BM_TABELA_1, BM_TABELA_2
 from ...common.tabelas import inserir_tabela
 
@@ -23,8 +24,11 @@ def build_metodologia(doc, dados_projeto, numero=4):
       - dados_projeto: Dicionário contendo as chaves metodológicas do projeto
     """
 
-    def add_sec_title(txt, bookmark=None):
-        adicionar_titulo(doc, txt, bookmark=bookmark, primario=True)
+    def add_sec_title(txt, bookmark=None, toc=None):
+        paragrafo = adicionar_titulo(doc, txt, bookmark=bookmark, primario=True)
+        if toc:
+            registrar_entrada(doc, txt, 1, toc, paragrafo)
+        return paragrafo
 
     def add_sub_title(txt, bookmark=None):
         adicionar_titulo(doc, txt, bookmark=bookmark, primario=False)
@@ -58,7 +62,7 @@ def build_metodologia(doc, dados_projeto, numero=4):
     # -------------------------------------------------------------------------
     # 4. METODOLOGIA (Título Primário)
     # -------------------------------------------------------------------------
-    add_sec_title(f"{numero}. METODOLOGIA", "sec_metodologia")
+    add_sec_title(f"{numero}. METODOLOGIA", "sec_metodologia", toc="_TOC_METODOLOGIA")
 
     documental = eh_documental(dados_projeto)
 
@@ -149,9 +153,24 @@ def build_metodologia(doc, dados_projeto, numero=4):
             _inserir_tabela_tokens(doc, dados_projeto["tabela_2"])
 
     # -------------------------------------------------------------------------
-    # 4.4. PROCEDIMENTOS DE COLETA
+    # 4.4. FONTES DE DADOS (empírica com acervo informacional explícito)
     # -------------------------------------------------------------------------
-    add_sub_title(f"{numero}.4. PROCEDIMENTOS DE COLETA", "sec_met_4")
+    sub = 4
+    if not documental:
+        fontes_empiricas = dados_projeto.get("metodologia_fontes", [])
+        if fontes_empiricas:
+            add_sub_title(f"{numero}.{sub}. FONTES DE DADOS", "sec_met_3f_emp")
+            if isinstance(fontes_empiricas, str):
+                add_body_p(fontes_empiricas)
+            else:
+                for par in fontes_empiricas:
+                    add_body_p(par)
+            sub += 1
+
+    # -------------------------------------------------------------------------
+    # PROCEDIMENTOS DE COLETA
+    # -------------------------------------------------------------------------
+    add_sub_title(f"{numero}.{sub}. PROCEDIMENTOS DE COLETA", "sec_met_4")
     coleta = dados_projeto.get("metodologia_coleta", [])
     if coleta:
         if isinstance(coleta, str):
@@ -175,8 +194,9 @@ def build_metodologia(doc, dados_projeto, numero=4):
     # -------------------------------------------------------------------------
     # 4.5. PROCEDIMENTOS ÉTICOS (Obrigatório em Pesquisas com Seres Humanos)
     # -------------------------------------------------------------------------
+    sub += 1
     if not documental or dados_projeto.get("metodologia_etica"):
-        add_sub_title(f"{numero}.5. PROCEDIMENTOS ÉTICOS", "sec_met_5")
+        add_sub_title(f"{numero}.{sub}. PROCEDIMENTOS ÉTICOS", "sec_met_5")
         etica = dados_projeto.get("metodologia_etica", [])
         if etica:
             if isinstance(etica, str):
@@ -195,7 +215,8 @@ def build_metodologia(doc, dados_projeto, numero=4):
     # -------------------------------------------------------------------------
     # 4.6. ANÁLISE DE DADOS
     # -------------------------------------------------------------------------
-    add_sub_title(f"{numero}.6. ANÁLISE DE DADOS", "sec_met_6")
+    sub += 1
+    add_sub_title(f"{numero}.{sub}. ANÁLISE DE DADOS", "sec_met_6")
     analise = dados_projeto.get("metodologia_analise", [])
     if analise:
         if isinstance(analise, str):

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { Card } from "@/components/ui/Card";
-import type { DocumentSections, ParseResponse, PTTItem } from "@/lib/api";
+import type { ArtigoQuadro, DocumentSections, ParseResponse, PTTItem } from "@/lib/api";
 import { faixaImpacto } from "@/lib/ptt";
 import type { components } from "@/types/api";
 
@@ -29,6 +29,7 @@ const ABAS = [
   { id: "secoes", label: "Seções do trabalho" },
   { id: "siglas", label: "Siglas" },
   { id: "ptts", label: "Produtos técnicos" },
+  { id: "quadro", label: "Estrutura / Quadro 1" },
 ] as const;
 
 type Aba = (typeof ABAS)[number]["id"];
@@ -49,6 +50,9 @@ const INOVACOES = ["Alto", "Médio", "Baixo"] as const;
 const COMPLEXIDADES = ["Alta", "Média", "Baixa"] as const;
 const DEMANDAS = ["Espontânea", "Contratada", "Edital-concorrência"] as const;
 const ABRANGENCIAS = ["Local", "Regional", "Nacional", "Internacional"] as const;
+const STATUS_QUADRO = ["Em produção", "Concluído", "Submetido"] as const;
+const TIPO_ESTUDO_PADRAO = "Qualitativo/Quantitativo Exploratório Descritivo";
+const ROMANOS = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii"];
 const LIMITE_PALAVRAS = 50;
 
 const TIPOS_PTT = [
@@ -110,6 +114,19 @@ const PTT_VAZIO: PTTItem = {
   divulgacao_url: "",
   abrangencia: "Local",
   publico_usuario: "Estado, Município, Comunidade",
+  objetivo_especifico: "",
+  tipo_estudo: TIPO_ESTUDO_PADRAO,
+  fontes: "",
+  status: "Em produção",
+};
+
+const ARTIGO_VAZIO: ArtigoQuadro = {
+  titulo: "",
+  objetivo_especifico: "",
+  tipo_estudo: TIPO_ESTUDO_PADRAO,
+  fontes: "",
+  status: "Em produção",
+  subtipo: "Artigo",
 };
 
 function contarPalavras(texto: string) {
@@ -258,6 +275,38 @@ export function Step3MetadataReview({
     const ptts = data.ptts.map((item, i) => (i === index ? { ...item, ...partial } : item));
     onChange({ ...data, ptts });
   }
+
+  function patchArtigo(index: number, partial: Partial<ArtigoQuadro>) {
+    const artigos = (data.artigos ?? []).map((item, i) => (i === index ? { ...item, ...partial } : item));
+    onChange({ ...data, artigos });
+  }
+
+  const fontesPadrao = (data.sections.metodologia_fontes ?? []).find((item) => item.trim())
+    || data.sections.metodologia_locus
+    || "SIAC";
+  const artigosQuadro = data.artigos ?? [];
+  const linhasQuadro = [
+    ...artigosQuadro.map((item, index) => ({
+      origem: `Artigo ${index + 1}`,
+      objetivo: `(${ROMANOS[index] ?? index + 1}) ${item.objetivo_especifico}`,
+      produto: `Artigo ${index + 1}: ${item.titulo}`,
+      estudo: item.tipo_estudo || TIPO_ESTUDO_PADRAO,
+      fontes: item.fontes || fontesPadrao,
+      status: item.status || "Em produção",
+    })),
+    ...data.ptts.map((item, index) => {
+      const ordem = artigosQuadro.length + index;
+      const num = item.num || String(index + 1);
+      return {
+        origem: item.num || `PTT ${index + 1}`,
+        objetivo: `(${ROMANOS[ordem] ?? ordem + 1}) ${item.objetivo_especifico || ""}`,
+        produto: `${item.subtipo || item.tipo || "PTT"} ${num} – ${item.titulo || item.nome}`,
+        estudo: item.tipo_estudo || TIPO_ESTUDO_PADRAO,
+        fontes: item.fontes || fontesPadrao,
+        status: item.status || "Em produção",
+      };
+    }),
+  ];
 
   const sugestaoCoautoria = coautoriaDocente(data.metadata.orientador, data.metadata.coorientador);
 
@@ -648,11 +697,14 @@ export function Step3MetadataReview({
                 </label>
                 <label className="text-sm">
                   Universo e amostragem
+                  <span className="block text-xs text-[#6b645a]">Um parágrafo por linha em branco.</span>
                   <textarea
-                    rows={3}
+                    rows={8}
                     className={campo}
-                    value={data.sections?.metodologia_participantes ?? ""}
-                    onChange={(event) => patchSection("metodologia_participantes", event.target.value)}
+                    value={paragrafosParaTexto(valorParagrafos("metodologia_participantes"))}
+                    onChange={(event) =>
+                      patchSection("metodologia_participantes", textoParaParagrafos(event.target.value))
+                    }
                   />
                 </label>
                 <label className="text-sm">
@@ -676,19 +728,21 @@ export function Step3MetadataReview({
                 <label className="text-sm">
                   Salvaguardas éticas e LGPD
                   <textarea
-                    rows={3}
+                    rows={6}
                     className={campo}
-                    value={data.sections?.metodologia_etica ?? ""}
-                    onChange={(event) => patchSection("metodologia_etica", event.target.value)}
+                    value={paragrafosParaTexto(valorParagrafos("metodologia_etica"))}
+                    onChange={(event) => patchSection("metodologia_etica", textoParaParagrafos(event.target.value))}
                   />
                 </label>
                 <label className="text-sm">
                   Análise de dados e modelagem
                   <textarea
-                    rows={3}
+                    rows={8}
                     className={campo}
-                    value={data.sections?.metodologia_analise ?? ""}
-                    onChange={(event) => patchSection("metodologia_analise", event.target.value)}
+                    value={paragrafosParaTexto(valorParagrafos("metodologia_analise"))}
+                    onChange={(event) =>
+                      patchSection("metodologia_analise", textoParaParagrafos(event.target.value))
+                    }
                   />
                 </label>
               </div>
@@ -748,6 +802,46 @@ export function Step3MetadataReview({
                               value={item.titulo || item.nome}
                               onChange={(event) => patchPtt(index, { titulo: event.target.value, nome: event.target.value })}
                             />
+                          </label>
+                          <label className="text-xs text-[#6b645a] sm:col-span-2">
+                            Objetivo específico vinculado
+                            <textarea
+                              rows={2}
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              value={item.objetivo_especifico || ""}
+                              onChange={(event) => patchPtt(index, { objetivo_especifico: event.target.value })}
+                            />
+                          </label>
+                          <label className="text-xs text-[#6b645a]">
+                            Tipo de estudo
+                            <input
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              value={item.tipo_estudo || TIPO_ESTUDO_PADRAO}
+                              onChange={(event) => patchPtt(index, { tipo_estudo: event.target.value })}
+                            />
+                          </label>
+                          <label className="text-xs text-[#6b645a]">
+                            Fontes
+                            <input
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              placeholder={fontesPadrao}
+                              value={item.fontes || ""}
+                              onChange={(event) => patchPtt(index, { fontes: event.target.value })}
+                            />
+                          </label>
+                          <label className="text-xs text-[#6b645a]">
+                            Status
+                            <select
+                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                              value={item.status || "Em produção"}
+                              onChange={(event) => patchPtt(index, { status: event.target.value })}
+                            >
+                              {STATUS_QUADRO.map((valor) => (
+                                <option key={valor} value={valor}>
+                                  {valor}
+                                </option>
+                              ))}
+                            </select>
                           </label>
                           <label className="text-xs text-[#6b645a]">
                             Tipo
@@ -1000,6 +1094,123 @@ export function Step3MetadataReview({
           >
             Adicionar produto
           </button>
+        </Card>
+      )}
+
+      {aba === "quadro" && (
+        <Card title="Estrutura / Quadro 1">
+          <p className="mb-3 text-sm text-[#5c564c]">
+            Cada artigo e cada produto técnico vira uma linha. Título e objetivo geral se repetem e serão mesclados no Word.
+            Fontes em branco herdam {fontesPadrao}.
+          </p>
+          <ul className="mb-4 flex flex-col gap-3">
+            {artigosQuadro.map((item, index) => (
+              <li key={`artigo-${index}`} className="rounded-lg border border-[#efe8dc] p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-sm font-semibold text-[#0f3d32]">Artigo {index + 1}</p>
+                  <button
+                    type="button"
+                    className="text-sm text-red-800"
+                    onClick={() => onChange({ ...data, artigos: artigosQuadro.filter((_, i) => i !== index) })}
+                  >
+                    Remover
+                  </button>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <label className="text-xs text-[#6b645a] sm:col-span-2">
+                    Título do artigo
+                    <input
+                      className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                      value={item.titulo}
+                      onChange={(event) => patchArtigo(index, { titulo: event.target.value })}
+                    />
+                  </label>
+                  <label className="text-xs text-[#6b645a] sm:col-span-2">
+                    Objetivo específico
+                    <textarea
+                      rows={2}
+                      className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                      value={item.objetivo_especifico}
+                      onChange={(event) => patchArtigo(index, { objetivo_especifico: event.target.value })}
+                    />
+                  </label>
+                  <label className="text-xs text-[#6b645a]">
+                    Tipo de estudo
+                    <input
+                      className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                      value={item.tipo_estudo || TIPO_ESTUDO_PADRAO}
+                      onChange={(event) => patchArtigo(index, { tipo_estudo: event.target.value })}
+                    />
+                  </label>
+                  <label className="text-xs text-[#6b645a]">
+                    Fontes
+                    <input
+                      className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                      placeholder={fontesPadrao}
+                      value={item.fontes}
+                      onChange={(event) => patchArtigo(index, { fontes: event.target.value })}
+                    />
+                  </label>
+                  <label className="text-xs text-[#6b645a]">
+                    Status
+                    <select
+                      className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
+                      value={item.status || "Em produção"}
+                      onChange={(event) => patchArtigo(index, { status: event.target.value })}
+                    >
+                      {STATUS_QUADRO.map((valor) => (
+                        <option key={valor} value={valor}>
+                          {valor}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            className="text-sm font-medium text-[#0f3d32]"
+            onClick={() => onChange({ ...data, artigos: [...artigosQuadro, { ...ARTIGO_VAZIO }] })}
+          >
+            Adicionar artigo
+          </button>
+          <h3 className="mb-2 mt-6 text-sm font-semibold text-[#0f3d32]">Pré-visualização das linhas</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left text-xs">
+              <thead>
+                <tr>
+                  {["Título", "Objetivo Geral", "Objetivos Específicos", "Tipo de Produto", "Tipo de Estudo", "Fontes", "Status"].map((coluna) => (
+                    <th key={coluna} className="border border-[#d9d1c3] bg-[#f6f1e8] px-2 py-1 font-semibold">
+                      {coluna}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {linhasQuadro.length === 0 ? (
+                  <tr>
+                    <td className="border border-[#d9d1c3] px-2 py-2 text-[#6b645a]" colSpan={7}>
+                      Cadastre um artigo ou um produto técnico para gerar o Quadro 1.
+                    </td>
+                  </tr>
+                ) : (
+                  linhasQuadro.map((linha, index) => (
+                    <tr key={`${linha.origem}-${index}`}>
+                      <td className="border border-[#d9d1c3] px-2 py-1">{data.metadata.titulo}</td>
+                      <td className="border border-[#d9d1c3] px-2 py-1">{data.sections.objetivo_geral}</td>
+                      <td className="border border-[#d9d1c3] px-2 py-1">{linha.objetivo}</td>
+                      <td className="border border-[#d9d1c3] px-2 py-1">{linha.produto}</td>
+                      <td className="border border-[#d9d1c3] px-2 py-1">{linha.estudo}</td>
+                      <td className="border border-[#d9d1c3] px-2 py-1">{linha.fontes}</td>
+                      <td className="border border-[#d9d1c3] px-2 py-1">{linha.status}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </Card>
       )}
 

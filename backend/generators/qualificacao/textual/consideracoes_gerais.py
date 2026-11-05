@@ -12,6 +12,7 @@ from docx.shared import Cm, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from ..formato import adicionar_titulo
+from ..pre_textual.sumario import registrar_entrada
 
 
 def build_consideracoes_gerais(doc, dados_secao):
@@ -27,8 +28,11 @@ def build_consideracoes_gerais(doc, dados_secao):
           * 'revisao': Lista de parágrafos da revisão / referencial teórico
     """
 
-    def add_sec_title(txt, bookmark=None):
-        adicionar_titulo(doc, txt, bookmark=bookmark, primario=True)
+    def add_sec_title(txt, bookmark=None, toc=None):
+        paragrafo = adicionar_titulo(doc, txt, bookmark=bookmark, primario=True)
+        if toc:
+            registrar_entrada(doc, txt, 1, toc, paragrafo)
+        return paragrafo
 
     def add_sub_title(txt, bookmark=None):
         adicionar_titulo(doc, txt, bookmark=bookmark, primario=False)
@@ -62,7 +66,7 @@ def build_consideracoes_gerais(doc, dados_secao):
     # -------------------------------------------------------------------------
     # 1. CONSIDERAÇÕES GERAIS (Título Primário)
     # -------------------------------------------------------------------------
-    add_sec_title("1. CONSIDERAÇÕES GERAIS", "sec_1")
+    add_sec_title("1. CONSIDERAÇÕES GERAIS", "sec_1", toc="_TOC_CONSIDERACOES")
 
     # -------------------------------------------------------------------------
     # 1.1. INTRODUÇÃO

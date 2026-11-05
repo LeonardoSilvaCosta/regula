@@ -1,6 +1,38 @@
 """Utilitários XML para controle avançado de paginação e bordas de tabelas."""
+import re
+
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+
+_ILLEGAL_OOXML = re.compile(r"[\x00-\x08\x0B-\x0C\x0E-\x1F\uFFFE\uFFFF]")
+_FRAC_LATEX = re.compile(r"(?:\\frac|\x0crac|rac)\{([^}]*)\}\{([^}]*)\}")
+
+
+def sanitizar_texto_ooxml(texto: str) -> str:
+    """Remove caracteres proibidos em XML 1.0 (exigência do python-docx)."""
+    if not isinstance(texto, str) or not texto:
+        return texto
+    out = texto
+    while True:
+        novo, n = _FRAC_LATEX.subn(r"(\1)/(\2)", out)
+        out = novo
+        if n == 0:
+            break
+    out = out.replace("\x0barepsilon", "ε").replace("\x0bdelta", "δ")
+    out = out.replace("\\varepsilon", "ε").replace("\\delta", "δ")
+    out = out.replace("arepsilon", "ε")
+    return _ILLEGAL_OOXML.sub("", out)
+
+
+def sanitizar_estrutura(dados):
+    """Aplica sanitizar_texto_ooxml recursivamente em dicts/listas."""
+    if isinstance(dados, str):
+        return sanitizar_texto_ooxml(dados)
+    if isinstance(dados, dict):
+        return {chave: sanitizar_estrutura(valor) for chave, valor in dados.items()}
+    if isinstance(dados, list):
+        return [sanitizar_estrutura(item) for item in dados]
+    return dados
 
 def aplicar_estilo_tabela_ibge(tabela):
     """Tabela aberta (IBGE/ABNT): topo, base do cabeçalho e fecho. Sem verticais nem grades internas."""

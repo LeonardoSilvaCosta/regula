@@ -7,13 +7,14 @@ import copy
 import os
 
 import docx
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.section import WD_ORIENT, WD_SECTION
 
 from core.styles import apply_base_styles, aplicar_idioma_pt_br, limpar_rodape, set_page_margins
 from core.xml_utils import configure_section_page_numbers, add_page_number_field, continuar_numeracao
-from core.campos import habilitar_atualizacao_de_campos
 from core.atualizar_campos import atualizar_campos_word
 
 from .formato import adicionar_paragrafo, adicionar_titulo
@@ -36,12 +37,20 @@ from .pre_textual.folha_aprovacao import build_folha_aprovacao
 from .pre_textual.listas_ilustracoes import build_lista_ilustracoes
 from .pre_textual.listas_siglas import build_lista_siglas, normalizar_siglas
 from .pre_textual.simbolos import build_lista_simbolos, normalizar_simbolos
-from .pre_textual.sumario import build_sumario
+from .pre_textual.sumario import build_sumario, preencher_sumario
 from .estrutura import numeracao_secoes
 from .textual.apresentacao import build_apresentacao, build_quadro_estrutura
 from .projeto import build_projeto_secoes
 from .textual.resultados_preliminares import build_resultados_preliminares
 from .pos_textual.pos_textual import build_pos_textual, itens_com_corpo
+
+
+def habilitar_atualizacao_campos(doc):
+    """Pede ao Word que recalcule sumário e paginação ao abrir o arquivo."""
+    settings = doc.settings._element
+    update_fields = OxmlElement("w:updateFields")
+    update_fields.set(qn("w:val"), "true")
+    settings.append(update_fields)
 
 
 def _secao_sem_numero(doc, primeira=False):
@@ -50,6 +59,19 @@ def _secao_sem_numero(doc, primeira=False):
     section.header.is_linked_to_previous = False
     section.footer.is_linked_to_previous = False
     return section
+
+
+def _fontes_padrao(projeto):
+    fontes = projeto.get("metodologia_fontes") or []
+    if isinstance(fontes, list):
+        for item in fontes:
+            texto = str(item or "").strip()
+            if texto:
+                return texto.split("\n")[0].strip()
+    elif str(fontes or "").strip():
+        return str(fontes).strip().split("\n")[0].strip()
+    locus = str(projeto.get("metodologia_locus") or "").strip()
+    return locus or "SIAC"
 
 
 def _secao_paisagem(doc):
@@ -104,6 +126,8 @@ _CHAVES_PROJETO = (
     "metodologia_coleta",
     "metodologia_etica",
     "metodologia_analise",
+    "tabela_1",
+    "tabela_2",
 )
 
 _DADOS_VAZIOS = {
@@ -169,21 +193,39 @@ def _mesclar_revisao(dados, revisao):
             bloco["texto_percurso"] = list(secoes["apresentacao"])
         if _valor_preenchido(secoes.get("referencias")):
             dados["referencias"] = list(secoes["referencias"])
-    if "ptts" not in revisao:
+    if revisao.get("cronograma"):
+        projeto = dados.setdefault("projeto", {})
+        projeto["cronograma"] = list(revisao.get("cronograma") or [])
+    if "ptts" in revisao:
+        projeto = dados.setdefault("projeto", {})
+        atuais = list(projeto.get("ptts") or [])
+        fundidos = []
+        for indice, item in enumerate(revisao.get("ptts") or []):
+            base = dict(atuais[indice]) if indice < len(atuais) else {}
+            for chave, valor in item.items():
+                if valor is None or valor == "":
+                    continue
+                base[chave] = valor
+            if item.get("titulo"):
+                base["titulo"] = item["titulo"]
+            fundidos.append(base)
+        projeto["ptts"] = fundidos
+    if "artigos" not in revisao:
         return
-    projeto = dados.setdefault("projeto", {})
-    atuais = list(projeto.get("ptts") or [])
-    fundidos = []
-    for indice, item in enumerate(revisao.get("ptts") or []):
-        base = dict(atuais[indice]) if indice < len(atuais) else {}
-        for chave, valor in item.items():
+    from .estrutura import artigos_de
+
+    resultados = dados.setdefault("resultados", {})
+    atuais = artigos_de(resultados)
+    fundidos_artigos = []
+    for indice, item in enumerate(revisao.get("artigos") or []):
+        base = dict(atuais[indice]) if indice < len(atuais) and isinstance(atuais[indice], dict) else {}
+        for chave, valor in (item or {}).items():
             if valor is None or valor == "":
                 continue
             base[chave] = valor
-        if item.get("titulo"):
-            base["titulo"] = item["titulo"]
-        fundidos.append(base)
-    projeto["ptts"] = fundidos
+        fundidos_artigos.append(base)
+    if fundidos_artigos:
+        resultados["artigos"] = fundidos_artigos
 
 
 def gerar_documento_qualificacao(
@@ -286,11 +328,15 @@ def gerar_documento_qualificacao(
 
     build_apresentacao(doc, dados["apresentacao"], dados["metadata"])
     _secao_paisagem(doc)
+    projeto_quadro = dados.get("projeto") or {}
     build_quadro_estrutura(
         doc,
         dados["apresentacao"],
         dados["metadata"],
-        objetivo_geral=(dados.get("projeto") or {}).get("objetivo_geral", ""),
+        objetivo_geral=projeto_quadro.get("objetivo_geral", ""),
+        ptts=projeto_quadro.get("ptts") or [],
+        artigos=(dados.get("resultados") or {}).get("artigos") or [],
+        fontes_padrao=_fontes_padrao(projeto_quadro),
     )
     _secao_retrato_continua(doc)
     meta = dados.get("metadata") or {}
@@ -314,7 +360,8 @@ def gerar_documento_qualificacao(
     build_pos_textual(doc, dados["referencias"], apendices=apendices, anexos=anexos)
 
     aplicar_idioma_pt_br(doc)
-    habilitar_atualizacao_de_campos(doc)
+    preencher_sumario(doc)
+    habilitar_atualizacao_campos(doc)
     doc.save(caminho_saida)
     atualizar_campos_word(caminho_saida)
     print(f"[CONCLUÍDO]: Relatório de Qualificação gerado em {caminho_saida}")

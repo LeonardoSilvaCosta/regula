@@ -8,6 +8,7 @@ from io import BytesIO
 from pathlib import Path
 
 from core.ptt_schema import validar_carteira_produtos
+from core.xml_utils import sanitizar_estrutura
 from generators.dissertacao.builder import gerar_documento_dissertacao
 from generators.qualificacao.builder import gerar_documento_qualificacao
 from generators.tese.builder import gerar_documento_tese
@@ -49,13 +50,17 @@ def validar_ptts(ptts: list[PTTItem], nivel: AcademicLevel) -> PTTValidationResu
 
 def _revisao(pedido: GenerateRequest) -> dict:
     """Metadados, seções, banca, siglas e PTTs confirmados no Passo 3."""
-    return {
-        "metadata": pedido.metadata.model_dump(),
-        "sections": pedido.sections.model_dump(),
-        "banca": [membro.model_dump() for membro in pedido.banca],
-        "siglas": [list(par) for par in pedido.siglas],
-        "ptts": [item.model_dump() for item in pedido.ptts],
-    }
+    return sanitizar_estrutura(
+        {
+            "metadata": pedido.metadata.model_dump(),
+            "sections": pedido.sections.model_dump(),
+            "banca": [membro.model_dump() for membro in pedido.banca],
+            "siglas": [list(par) for par in pedido.siglas],
+            "ptts": [item.model_dump() for item in pedido.ptts],
+            "artigos": [item.model_dump() for item in pedido.artigos],
+            "cronograma": [item.model_dump() for item in pedido.cronograma],
+        }
+    )
 
 
 def gerar_buffer(pedido: GenerateRequest) -> BytesIO:
