@@ -3,14 +3,12 @@ Módulo granular para a Folha de Aprovação do Relatório de Qualificação
 conforme o modelo oficial da Resolução nº 009/2025-PPGSP/UFPA (página 14).
 """
 
-import os
 from docx.shared import Cm, Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import parse_xml
 from docx.oxml.ns import nsdecls
 
-from core.styles import BRASAO_UFPA_ALTURA, BRASAO_UFPA_LARGURA
 from ..titulo import escrever_titulo_e_subtitulo, nome_discente, separar_titulacao
 
 
@@ -108,45 +106,16 @@ def _escrever_linha_celula(cell, texto, tamanho=12, italico=True, espaco_depois=
 
 
 def build_folha_aprovacao(doc, metadata, assets_dir="assets"):
-    # 1. Brasão da UFPA
-    brasao_path = os.path.join(assets_dir, "brasao_ufpa.png")
-    if os.path.exists(brasao_path):
-        p_img = doc.add_paragraph()
-        p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_img.paragraph_format.space_before = Pt(0)
-        p_img.paragraph_format.space_after = Pt(4)
-        run_img = p_img.add_run()
-        run_img.add_picture(
-            brasao_path, width=BRASAO_UFPA_LARGURA, height=BRASAO_UFPA_ALTURA
-        )
-
-    # 2. Cabeçalho Institucional
+    # Brasão e identificação institucional ficam no cabeçalho da seção.
+    del assets_dir
     is_doutorado = metadata.get("nivel", "mestrado").lower() in ["doutorado", "tese"]
-    curso_nome = "DOUTORADO EM SEGURANÇA PÚBLICA" if is_doutorado else "MESTRADO EM SEGURANÇA PÚBLICA"
     tipo_trabalho = "Tese" if is_doutorado else "Dissertação"
-
-    cabecalho = [
-        "UNIVERSIDADE FEDERAL DO PARÁ",
-        "INSTITUTO DE CIÊNCIAS EXATAS E NATURAIS",
-        "PROGRAMA DE PÓS-GRADUAÇÃO EM SEGURANÇA PÚBLICA",
-        curso_nome
-    ]
-    for linha in cabecalho:
-        p_c = doc.add_paragraph()
-        p_c.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_c.paragraph_format.line_spacing = 1.0
-        p_c.paragraph_format.space_before = Pt(0)
-        p_c.paragraph_format.space_after = Pt(2)
-        r_c = p_c.add_run(linha)
-        r_c.bold = True
-        r_c.font.name = "Times New Roman"
-        r_c.font.size = Pt(12)
 
     # 3. Título e Autor (Times 14, negrito; subtítulo em estilo frase)
     p_tit = doc.add_paragraph()
     p_tit.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_tit.paragraph_format.space_before = Pt(14)
-    p_tit.paragraph_format.space_after = Pt(6)
+    p_tit.paragraph_format.space_before = Pt(0)
+    p_tit.paragraph_format.space_after = Pt(4)
     if not escrever_titulo_e_subtitulo(p_tit, metadata.get("titulo", ""), tamanho=14):
         r_t = p_tit.add_run("[TÍTULO DO RELATÓRIO DE QUALIFICAÇÃO]")
         r_t.italic = True
@@ -156,7 +125,7 @@ def build_folha_aprovacao(doc, metadata, assets_dir="assets"):
     p_aut = doc.add_paragraph()
     p_aut.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_aut.paragraph_format.space_before = Pt(0)
-    p_aut.paragraph_format.space_after = Pt(12)
+    p_aut.paragraph_format.space_after = Pt(6)
     autor = nome_discente(metadata.get("autor")) or "[Nome do(a) discente]"
     r_a = p_aut.add_run(autor)
     r_a.bold = True
@@ -184,18 +153,16 @@ def build_folha_aprovacao(doc, metadata, assets_dir="assets"):
     r_ap.font.size = Pt(12)
 
     # 5. Local e Data
-    _paragrafo_vazio(doc)
     ano = metadata.get("ano", "2026")
     data_txt = f"Belém, Pará, ____ de _______________ de {ano}."
     p_data = doc.add_paragraph()
     p_data.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p_data.paragraph_format.line_spacing = 1.0
-    p_data.paragraph_format.space_before = Pt(12)
-    p_data.paragraph_format.space_after = Pt(18)
+    p_data.paragraph_format.space_before = Pt(8)
+    p_data.paragraph_format.space_after = Pt(8)
     r_data = p_data.add_run(data_txt)
     r_data.font.name = "Times New Roman"
     r_data.font.size = Pt(12)
-    _paragrafo_vazio(doc)
 
     # 6. Coordenador (Times 12, como o cabeçalho institucional)
     coord = (metadata.get("coordenador") or "").strip() or "[Nome do Coordenador]"
@@ -228,11 +195,10 @@ def build_folha_aprovacao(doc, metadata, assets_dir="assets"):
     r_cd2.italic = True
 
     # 7. BANCA EXAMINADORA
-    _paragrafo_vazio(doc)
     p_bt = doc.add_paragraph()
     p_bt.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_bt.paragraph_format.space_before = Pt(0)
-    p_bt.paragraph_format.space_after = Pt(8)
+    p_bt.paragraph_format.space_before = Pt(8)
+    p_bt.paragraph_format.space_after = Pt(4)
     r_bt = p_bt.add_run("BANCA EXAMINADORA")
     r_bt.bold = True
     r_bt.font.name = "Times New Roman"
@@ -265,4 +231,4 @@ def build_folha_aprovacao(doc, metadata, assets_dir="assets"):
             _escrever_linha_celula(cell, titulacao, tamanho=12, italico=True, espaco_depois=1)
         _escrever_linha_celula(cell, instituicao, tamanho=12, italico=True, espaco_depois=1)
         if funcao:
-            _escrever_linha_celula(cell, funcao, tamanho=12, italico=True, espaco_depois=6)
+            _escrever_linha_celula(cell, funcao, tamanho=12, italico=True, espaco_depois=2)

@@ -13,7 +13,15 @@ from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.section import WD_ORIENT, WD_SECTION
 
-from core.styles import apply_base_styles, aplicar_idioma_pt_br, limpar_rodape, set_page_margins
+from core.styles import (
+    apply_base_styles,
+    aplicar_idioma_pt_br,
+    aplicar_cabecalho_institucional,
+    aplicar_rodape_local_ano,
+    limpar_cabecalho,
+    limpar_rodape,
+    set_page_margins,
+)
 from core.xml_utils import configure_section_page_numbers, add_page_number_field, continuar_numeracao
 from core.atualizar_campos import atualizar_campos_word
 
@@ -58,6 +66,7 @@ def _secao_sem_numero(doc, primeira=False):
     set_page_margins(section)
     section.header.is_linked_to_previous = False
     section.footer.is_linked_to_previous = False
+    limpar_cabecalho(section)
     return section
 
 
@@ -101,6 +110,7 @@ def _paginar(section, formato, inicio):
     set_page_margins(section)
     section.header.is_linked_to_previous = False
     section.footer.is_linked_to_previous = False
+    limpar_cabecalho(section)
     limpar_rodape(section)
     configure_section_page_numbers(section, num_format=formato, start_at=inicio)
     header = section.header.paragraphs[0]
@@ -116,6 +126,7 @@ _CHAVES_PROJETO = (
     "justificativa",
     "problema",
     "revisao",
+    "referencial_teorico",
     "objetivo_geral",
     "objetivos_especificos",
     "hipotese",
@@ -138,8 +149,11 @@ _DADOS_VAZIOS = {
         "justificativa": [],
         "problema": [],
         "revisao": [],
+        "incluir_referencial_teorico": False,
+        "referencial_teorico": [],
         "objetivo_geral": "",
         "objetivos_especificos": [],
+        "incluir_hipoteses": False,
         "hipotese": [],
         "metodologia_natureza": [],
         "metodologia_locus": "",
@@ -185,6 +199,12 @@ def _mesclar_revisao(dados, revisao):
             if chave not in secoes or not _valor_preenchido(secoes[chave]):
                 continue
             projeto[chave] = secoes[chave]
+        if "incluir_hipoteses" in secoes:
+            projeto["incluir_hipoteses"] = bool(secoes.get("incluir_hipoteses"))
+        if "incluir_referencial_teorico" in secoes:
+            projeto["incluir_referencial_teorico"] = bool(secoes.get("incluir_referencial_teorico"))
+        if "referencial_teorico" in secoes:
+            projeto["referencial_teorico"] = list(secoes.get("referencial_teorico") or [])
         if _valor_preenchido(secoes.get("apresentacao")):
             bloco = dados.setdefault("apresentacao", {})
             if not isinstance(bloco, dict):
@@ -263,18 +283,31 @@ def gerar_documento_qualificacao(
     apply_base_styles(doc)
 
     # =========================================================================
-    # Capa e folha de rosto: local e ano no corpo. Rodapé das seções fica vazio.
+    # Capa e folha de rosto: local e ano na base da página.
     # Folha de aprovação segue sem esse rodapé e sem número visível.
     # =========================================================================
+    meta = dados["metadata"]
+    local = (meta.get("local") or "Belém-Pará").strip()
+    ano = (meta.get("ano") or "2026").strip()
+
     sec_capa = _secao_sem_numero(doc, primeira=True)
-    limpar_rodape(sec_capa)
-    build_capa(doc, dados["metadata"], assets_dir=assets_dir)
+    aplicar_cabecalho_institucional(sec_capa, meta, assets_dir=assets_dir, space_after=24)
+    build_capa(doc, meta, assets_dir=assets_dir)
+    aplicar_rodape_local_ano(sec_capa, local, ano)
 
     sec_rosto = _secao_sem_numero(doc)
-    limpar_rodape(sec_rosto)
-    build_folha_rosto(doc, dados["metadata"], assets_dir=assets_dir)
+    aplicar_cabecalho_institucional(sec_rosto, meta, assets_dir=assets_dir, space_after=18)
+    build_folha_rosto(doc, meta, assets_dir=assets_dir)
+    aplicar_rodape_local_ano(sec_rosto, local, ano)
 
     sec_aprov = _secao_sem_numero(doc)
+    aplicar_cabecalho_institucional(
+        sec_aprov,
+        meta,
+        assets_dir=assets_dir,
+        space_after=6,
+        somente_primeira_pagina=True,
+    )
     limpar_rodape(sec_aprov)
     build_folha_aprovacao(doc, dados["metadata"], assets_dir=assets_dir)
 

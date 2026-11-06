@@ -3,11 +3,9 @@ Módulo granular para geração exclusiva da FOLHA DE ROSTO do Relatório de Qua
 conforme a Resolução nº 009/2025-PPGSP/UFPA (Art. 1º, I, item 2 e modelo da pág. 12).
 """
 
-import os
 from docx.shared import Cm, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
-from core.styles import BRASAO_UFPA_ALTURA, BRASAO_UFPA_LARGURA
 from ..titulo import escrever_titulo_e_subtitulo, nome_discente
 
 
@@ -52,49 +50,9 @@ def build_folha_rosto(doc, metadata, assets_dir="assets"):
       (xii) Ano de aprovação
     """
     is_doutorado = metadata.get("nivel", "mestrado").strip().lower() in ["doutorado", "tese"]
-    nivel_cabecalho = "DOUTORADO EM SEGURANÇA PÚBLICA" if is_doutorado else "MESTRADO EM SEGURANÇA PÚBLICA"
     tipo_trabalho = "Tese" if is_doutorado else "Dissertação"
-
-    # -------------------------------------------------------------
-    # (i) Brasão da UFPA
-    # -------------------------------------------------------------
-    caminho_brasao = os.path.join(assets_dir, "brasao_ufpa.png")
-    p_brasao = doc.add_paragraph()
-    p_brasao.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_brasao.paragraph_format.space_before = Pt(0)
-    p_brasao.paragraph_format.space_after = Pt(6)
-
-    if os.path.exists(caminho_brasao):
-        run_brasao = p_brasao.add_run()
-        run_brasao.add_picture(
-            caminho_brasao, width=BRASAO_UFPA_LARGURA, height=BRASAO_UFPA_ALTURA
-        )
-    else:
-        run_brasao = p_brasao.add_run("[BRASÃO DA UFPA]")
-        run_brasao.italic = True
-        run_brasao.font.size = Pt(10)
-        run_brasao.font.color.rgb = RGBColor(120, 120, 120)
-
-    # -------------------------------------------------------------
-    # (ii) a (v) Cabeçalho Institucional (Times 12 Negrito)
-    # -------------------------------------------------------------
-    p_cabecalho = doc.add_paragraph()
-    p_cabecalho.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_cabecalho.paragraph_format.line_spacing = 1.0
-    p_cabecalho.paragraph_format.space_before = Pt(0)
-    p_cabecalho.paragraph_format.space_after = Pt(18)
-
-    linhas_cabecalho = [
-        "UNIVERSIDADE FEDERAL DO PARÁ",
-        "INSTITUTO DE CIÊNCIAS EXATAS E NATURAIS",
-        "PROGRAMA DE PÓS-GRADUAÇÃO EM SEGURANÇA PÚBLICA",
-        nivel_cabecalho
-    ]
-    for linha in linhas_cabecalho:
-        r = p_cabecalho.add_run(f"{linha}\n")
-        r.bold = True
-        r.font.name = "Times New Roman"
-        r.font.size = Pt(12)
+    # Brasão e identificação institucional ficam no cabeçalho da seção.
+    del assets_dir
 
     # -------------------------------------------------------------
     # (vi) Nome do(a) discente (vem ANTES do título, Times 14 Negrito)
@@ -182,17 +140,4 @@ def build_folha_rosto(doc, metadata, assets_dir="assets"):
     if coorientador:
         _paragrafo_campo(doc, "Coorientador(a)", coorientador, space_before=10)
 
-    # (xi) e (xii) Local e ano no corpo, na base da página (não no rodapé)
-    local = (metadata.get("local") or "Belém-Pará").strip()
-    ano = (metadata.get("ano") or "2026").strip()
-
-    p_loc = doc.add_paragraph()
-    p_loc.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_loc.paragraph_format.line_spacing = 1.0
-    p_loc.paragraph_format.space_before = Pt(72)
-    p_loc.paragraph_format.space_after = Pt(0)
-
-    r_loc = p_loc.add_run(f"{local} {ano}" if " " in ano else f"{local}\n{ano}")
-    r_loc.font.name = "Times New Roman"
-    r_loc.font.size = Pt(12)
-    r_loc.bold = True
+    # Local e ano ficam no rodapé da seção, na base da página.

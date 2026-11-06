@@ -68,6 +68,7 @@ const CAMPOS_PARAGRAFOS = [
   "justificativa",
   "problema",
   "revisao",
+  "referencial_teorico",
   "objetivos_especificos",
   "hipotese",
   "metodologia_natureza",
@@ -328,7 +329,7 @@ export function Step3MetadataReview({
     }
   }, [data, onChange, sugestaoCoautoria]);
 
-  function patchSection(chave: keyof DocumentSections, valor: string | string[]) {
+  function patchSection(chave: keyof DocumentSections, valor: string | string[] | boolean) {
     const sections = { ...data.sections, [chave]: valor };
     onChange({ ...data, sections });
   }
@@ -637,7 +638,8 @@ export function Step3MetadataReview({
                   />
                 </label>
                 <label className="text-sm">
-                  Referencial teórico / estado da arte
+                  Revisão da literatura
+                  <span className="block text-xs text-[#6b645a]">Seção 1.4. REVISÃO DA LITERATURA.</span>
                   <textarea
                     rows={5}
                     className={campo}
@@ -645,11 +647,36 @@ export function Step3MetadataReview({
                     onChange={(event) => patchSection("revisao", textoParaParagrafos(event.target.value))}
                   />
                 </label>
+                <label className="flex items-start gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    className="mt-1"
+                    checked={Boolean(data.sections?.incluir_referencial_teorico)}
+                    onChange={(event) => patchSection("incluir_referencial_teorico", event.target.checked)}
+                  />
+                  <span>
+                    Incluir referencial teórico
+                    <span className="block text-xs text-[#6b645a]">
+                      A seção 1.4 passa a se chamar REVISÃO DA LITERATURA E REFERENCIAL TEÓRICO, com as subseções 1.4.1 e 1.4.2.
+                    </span>
+                  </span>
+                </label>
+                {data.sections?.incluir_referencial_teorico && (
+                  <label className="text-sm">
+                    Referencial teórico
+                    <textarea
+                      rows={5}
+                      className={campo}
+                      value={paragrafosParaTexto(valorParagrafos("referencial_teorico"))}
+                      onChange={(event) => patchSection("referencial_teorico", textoParaParagrafos(event.target.value))}
+                    />
+                  </label>
+                )}
               </div>
             </details>
 
             <details open className="rounded-lg border border-[#efe8dc] p-3">
-              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">2. Objetivos e hipótese</summary>
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">2. Objetivos</summary>
               <div className="mt-3 flex flex-col gap-4">
                 <label className="text-sm">
                   Objetivo geral
@@ -678,15 +705,31 @@ export function Step3MetadataReview({
                     </ol>
                   )}
                 </label>
-                <label className="text-sm">
-                  Hipóteses ou questões norteadoras
-                  <textarea
-                    rows={4}
-                    className={campo}
-                    value={paragrafosParaTexto(valorParagrafos("hipotese"))}
-                    onChange={(event) => patchSection("hipotese", textoParaParagrafos(event.target.value))}
+                <label className="flex items-start gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    className="mt-1"
+                    checked={Boolean(data.sections?.incluir_hipoteses)}
+                    onChange={(event) => patchSection("incluir_hipoteses", event.target.checked)}
                   />
+                  <span>
+                    Incluir hipóteses ou questões norteadoras
+                    <span className="block text-xs text-[#6b645a]">
+                      Seção opcional. Quando marcada, entra depois dos objetivos e desloca a numeração seguinte.
+                    </span>
+                  </span>
                 </label>
+                {data.sections?.incluir_hipoteses && (
+                  <label className="text-sm">
+                    Hipóteses ou questões norteadoras
+                    <textarea
+                      rows={4}
+                      className={campo}
+                      value={paragrafosParaTexto(valorParagrafos("hipotese"))}
+                      onChange={(event) => patchSection("hipotese", textoParaParagrafos(event.target.value))}
+                    />
+                  </label>
+                )}
               </div>
             </details>
 

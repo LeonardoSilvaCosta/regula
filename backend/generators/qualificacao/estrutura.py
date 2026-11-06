@@ -41,16 +41,12 @@ _BLOCOS_MANUSCRITO = (
 
 
 def tem_hipotese(projeto):
-    hipotese = (projeto or {}).get("hipotese")
-    if isinstance(hipotese, str):
-        return bool(hipotese.strip())
-    if isinstance(hipotese, (list, tuple)):
-        return any(str(item).strip() for item in hipotese)
-    return bool(hipotese)
+    """A seção só entra quando o usuário a ativa. O padrão é omiti-la."""
+    return bool((projeto or {}).get("incluir_hipoteses"))
 
 
 def numeracao_secoes(projeto):
-    """Seções primárias sem lacuna. Hipóteses só entra quando há conteúdo."""
+    """Seções primárias sem lacuna. Hipóteses só entra quando está ativa."""
     numeros = {"consideracoes": 1, "objetivos": 2}
     proximo = 3
     if tem_hipotese(projeto):
@@ -235,6 +231,17 @@ def rotulo_pos(prefixo, indice, total, rotulo):
     return f"{cabeca} – {texto}".upper()
 
 
+def titulos_revisao(numero, projeto):
+    """1.4 só com revisão, ou 1.4, 1.4.1 e 1.4.2 quando o referencial teórico está ativo."""
+    if not (projeto or {}).get("incluir_referencial_teorico"):
+        return [(f"{numero}.4. REVISÃO DA LITERATURA", "sec_1_4")]
+    return [
+        (f"{numero}.4. REVISÃO DA LITERATURA E REFERENCIAL TEÓRICO.", "sec_1_4"),
+        (f"{numero}.4.1 Revisão da Literatura", "sec_1_4_1"),
+        (f"{numero}.4.2 Referencial Teórico", "sec_1_4_2"),
+    ]
+
+
 def itens_do_sumario(dados, apendices=None, anexos=None, listas=None):
     """Listas utilizadas, depois a parte textual. Capa, rosto e aprovação ficam de fora."""
     projeto = (dados or {}).get("projeto") or {}
@@ -249,7 +256,7 @@ def itens_do_sumario(dados, apendices=None, anexos=None, listas=None):
         (f"{n1}.1. INTRODUÇÃO", "sec_1_1"),
         (f"{n1}.2. JUSTIFICATIVA", "sec_1_2"),
         (f"{n1}.3. PROBLEMA DE PESQUISA", "sec_1_3"),
-        (f"{n1}.4. REVISÃO DA LITERATURA / REFERENCIAL TEÓRICO", "sec_1_4"),
+        *titulos_revisao(n1, projeto),
         (f"{n2}. OBJETIVOS", "sec_2"),
         (f"{n2}.1. OBJETIVO GERAL", "sec_2_1"),
         (f"{n2}.2. OBJETIVOS ESPECÍFICOS", "sec_2_2"),

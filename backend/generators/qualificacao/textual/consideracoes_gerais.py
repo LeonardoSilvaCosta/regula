@@ -5,13 +5,18 @@ Subseções:
   1.1. INTRODUÇÃO
   1.2. JUSTIFICATIVA
   1.3. PROBLEMA DE PESQUISA
-  1.4. REVISÃO DA LITERATURA / REFERENCIAL TEÓRICO
+  1.4. REVISÃO DA LITERATURA
+  ou, com referencial teórico ativo:
+  1.4. REVISÃO DA LITERATURA E REFERENCIAL TEÓRICO.
+    1.4.1 Revisão da Literatura
+    1.4.2 Referencial Teórico
 """
 
 from docx.shared import Cm, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from core.xml_utils import adicionar_bookmark
+from ..estrutura import titulos_revisao
 from ..formato import adicionar_titulo
 from ..pre_textual.sumario import registrar_entrada
 
@@ -26,7 +31,9 @@ def build_consideracoes_gerais(doc, dados_secao):
           * 'introducao': Lista de parágrafos da introdução
           * 'justificativa': Lista de parágrafos da justificativa
           * 'problema': Lista de parágrafos ou string da pergunta problema
-          * 'revisao': Lista de parágrafos da revisão / referencial teórico
+          * 'revisao': Lista de parágrafos da revisão da literatura
+          * 'incluir_referencial_teorico': Liga as subseções 1.4.1 e 1.4.2
+          * 'referencial_teorico': Lista de parágrafos do referencial teórico
     """
 
     def add_sec_title(txt, bookmark=None, toc=None):
@@ -123,17 +130,21 @@ def build_consideracoes_gerais(doc, dados_secao):
         )
 
     # -------------------------------------------------------------------------
-    # 1.4. REVISÃO DA LITERATURA / REFERENCIAL TEÓRICO
+    # 1.4. REVISÃO DA LITERATURA
+    # Com referencial teórico: título composto e subseções 1.4.1 e 1.4.2
     # -------------------------------------------------------------------------
-    add_sub_title("1.4. REVISÃO DA LITERATURA / REFERENCIAL TEÓRICO", "sec_1_4")
+    titulos = titulos_revisao(1, dados_secao)
+    add_sub_title(titulos[0][0], titulos[0][1])
     revisao_paragrafos = dados_secao.get("revisao", [])
+    if len(titulos) > 1:
+        add_sub_title(titulos[1][0], titulos[1][1])
     if revisao_paragrafos:
         for par in revisao_paragrafos:
             add_body_p(par)
     else:
         add_placeholder(
             "Conforme a Resolução nº 009/2025 (Art. 1º, II, 1.iv), apresente o estado da arte a partir de fontes bibliográficas e/ou documentais atuais "
-            "(preferencialmente dos últimos 10 anos), contemplando o panorama de estudos científicos no escopo do trabalho e o referencial teórico conceitual adotado.\n"
+            "(preferencialmente dos últimos 10 anos), contemplando o panorama de estudos científicos no escopo do trabalho.\n"
             "Diretrizes e vedações obrigatórias da resolução:\n"
             "(i) Plágio é inaceitável (citar todas as ideias e dados);\n"
             "(ii) Revisão clara, coerente e crítica;\n"
@@ -142,3 +153,13 @@ def build_consideracoes_gerais(doc, dados_secao):
             "(v) Citações diretas longas (>3 linhas) devem ser obrigatoriamente evitadas, priorizando síntese interpretativa;\n"
             "(vi) A expressão 'apud' deve ser obrigatoriamente evitada, priorizando a citação direta da fonte original."
         )
+    if len(titulos) > 2:
+        add_sub_title(titulos[2][0], titulos[2][1])
+        referencial = dados_secao.get("referencial_teorico", [])
+        if referencial:
+            for par in referencial:
+                add_body_p(par)
+        else:
+            add_placeholder(
+                "Apresente o referencial teórico conceitual adotado, articulando os conceitos à revisão da literatura, ao problema e aos objetivos da pesquisa."
+            )

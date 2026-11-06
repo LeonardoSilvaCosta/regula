@@ -37,8 +37,11 @@ class DocumentSections(BaseModel):
     justificativa: list[str] = Field(default_factory=list)
     problema: list[str] = Field(default_factory=list)
     revisao: list[str] = Field(default_factory=list)
+    incluir_referencial_teorico: bool = False
+    referencial_teorico: list[str] = Field(default_factory=list)
     objetivo_geral: str = ""
     objetivos_especificos: list[str] = Field(default_factory=list)
+    incluir_hipoteses: bool = False
     hipotese: list[str] = Field(default_factory=list)
     metodologia_natureza: list[str] = Field(default_factory=list)
     metodologia_locus: str = ""

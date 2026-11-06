@@ -3,7 +3,7 @@ Módulo granular para geração exclusiva da SEÇÃO 3 (HIPÓTESES OU QUESTÕES 
 do Projeto de Qualificação conforme o Art. 1º, II, item 3 da Resolução nº 009/2025-PPGSP/UFPA.
 """
 
-from docx.shared import Cm, Pt
+from docx.shared import Cm, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from ..formato import adicionar_titulo
@@ -40,12 +40,22 @@ def build_hipoteses(doc, dados_projeto, numero=3):
         paragrafos = [str(par).strip() for par in hipotese_dados if str(par).strip()]
     else:
         paragrafos = []
-    if not paragrafos:
-        return
-
     add_sec_title(
         f"{numero}. HIPÓTESES OU QUESTÕES NORTEADORAS",
         bookmark="sec_hipoteses",
     )
-    for par in paragrafos:
-        add_body_p(par)
+    if paragrafos:
+        for par in paragrafos:
+            add_body_p(par)
+        return
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    p.paragraph_format.first_line_indent = Cm(1.27)
+    p.paragraph_format.line_spacing = 1.5
+    r = p.add_run(
+        "[ORIENTAÇÃO DE PREENCHIMENTO: Apresente as hipóteses ou as questões norteadoras articuladas ao problema de pesquisa e aos objetivos.]"
+    )
+    r.italic = True
+    r.font.name = "Times New Roman"
+    r.font.size = Pt(11)
+    r.font.color.rgb = RGBColor(115, 115, 115)

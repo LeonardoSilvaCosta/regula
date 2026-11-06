@@ -14,8 +14,11 @@ export interface DocumentSections {
   justificativa?: string[];
   problema?: string[];
   revisao?: string[];
+  incluir_referencial_teorico?: boolean;
+  referencial_teorico?: string[];
   objetivo_geral?: string;
   objetivos_especificos?: string[];
+  incluir_hipoteses?: boolean;
   hipotese?: string[];
   metodologia_natureza?: string[];
   metodologia_locus?: string;

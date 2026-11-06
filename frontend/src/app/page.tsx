@@ -49,6 +49,7 @@ function criarEstadoVazio(tipo: DocumentType, nivel: AcademicLevel): ParseRespon
       revisao: [],
       objetivo_geral: "",
       objetivos_especificos: [],
+      incluir_hipoteses: false,
       hipotese: [],
       metodologia_natureza: [],
       metodologia_locus: "",

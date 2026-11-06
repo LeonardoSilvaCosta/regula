@@ -101,9 +101,81 @@ def _limpar_paragrafo(paragrafo):
         run._element.getparent().remove(run._element)
 
 
+def _esvaziar_header(header):
+    header.is_linked_to_previous = False
+    elemento = header._element
+    paragrafos = elemento.findall(qn("w:p"))
+    for extra in paragrafos[1:]:
+        elemento.remove(extra)
+    if header.paragraphs:
+        _limpar_paragrafo(header.paragraphs[0])
+        header.paragraphs[0].paragraph_format.space_before = Pt(0)
+        header.paragraphs[0].paragraph_format.space_after = Pt(0)
+
+
+def limpar_cabecalho(section):
+    """Esvazia o cabeçalho e desvincula da seção anterior."""
+    section.different_first_page_header_footer = False
+    _esvaziar_header(section.header)
+
+
+def aplicar_cabecalho_institucional(
+    section,
+    metadata,
+    assets_dir="assets",
+    space_after=24,
+    somente_primeira_pagina=False,
+):
+    """Brasão e identificação institucional no cabeçalho, a 3 cm do topo da página."""
+    section.header_distance = Cm(3.0)
+    # Altura do brasão, das quatro linhas e do espaço final, para o corpo começar logo abaixo.
+    section.top_margin = Cm(8.7 if space_after >= 24 else 8.2)
+    if somente_primeira_pagina:
+        section.different_first_page_header_footer = True
+        _esvaziar_header(section.header)
+        header = section.first_page_header
+    else:
+        section.different_first_page_header_footer = False
+        header = section.header
+    header.is_linked_to_previous = False
+    _esvaziar_header(header)
+
+    caminho = os.path.join(assets_dir, "brasao_ufpa.png")
+    p_brasao = header.paragraphs[0]
+    p_brasao.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_brasao.paragraph_format.space_before = Pt(0)
+    p_brasao.paragraph_format.space_after = Pt(6)
+    if os.path.exists(caminho):
+        p_brasao.add_run().add_picture(caminho, width=BRASAO_UFPA_LARGURA, height=BRASAO_UFPA_ALTURA)
+    else:
+        aviso = p_brasao.add_run("[BRASÃO DA UFPA]")
+        aviso.italic = True
+        aviso.font.size = Pt(10)
+        aviso.font.color.rgb = RGBColor(120, 120, 120)
+
+    nivel = str((metadata or {}).get("nivel") or "mestrado").strip().lower()
+    nivel_texto = "DOUTORADO EM SEGURANÇA PÚBLICA" if nivel in ("doutorado", "tese") else "MESTRADO EM SEGURANÇA PÚBLICA"
+    p_texto = header.add_paragraph()
+    p_texto.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_texto.paragraph_format.line_spacing = 1.0
+    p_texto.paragraph_format.space_before = Pt(0)
+    p_texto.paragraph_format.space_after = Pt(space_after)
+    for linha in (
+        "UNIVERSIDADE FEDERAL DO PARÁ",
+        "INSTITUTO DE CIÊNCIAS EXATAS E NATURAIS",
+        "PROGRAMA DE PÓS-GRADUAÇÃO EM SEGURANÇA PÚBLICA",
+        nivel_texto,
+    ):
+        run = p_texto.add_run(f"{linha}\n")
+        run.bold = True
+        run.font.name = "Times New Roman"
+        run.font.size = Pt(12)
+
+
 def aplicar_rodape_local_ano(section, local="Belém-Pará", ano="2026"):
-    """Local e ano no rodapé, três linhas acima da borda inferior."""
-    section.footer_distance = Cm(2.1)
+    """Local e ano centralizados a cerca de 3 cm da borda inferior."""
+    section.footer_distance = Cm(3.0)
+    section.bottom_margin = Cm(4.5)
     footer = section.footer
     footer.is_linked_to_previous = False
     p = footer.paragraphs[0]
