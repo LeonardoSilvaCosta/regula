@@ -2,6 +2,8 @@
 Apresentação e Quadro 1 da Resolução nº 009/2025-PPGSP/UFPA.
 """
 
+import re
+
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Pt, Twips
@@ -15,8 +17,9 @@ from ..formato import (
     adicionar_paragrafo,
     adicionar_titulo,
     escrever_fonte,
+    escrever_legenda_quadro_1,
 )
-from ..legendas import BM_QUADRO_1
+from ..legendas import BM_QUADRO_1, legenda_quadro_1
 from ..pre_textual.sumario import registrar_entrada
 
 
@@ -78,6 +81,25 @@ def _texto_item(item, chave):
     return str(getattr(item, chave, "") or "").strip()
 
 
+def _aplicar_lista_objetivos(linhas, objetivos):
+    """A coluna de objetivos específicos repete a lista numerada da seção 2.2."""
+    itens = []
+    for item in objetivos or []:
+        texto = re.sub(
+            r"^\s*\(?\s*(?:i{1,3}|iv|vi{0,3}|ix|x|\d+)\s*[\).\]]\s*",
+            "",
+            str(item or "").strip(),
+            flags=re.IGNORECASE,
+        ).strip()
+        if texto:
+            itens.append(texto)
+    for indice, linha in enumerate(linhas):
+        if indice >= len(itens):
+            break
+        linha[2] = f"({_romano(indice + 1)}) {itens[indice]}"
+    return linhas
+
+
 def _linhas_produtos(metadata, objetivo_geral, artigos, ptts, fontes_padrao):
     titulo = str((metadata or {}).get("titulo") or (metadata or {}).get("titulo_curto") or "").strip()
     objetivo = str(objetivo_geral or "").strip()
@@ -120,6 +142,7 @@ def build_quadro_estrutura(
     dados_apresentacao,
     metadata,
     objetivo_geral="",
+    objetivos_especificos=None,
     ptts=None,
     artigos=None,
     fontes_padrao="",
@@ -129,13 +152,7 @@ def build_quadro_estrutura(
     p_qtit.paragraph_format.space_before = Pt(18)
     p_qtit.paragraph_format.space_after = Pt(4)
     p_qtit.paragraph_format.line_spacing = 1.0
-    titulo_trabalho = str((metadata or {}).get("titulo") or "").strip()
-    run_titulo = p_qtit.add_run(
-        f'Quadro 1 - Estrutura dos principais itens da dissertação/tese “{titulo_trabalho}”.'
-    )
-    run_titulo.bold = True
-    run_titulo.font.name = "Times New Roman"
-    run_titulo.font.size = Pt(11)
+    escrever_legenda_quadro_1(p_qtit, legenda_quadro_1(metadata))
     adicionar_bookmark(p_qtit, BM_QUADRO_1)
 
     linhas = _linhas_produtos(metadata, objetivo_geral, artigos, ptts, fontes_padrao)
@@ -148,6 +165,7 @@ def build_quadro_estrutura(
     if not linhas:
         adicionar_lacuna(doc, "[Quadro 1 não informado no projeto.]")
         return
+    _aplicar_lista_objetivos(linhas, objetivos_especificos)
 
     _montar_quadro(doc, linhas)
     mes_ano = str((metadata or {}).get("mes_ano") or (metadata or {}).get("ano") or "2026").strip()

@@ -154,6 +154,9 @@ def _bloco(doc, legenda, bookmark, atividades, anos):
     escrever_legenda(p_tit, legenda, tamanho=12)
     if bookmark:
         adicionar_bookmark(p_tit, bookmark)
+    catalogo = getattr(doc, "_catalogo", None)
+    if catalogo is not None:
+        catalogo.registrar_legenda(legenda, "Cronograma")
 
     tabela = doc.add_table(rows=2 + len(atividades), cols=25)
     tabela.alignment = WD_TABLE_ALIGNMENT.LEFT

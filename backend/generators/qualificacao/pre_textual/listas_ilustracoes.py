@@ -116,6 +116,14 @@ def _linha_item(doc, item):
         WD_TAB_LEADER.DOTS,
     )
 
+    pagina = item.get("pagina")
+    if pagina is not None and str(pagina).strip() != "":
+        r_txt = p.add_run(f"{rotulo} {numero} - {titulo}\t{pagina}")
+        r_txt.bold = False
+        r_txt.font.name = "Times New Roman"
+        r_txt.font.size = Pt(12)
+        return p
+
     r_txt = p.add_run(texto)
     r_txt.bold = False
     r_txt.font.name = "Times New Roman"
@@ -125,12 +133,7 @@ def _linha_item(doc, item):
     r_tab.font.name = "Times New Roman"
     r_tab.font.size = Pt(12)
 
-    pagina = item.get("pagina")
-    if pagina is not None and str(pagina).strip() != "":
-        r_pag = p.add_run(str(pagina).strip())
-        r_pag.font.name = "Times New Roman"
-        r_pag.font.size = Pt(12)
-    elif item.get("bookmark"):
+    if item.get("bookmark"):
         adicionar_campo_pageref(p, item["bookmark"])
     return p
 

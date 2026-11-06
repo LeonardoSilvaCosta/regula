@@ -6,12 +6,23 @@ Subseções:
   2.2. OBJETIVOS ESPECÍFICOS
 """
 
+import re
+
 from docx.shared import Cm, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from core.xml_utils import adicionar_bookmark
 from ..formato import adicionar_titulo
 from ..pre_textual.sumario import registrar_entrada
+
+_ROMANOS = (
+    "i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x",
+    "xi", "xii", "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx",
+)
+_RE_MARCADOR = re.compile(
+    r"^\s*\(?\s*(?:i{1,3}|iv|vi{0,3}|ix|x|\d+)\s*[\).\]]\s*",
+    re.IGNORECASE,
+)
 
 
 def build_objetivos(doc, dados_projeto):
@@ -86,11 +97,10 @@ def build_objetivos(doc, dados_projeto):
     p_obj_esp = add_sub_title("2.2. OBJETIVOS ESPECÍFICOS", "sec_2_2")
     adicionar_bookmark(p_obj_esp, "_TOC_OBJETIVOS_ESPECIFICOS")
     registrar_entrada(doc, "2.2. OBJETIVOS ESPECÍFICOS", 2, "_TOC_OBJETIVOS_ESPECIFICOS")
-    objetivos_especificos = dados_projeto.get("objetivos_especificos", [])
+    objetivos_especificos = _itens_numerados(dados_projeto.get("objetivos_especificos", []))
     if objetivos_especificos:
-        for oe in objetivos_especificos:
-            if str(oe).strip():
-                add_body_p(str(oe).strip())
+        for indice, oe in enumerate(objetivos_especificos, start=1):
+            _item_numerado(doc, indice, oe)
     else:
         add_placeholder(
             "Conforme a Resolução nº 009/2025 (Art. 1º, II, 2.ii e item 1), liste os objetivos específicos "
@@ -98,3 +108,32 @@ def build_objetivos(doc, dados_projeto):
             "obrigatoriamente com um verbo diferente no infinitivo (ex.: Identificar, Mapear, Comparar, Estruturar, "
             "Conceber, Auditar, Propor), articulando as etapas metodológicas aos produtos e artigos previstos."
         )
+
+
+def _romano(indice):
+    if 1 <= indice <= len(_ROMANOS):
+        return _ROMANOS[indice - 1]
+    return str(indice)
+
+
+def _itens_numerados(objetivos):
+    itens = []
+    for item in objetivos or []:
+        texto = _RE_MARCADOR.sub("", str(item or "").strip()).strip()
+        if texto:
+            itens.append(texto)
+    return itens
+
+
+def _item_numerado(doc, indice, texto):
+    """Item da lista (i), (ii), (iii), alinhado ao recuo do corpo."""
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    p.paragraph_format.left_indent = Cm(1.27)
+    p.paragraph_format.first_line_indent = Cm(0)
+    p.paragraph_format.line_spacing = 1.5
+    p.paragraph_format.space_before = Pt(0)
+    p.paragraph_format.space_after = Pt(0)
+    r = p.add_run(f"({_romano(indice)}) {texto}")
+    r.font.name = "Times New Roman"
+    r.font.size = Pt(12)

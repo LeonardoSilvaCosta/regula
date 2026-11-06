@@ -46,6 +46,9 @@ def inserir_tabela(
     paragrafo_titulo.paragraph_format.space_after = Pt(3)
     paragrafo_titulo.paragraph_format.line_spacing = 1.0
     _run(paragrafo_titulo, f"Tabela {numero} – {titulo}", tamanho=12, negrito=False)
+    catalogo = getattr(doc, "_catalogo", None)
+    if catalogo is not None:
+        catalogo.registrar_ilustracao("Tabela", numero, titulo, "Tabela", "Metodologia")
     if bookmark:
         from core.campos import adicionar_bookmark
 

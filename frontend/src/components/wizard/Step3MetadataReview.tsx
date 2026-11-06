@@ -284,11 +284,16 @@ export function Step3MetadataReview({
   const fontesPadrao = (data.sections.metodologia_fontes ?? []).find((item) => item.trim())
     || data.sections.metodologia_locus
     || "SIAC";
+  const objetivosLista = (data.sections.objetivos_especificos ?? [])
+    .map((item) => item.replace(/^\s*\(?\s*(?:i{1,3}|iv|vi{0,3}|ix|x|\d+)\s*[\).\]]\s*/i, "").trim())
+    .filter(Boolean);
   const artigosQuadro = data.artigos ?? [];
   const linhasQuadro = [
     ...artigosQuadro.map((item, index) => ({
       origem: `Artigo ${index + 1}`,
-      objetivo: `(${ROMANOS[index] ?? index + 1}) ${item.objetivo_especifico}`,
+      objetivo: objetivosLista[index]
+        ? `(${ROMANOS[index] ?? index + 1}) ${objetivosLista[index]}`
+        : `(${ROMANOS[index] ?? index + 1}) ${item.objetivo_especifico}`,
       produto: `Artigo ${index + 1}: ${item.titulo}`,
       estudo: item.tipo_estudo || TIPO_ESTUDO_PADRAO,
       fontes: item.fontes || fontesPadrao,
@@ -299,7 +304,9 @@ export function Step3MetadataReview({
       const num = item.num || String(index + 1);
       return {
         origem: item.num || `PTT ${index + 1}`,
-        objetivo: `(${ROMANOS[ordem] ?? ordem + 1}) ${item.objetivo_especifico || ""}`,
+        objetivo: objetivosLista[ordem]
+          ? `(${ROMANOS[ordem] ?? ordem + 1}) ${objetivosLista[ordem]}`
+          : `(${ROMANOS[ordem] ?? ordem + 1}) ${item.objetivo_especifico || ""}`,
         produto: `${item.subtipo || item.tipo || "PTT"} ${num} – ${item.titulo || item.nome}`,
         estudo: item.tipo_estudo || TIPO_ESTUDO_PADRAO,
         fontes: item.fontes || fontesPadrao,
@@ -654,13 +661,22 @@ export function Step3MetadataReview({
                 </label>
                 <label className="text-sm">
                   Objetivos específicos
-                  <span className="block text-xs text-[#6b645a]">Um objetivo por parágrafo.</span>
+                  <span className="block text-xs text-[#6b645a]">Um objetivo por parágrafo. A lista numerada preenche a seção 2.2 e a coluna do Quadro 1, na mesma ordem dos artigos e produtos.</span>
                   <textarea
                     rows={5}
                     className={campo}
                     value={paragrafosParaTexto(valorParagrafos("objetivos_especificos"))}
                     onChange={(event) => patchSection("objetivos_especificos", textoParaParagrafos(event.target.value))}
                   />
+                  {objetivosLista.length > 0 && (
+                    <ol className="mt-2 list-none space-y-1 text-sm text-[#3d3832]">
+                      {objetivosLista.map((item, index) => (
+                        <li key={`${index}-${item.slice(0, 24)}`}>
+                          ({ROMANOS[index] ?? index + 1}) {item}
+                        </li>
+                      ))}
+                    </ol>
+                  )}
                 </label>
                 <label className="text-sm">
                   Hipóteses ou questões norteadoras

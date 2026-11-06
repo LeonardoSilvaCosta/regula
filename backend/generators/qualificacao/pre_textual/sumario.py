@@ -96,12 +96,16 @@ def registrar_entrada(doc, titulo, nivel, bookmark, paragraph=None):
         adicionar_bookmark(paragraph, bookmark)
     entradas = _estado(doc)["entradas"]
     entradas[:] = [item for item in entradas if item["bookmark"] != bookmark]
+    titulo_limpo = str(titulo or "").strip()
     entradas.append({
-        "titulo": str(titulo or "").strip(),
+        "titulo": titulo_limpo,
         "nivel": nivel,
         "bookmark": bookmark,
         "pagina": pagina_estimada(doc, bookmark),
     })
+    catalogo = getattr(doc, "_catalogo", None)
+    if catalogo is not None:
+        catalogo.registrar_secao(titulo_limpo, catalogo.pagina, nivel, bookmark)
 
 
 def preencher_sumario(doc):
@@ -110,12 +114,20 @@ def preencher_sumario(doc):
     if not reservas:
         return
     paginas = mapa_de_paginas(doc)
+    catalogo = getattr(doc, "_catalogo", None)
+    por_catalogo = {}
+    if catalogo is not None:
+        por_catalogo = {item["bookmark"]: item for item in catalogo.secoes}
     por_bookmark = {item["bookmark"]: item for item in _estado(doc)["entradas"]}
     for reserva in reservas:
         titulo = reserva["titulo"]
         bookmark = reserva["bookmark"]
-        registrado = por_bookmark.get(bookmark) or {}
-        pagina_resolvida = paginas.get(bookmark) or registrado.get("pagina") or 1
+        registrado = por_catalogo.get(bookmark) or por_bookmark.get(bookmark) or {}
+        pagina_resolvida = (
+            registrado.get("pagina")
+            or paginas.get(bookmark)
+            or 1
+        )
         _escrever_linha(
             reserva["paragrafo"],
             titulo,

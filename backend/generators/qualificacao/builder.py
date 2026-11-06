@@ -334,6 +334,7 @@ def gerar_documento_qualificacao(
         dados["apresentacao"],
         dados["metadata"],
         objetivo_geral=projeto_quadro.get("objetivo_geral", ""),
+        objetivos_especificos=projeto_quadro.get("objetivos_especificos") or [],
         ptts=projeto_quadro.get("ptts") or [],
         artigos=(dados.get("resultados") or {}).get("artigos") or [],
         fontes_padrao=_fontes_padrao(projeto_quadro),
