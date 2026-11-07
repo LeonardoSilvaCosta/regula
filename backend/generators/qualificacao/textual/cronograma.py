@@ -5,11 +5,14 @@ Sem atividades informadas no projeto, entra o quadro canônico do PPGSP.
 
 from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import qn
-from docx.shared import Inches, Pt
+from docx.shared import Cm, Inches, Pt
+from docx.enum.section import WD_ORIENT, WD_SECTION
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 
-from core.xml_utils import set_cell_border
+from core.styles import set_page_margins
+from core.xml_utils import continuar_numeracao, set_cell_border
+
 from core.campos import adicionar_bookmark
 from ..formato import adicionar_lacuna, adicionar_paragrafo, escrever_fonte, escrever_legenda
 from ..pre_textual.sumario import registrar_entrada
@@ -50,7 +53,30 @@ NOMES_DOUTORADO = [
 ]
 
 
+def _secao_paisagem(doc):
+    """A4 deitado para o quadro de 24 ou 48 meses. Cabeçalho segue a seção anterior."""
+    section = doc.add_section(WD_SECTION.NEW_PAGE)
+    set_page_margins(section)
+    section.orientation = WD_ORIENT.LANDSCAPE
+    section.page_width = Cm(29.7)
+    section.page_height = Cm(21.0)
+    section.header.is_linked_to_previous = True
+    section.footer.is_linked_to_previous = True
+    continuar_numeracao(section)
+    return section
+
+
+def _secao_retrato(doc):
+    section = doc.add_section(WD_SECTION.NEW_PAGE)
+    set_page_margins(section)
+    section.header.is_linked_to_previous = True
+    section.footer.is_linked_to_previous = True
+    continuar_numeracao(section)
+    return section
+
+
 def build_cronograma(doc, dados_projeto, nivel="mestrado", ano_referencia="2026", numero=6):
+    _secao_paisagem(doc)
     is_doutorado = str(nivel).strip().lower() in ["doutorado", "tese"]
     titulo = _titulo_secao(doc, f"{numero}. CRONOGRAMA", bookmark="sec_cronograma")
     registrar_entrada(doc, f"{numero}. CRONOGRAMA", 1, "_TOC_CRONOGRAMA", titulo)
@@ -94,16 +120,17 @@ def build_cronograma(doc, dados_projeto, nivel="mestrado", ano_referencia="2026"
     p_f.paragraph_format.space_after = Pt(12)
     p_f.paragraph_format.line_spacing = 1.0
     escrever_fonte(p_f, f"Fonte: Elaborado pelo(a) autor(a), {ano_referencia}.")
+    _secao_retrato(doc)
 
 
 def _titulo_secao(doc, texto, bookmark=None):
-    p = doc.add_paragraph()
+    p = doc.add_paragraph(style="Heading 1")
     p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     p.paragraph_format.space_before = Pt(12)
     p.paragraph_format.space_after = Pt(6)
     p.paragraph_format.line_spacing = 1.0
     r = p.add_run(texto.upper())
-    r.bold = True
+    r.bold = False
     r.font.name = "Times New Roman"
     r.font.size = Pt(12)
     if bookmark:

@@ -3,6 +3,8 @@ import re
 import unicodedata
 
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 from docx.shared import Pt
 
 from core.campos import ancorar_paragrafo
@@ -28,7 +30,7 @@ def titulo_referencias(capitulo=None):
 
 
 def adicionar_titulo_referencias(doc, texto="REFERÊNCIAS", bookmark=None):
-    """Times 12, negrito, caixa alta, à esquerda, 18 pt antes e 12 pt depois."""
+    """Times 12, sem negrito, caixa alta, à esquerda, 18 pt antes e 12 pt depois."""
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
     p.paragraph_format.first_line_indent = Pt(0)
@@ -36,16 +38,22 @@ def adicionar_titulo_referencias(doc, texto="REFERÊNCIAS", bookmark=None):
     p.paragraph_format.space_after = Pt(12)
     p.paragraph_format.line_spacing = 1.0
     r = p.add_run(str(texto).upper())
-    r.bold = True
+    r.bold = False
     r.font.name = "Times New Roman"
     r.font.size = Pt(12)
+    p_pr = p._p.get_or_add_pPr()
+    outline = p_pr.find(qn("w:outlineLvl"))
+    if outline is None:
+        outline = OxmlElement("w:outlineLvl")
+        p_pr.append(outline)
+    outline.set(qn("w:val"), "0")
     ancorar_paragrafo(p, str(texto).upper(), bookmark=bookmark)
     return p
 
 
 def adicionar_paragrafo_referencia(doc, texto):
     """Parágrafo simples, à esquerda, sem recuo, com 10 pt depois."""
-    p = doc.add_paragraph()
+    p = doc.add_paragraph(style="Referência")
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
     p.paragraph_format.left_indent = Pt(0)
     p.paragraph_format.first_line_indent = Pt(0)

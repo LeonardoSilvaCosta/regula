@@ -12,7 +12,6 @@ from docx.oxml.ns import qn
 from docx.shared import Inches, Pt
 
 from core.campos import adicionar_bookmark, adicionar_campo_pageref
-from ..estrutura import itens_do_sumario
 
 # Títulos primários apontam para um marcador exclusivo, além do marcador sec_* já usado no corpo.
 _BOOKMARK_TOC = {
@@ -50,26 +49,67 @@ def build_sumario(doc, dados, apendices=None, anexos=None, listas=None, quebrar=
     p_tit.paragraph_format.line_spacing = 1.0
 
     r_tit = p_tit.add_run("SUMÁRIO")
-    r_tit.bold = True
+    r_tit.bold = False
     r_tit.font.name = "Times New Roman"
     r_tit.font.size = Pt(12)
 
-    origem = dados if isinstance(dados, dict) and "projeto" in dados else {"projeto": {}, "resultados": {}}
-    itens = itens_do_sumario(origem, apendices, anexos, listas=None)
-    if not itens or itens[0][0] != "APRESENTAÇÃO":
-        itens = [("APRESENTAÇÃO", "sec_apresentacao")] + [
-            item for item in itens if item[0] != "APRESENTAÇÃO"
-        ]
-
-    reservas = []
-    for rotulo, bookmark in itens:
-        titulo = _exibir(rotulo)
-        ancora = _BOOKMARK_TOC.get(bookmark, bookmark)
-        nivel = 1 if _primaria(titulo) else 2
-        reservas.append(_reservar_linha(doc, titulo, ancora, nivel))
-    _estado(doc)["reservas"] = reservas
-
+    del dados, apendices, anexos
+    _inserir_campo_toc(doc)
     doc.add_page_break()
+
+
+def _inserir_campo_toc(doc):
+    """Campo TOC nativo. O Word recalcula títulos e páginas ao abrir (updateFields)."""
+    from docx.oxml import OxmlElement
+
+    paragrafo = doc.add_paragraph()
+    paragrafo.paragraph_format.space_before = Pt(0)
+    paragrafo.paragraph_format.space_after = Pt(0)
+    paragrafo.paragraph_format.line_spacing = 1.0
+    paragrafo.paragraph_format.first_line_indent = Pt(0)
+
+    def _run():
+        run = OxmlElement("w:r")
+        rpr = OxmlElement("w:rPr")
+        fontes = OxmlElement("w:rFonts")
+        fontes.set(qn("w:ascii"), "Times New Roman")
+        fontes.set(qn("w:hAnsi"), "Times New Roman")
+        rpr.append(fontes)
+        tamanho = OxmlElement("w:sz")
+        tamanho.set(qn("w:val"), "24")
+        rpr.append(tamanho)
+        run.append(rpr)
+        return run
+
+    inicio = _run()
+    fld = OxmlElement("w:fldChar")
+    fld.set(qn("w:fldCharType"), "begin")
+    fld.set(qn("w:dirty"), "true")
+    inicio.append(fld)
+
+    instrucao = _run()
+    texto = OxmlElement("w:instrText")
+    texto.set(qn("xml:space"), "preserve")
+    texto.text = ' TOC \\o "1-3" \\h \\z \\u '
+    instrucao.append(texto)
+
+    separador = _run()
+    sep = OxmlElement("w:fldChar")
+    sep.set(qn("w:fldCharType"), "separate")
+    separador.append(sep)
+
+    aviso = _run()
+    mostrado = OxmlElement("w:t")
+    mostrado.text = ""
+    aviso.append(mostrado)
+
+    fim = _run()
+    fecha = OxmlElement("w:fldChar")
+    fecha.set(qn("w:fldCharType"), "end")
+    fim.append(fecha)
+
+    for elemento in (inicio, instrucao, separador, aviso, fim):
+        paragrafo._p.append(elemento)
 
 
 def _exibir(rotulo):
@@ -144,7 +184,6 @@ def _estado(doc):
         doc._sumario_qualificacao = estado
     return estado
 
-
 def _reservar_linha(doc, titulo, bookmark, nivel):
     p = doc.add_paragraph()
     _formatar_linha(p)
@@ -156,7 +195,7 @@ def _escrever_linha(paragraph, titulo, bookmark, pagina, nivel=1):
     paragraph.clear()
     apresentacao = bookmark in ("sec_apresentacao", "_TOC_APRESENTACAO")
     r_txt = paragraph.add_run(f"{titulo}\t")
-    r_txt.bold = nivel == 1 or _primaria(titulo)
+    r_txt.bold = False
     r_txt.font.name = "Times New Roman"
     r_txt.font.size = Pt(12)
     pagina_resolvida = max(1, int(pagina or 1))
@@ -278,3 +317,4 @@ def mapa_de_paginas(doc):
             pagina += 1
         pagina_seguinte = pagina
     return mapa
+

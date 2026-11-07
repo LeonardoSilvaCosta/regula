@@ -93,7 +93,7 @@ def build_folha_rosto(doc, metadata, assets_dir="assets"):
     # -------------------------------------------------------------
     # (viii) Texto Recuado a 8 cm à direita (Times 12, Espaço Simples)
     # -------------------------------------------------------------
-    p_rec = doc.add_paragraph()
+    p_rec = doc.add_paragraph(style="Recuo Folha de Rosto")
     p_rec.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     p_rec.paragraph_format.left_indent = Cm(8.0)
     p_rec.paragraph_format.line_spacing = 1.0

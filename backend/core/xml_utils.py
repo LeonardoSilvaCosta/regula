@@ -115,10 +115,24 @@ def set_cell_border(cell, **kwargs):
     tcPr.append(tcBorders)
 
 def add_page_number_field(run):
-    """Insere o campo dinâmico nativo de paginação do Word (PAGE)."""
-    fldSimple = OxmlElement('w:fldSimple')
-    fldSimple.set(qn('w:instr'), 'PAGE')
-    run._r.append(fldSimple)
+    """Insere o campo PAGE como irmão do run, no parágrafo do cabeçalho."""
+    fld_simple = OxmlElement("w:fldSimple")
+    fld_simple.set(qn("w:instr"), " PAGE ")
+    interno = OxmlElement("w:r")
+    rpr = OxmlElement("w:rPr")
+    fontes = OxmlElement("w:rFonts")
+    fontes.set(qn("w:ascii"), "Times New Roman")
+    fontes.set(qn("w:hAnsi"), "Times New Roman")
+    tamanho = OxmlElement("w:sz")
+    tamanho.set(qn("w:val"), "24")
+    rpr.append(fontes)
+    rpr.append(tamanho)
+    interno.append(rpr)
+    texto = OxmlElement("w:t")
+    texto.text = "1"
+    interno.append(texto)
+    fld_simple.append(interno)
+    run._r.addnext(fld_simple)
 
 def configure_section_page_numbers(section, num_format='roman', start_at=None):
     """Configura numeração romana (lowerRoman) ou arábica (decimal) no XML da seção."""

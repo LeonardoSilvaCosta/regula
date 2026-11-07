@@ -9,7 +9,7 @@ from core.campos import adicionar_bookmark, ancorar_paragrafo, aplicar_tabulacao
 
 def adicionar_titulo(doc, texto, bookmark=None, primario=True, marcar=True):
     """Título justificado, sem negrito, com uma linha em branco antes do texto."""
-    p = doc.add_paragraph()
+    p = doc.add_paragraph(style="Heading 1" if primario else "Heading 2")
     p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     p.paragraph_format.space_before = Pt(18 if primario else 12)
     p.paragraph_format.space_after = Pt(18)
@@ -37,7 +37,7 @@ def adicionar_titulo_produto(doc, texto, secao, bookmark=None):
             inicio, resto = texto, ""
     else:
         inicio, resto = texto, ""
-    p = doc.add_paragraph()
+    p = doc.add_paragraph(style="Título de Produto")
     p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     p.paragraph_format.space_before = Pt(12)
     p.paragraph_format.space_after = Pt(18)
@@ -189,7 +189,7 @@ def escrever_fonte(paragrafo, texto, tamanho=10):
 
 
 def adicionar_paragrafo(doc, texto):
-    p = doc.add_paragraph()
+    p = doc.add_paragraph(style="Corpo de Texto")
     p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     p.paragraph_format.first_line_indent = Cm(1.27)
     p.paragraph_format.line_spacing = 1.5
@@ -202,7 +202,7 @@ def adicionar_paragrafo(doc, texto):
 
 
 def adicionar_lacuna(doc, texto):
-    p = doc.add_paragraph()
+    p = doc.add_paragraph(style="Corpo de Texto")
     p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     p.paragraph_format.first_line_indent = Cm(1.27)
     p.paragraph_format.line_spacing = 1.5

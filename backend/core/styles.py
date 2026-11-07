@@ -1,8 +1,13 @@
-"""Padrões tipográficos e margens normativas do PPGSP/UFPA."""
+"""Padrões tipográficos e margens normativas do PPGSP/UFPA.
+
+Os estilos nativos repetem, sem ajuste, as medidas já aplicadas nos geradores:
+Times, pontos, recuos e espaçamentos continuam os mesmos do documento manual.
+"""
 import os
+from docx.enum.style import WD_STYLE_TYPE
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from docx.shared import Cm, Pt, RGBColor
+from docx.shared import Cm, Pt, RGBColor, Twips
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 IDIOMA_PT_BR = "pt-BR"
@@ -74,16 +79,166 @@ def aplicar_idioma_pt_br(doc):
                     _idioma_no_run(run)
 
 
+def _estilo(doc, nome):
+    try:
+        return doc.styles[nome]
+    except KeyError:
+        return doc.styles.add_style(nome, WD_STYLE_TYPE.PARAGRAPH)
+
+
+def _fonte_estilo(estilo, tamanho, negrito=False):
+    fonte = estilo.font
+    fonte.name = "Times New Roman"
+    fonte.size = Pt(tamanho)
+    fonte.bold = negrito
+    fonte.italic = False
+    fonte.color.rgb = RGBColor(0, 0, 0)
+    rpr = estilo.element.get_or_add_rPr()
+    fontes = rpr.find(qn("w:rFonts"))
+    if fontes is None:
+        fontes = OxmlElement("w:rFonts")
+        rpr.append(fontes)
+    for atributo in ("w:ascii", "w:hAnsi", "w:cs", "w:eastAsia"):
+        fontes.set(qn(atributo), "Times New Roman")
+    _elemento_idioma(rpr)
+
+
+def _nivel_estrutura(estilo, nivel):
+    p_pr = estilo.element.get_or_add_pPr()
+    outline = p_pr.find(qn("w:outlineLvl"))
+    if outline is None:
+        outline = OxmlElement("w:outlineLvl")
+        p_pr.append(outline)
+    outline.set(qn("w:val"), str(nivel))
+
+
+def _paragrafo_estilo(
+    estilo,
+    alinhamento,
+    entrelinha,
+    antes=0,
+    depois=0,
+    recuo_primeira=None,
+    recuo_esquerdo=None,
+    manter_com_proximo=False,
+):
+    formato = estilo.paragraph_format
+    if alinhamento is not None:
+        formato.alignment = alinhamento
+    formato.line_spacing = entrelinha
+    formato.space_before = Pt(antes)
+    formato.space_after = Pt(depois)
+    formato.first_line_indent = Cm(0) if recuo_primeira is None else recuo_primeira
+    if recuo_esquerdo is not None:
+        formato.left_indent = recuo_esquerdo
+    formato.keep_with_next = manter_com_proximo
+
+
+def registrar_estilos(doc):
+    """Registra os estilos com as métricas já usadas nos geradores."""
+    normal = doc.styles["Normal"]
+    _fonte_estilo(normal, 12, negrito=False)
+    _paragrafo_estilo(normal, None, 1.5, 0, 0, recuo_primeira=Cm(0))
+
+    corpo = _estilo(doc, "Corpo de Texto")
+    corpo.base_style = normal
+    _fonte_estilo(corpo, 12)
+    _paragrafo_estilo(
+        corpo,
+        WD_ALIGN_PARAGRAPH.JUSTIFY,
+        1.5,
+        0,
+        0,
+        recuo_primeira=Cm(1.27),
+    )
+
+    titulo = _estilo(doc, "Heading 1")
+    _fonte_estilo(titulo, 12, negrito=False)
+    _paragrafo_estilo(
+        titulo,
+        WD_ALIGN_PARAGRAPH.JUSTIFY,
+        1.5,
+        18,
+        18,
+        manter_com_proximo=True,
+    )
+    _nivel_estrutura(titulo, 0)
+
+    titulo_sec = _estilo(doc, "Heading 2")
+    _fonte_estilo(titulo_sec, 12, negrito=False)
+    _paragrafo_estilo(
+        titulo_sec,
+        WD_ALIGN_PARAGRAPH.JUSTIFY,
+        1.5,
+        12,
+        18,
+        manter_com_proximo=True,
+    )
+    _nivel_estrutura(titulo_sec, 1)
+
+    titulo_ter = _estilo(doc, "Heading 3")
+    _fonte_estilo(titulo_ter, 12, negrito=False)
+    _paragrafo_estilo(
+        titulo_ter,
+        WD_ALIGN_PARAGRAPH.JUSTIFY,
+        1.5,
+        12,
+        12,
+        manter_com_proximo=True,
+    )
+    _nivel_estrutura(titulo_ter, 2)
+
+    produto = _estilo(doc, "Título de Produto")
+    produto.base_style = titulo_sec
+    _fonte_estilo(produto, 12, negrito=False)
+    _paragrafo_estilo(
+        produto,
+        WD_ALIGN_PARAGRAPH.JUSTIFY,
+        1.5,
+        12,
+        18,
+        manter_com_proximo=True,
+    )
+    _nivel_estrutura(produto, 0)
+
+    recuo = _estilo(doc, "Recuo Folha de Rosto")
+    _fonte_estilo(recuo, 12)
+    _paragrafo_estilo(
+        recuo,
+        WD_ALIGN_PARAGRAPH.JUSTIFY,
+        1.0,
+        0,
+        18,
+        recuo_esquerdo=Cm(8.0),
+    )
+
+    quadro = _estilo(doc, "Conteúdo de Quadro")
+    _fonte_estilo(quadro, 10)
+    _paragrafo_estilo(quadro, WD_ALIGN_PARAGRAPH.LEFT, 1.0, 0, 0)
+
+    legenda = _estilo(doc, "Legenda")
+    _fonte_estilo(legenda, 10)
+    _paragrafo_estilo(legenda, WD_ALIGN_PARAGRAPH.LEFT, 1.0, 2, 0)
+
+    fonte = _estilo(doc, "Fonte de Ilustração")
+    _fonte_estilo(fonte, 10)
+    _paragrafo_estilo(fonte, WD_ALIGN_PARAGRAPH.LEFT, 1.0, 2, 12)
+
+    referencia = _estilo(doc, "Referência")
+    _fonte_estilo(referencia, 12)
+    _paragrafo_estilo(referencia, WD_ALIGN_PARAGRAPH.LEFT, 1.0, 0, 10)
+
+    for nome in ("TOC 1", "TOC 2", "TOC 3"):
+        toc = _estilo(doc, nome)
+        _fonte_estilo(toc, 12, negrito=False)
+        _paragrafo_estilo(toc, WD_ALIGN_PARAGRAPH.LEFT, 1.0, 0, 3)
+        formato = toc.paragraph_format
+        formato.tab_stops.add_tab_stop(Twips(9072))
+
+
 def apply_base_styles(doc):
     """Aplica o padrão gráfico básico: Times 12, entrelinhas 1.5, parágrafos 0 pt."""
-    style_normal = doc.styles['Normal']
-    font = style_normal.font
-    font.name = 'Times New Roman'
-    font.size = Pt(12)
-    font.color.rgb = RGBColor(0, 0, 0)
-    style_normal.paragraph_format.line_spacing = 1.5
-    style_normal.paragraph_format.space_before = Pt(0)
-    style_normal.paragraph_format.space_after = Pt(0)
+    registrar_estilos(doc)
     aplicar_idioma_pt_br(doc)
 
 def set_page_margins(section):

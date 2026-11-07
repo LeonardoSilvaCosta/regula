@@ -204,6 +204,7 @@ def _texto_celula(celula, texto, negrito=False, alinhamento=WD_ALIGN_PARAGRAPH.L
     celula.text = texto
     celula.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     p = celula.paragraphs[0]
+    p.style = "Conteúdo de Quadro"
     p.alignment = alinhamento
     p.paragraph_format.line_spacing = 1.0
     p.paragraph_format.space_before = Pt(0)

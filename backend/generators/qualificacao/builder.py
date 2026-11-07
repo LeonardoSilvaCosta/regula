@@ -7,8 +7,6 @@ import copy
 import os
 
 import docx
-from docx.oxml import OxmlElement
-from docx.oxml.ns import qn
 from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.section import WD_ORIENT, WD_SECTION
@@ -55,10 +53,9 @@ from .pos_textual.pos_textual import build_pos_textual, itens_com_corpo
 
 def habilitar_atualizacao_campos(doc):
     """Pede ao Word que recalcule sumário e paginação ao abrir o arquivo."""
-    settings = doc.settings._element
-    update_fields = OxmlElement("w:updateFields")
-    update_fields.set(qn("w:val"), "true")
-    settings.append(update_fields)
+    from core.campos import habilitar_atualizacao_de_campos
+
+    habilitar_atualizacao_de_campos(doc)
 
 
 def _secao_sem_numero(doc, primeira=False):
