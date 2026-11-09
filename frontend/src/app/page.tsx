@@ -162,12 +162,14 @@ export default function Home() {
 
   function iniciarPreenchimentoDireto() {
     const exemplo = mockPreenchimento as ParseResponse;
+    const base = criarEstadoVazio(tipoDocumento, nivel);
     setParsedData({
-      ...criarEstadoVazio(tipoDocumento, nivel),
+      ...base,
       ...exemplo,
       documento_id: "",
       tipo_documento: tipoDocumento,
       nivel,
+      metadata: { ...base.metadata, ...exemplo.metadata },
     });
     setSubtitulo(exemplo.metadata.subtitulo ?? "");
     setError(null);

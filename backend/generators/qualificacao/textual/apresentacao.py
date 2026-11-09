@@ -4,13 +4,11 @@ Apresentação e Quadro 1 da Resolução nº 009/2025-PPGSP/UFPA.
 
 import re
 
-from docx.oxml import OxmlElement
-from docx.oxml.ns import qn
-from docx.shared import Pt, Twips
+from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 
-from core.xml_utils import set_cell_border
+from core.xml_utils import aplicar_autoajuste_janela, set_cell_border
 from core.campos import adicionar_bookmark
 from ..formato import (
     adicionar_lacuna,
@@ -32,7 +30,7 @@ _COLUNAS = [
     "Fontes",
     "Status",
 ]
-# Larguras do quadro modelo, em twips. Cabem na área útil da página paisagem.
+# Proporções das colunas do Quadro 1 (pesos relativos; a tabela usa autoajuste à janela).
 _LARGURAS = [1731, 2276, 3502, 3121, 1416, 857, 1092]
 _ALINHAMENTO = [
     WD_ALIGN_PARAGRAPH.LEFT,
@@ -216,47 +214,18 @@ def _texto_celula(celula, texto, negrito=False, alinhamento=WD_ALIGN_PARAGRAPH.L
     set_cell_border(celula, top={"sz": 4}, bottom={"sz": 4}, left={"sz": 4}, right={"sz": 4})
 
 
-def _grade_fixa(tabela):
-    tbl = tabela._tbl
-    tbl_pr = tbl.tblPr
-    layout = tbl_pr.find(qn("w:tblLayout"))
-    if layout is None:
-        layout = OxmlElement("w:tblLayout")
-        tbl_pr.append(layout)
-    layout.set(qn("w:type"), "fixed")
-    tbl_w = tbl_pr.find(qn("w:tblW"))
-    if tbl_w is None:
-        tbl_w = OxmlElement("w:tblW")
-        tbl_pr.append(tbl_w)
-    tbl_w.set(qn("w:w"), str(sum(_LARGURAS)))
-    tbl_w.set(qn("w:type"), "dxa")
-    grade = tbl.find(qn("w:tblGrid"))
-    if grade is None:
-        grade = OxmlElement("w:tblGrid")
-        tbl_pr.addnext(grade)
-    for filho in list(grade):
-        grade.remove(filho)
-    for largura in _LARGURAS:
-        coluna = OxmlElement("w:gridCol")
-        coluna.set(qn("w:w"), str(largura))
-        grade.append(coluna)
-
-
 def _montar_quadro(doc, linhas):
     tabela = doc.add_table(rows=1 + len(linhas), cols=len(_COLUNAS))
     tabela.alignment = WD_TABLE_ALIGNMENT.LEFT
-    tabela.autofit = False
-    _grade_fixa(tabela)
+    aplicar_autoajuste_janela(tabela, _LARGURAS)
 
     for idx, nome in enumerate(_COLUNAS):
         celula = tabela.rows[0].cells[idx]
-        celula.width = Twips(_LARGURAS[idx])
         _texto_celula(celula, nome, negrito=True, alinhamento=WD_ALIGN_PARAGRAPH.CENTER)
 
     for r_idx, linha in enumerate(linhas, start=1):
         for c_idx, valor in enumerate(linha):
             celula = tabela.rows[r_idx].cells[c_idx]
-            celula.width = Twips(_LARGURAS[c_idx])
             _texto_celula(celula, valor, alinhamento=_ALINHAMENTO[c_idx])
 
     if len(linhas) > 1:
@@ -269,5 +238,4 @@ def _mesclar(tabela, coluna, texto):
     topo = tabela.rows[1].cells[coluna]
     for linha in range(2, len(tabela.rows)):
         topo.merge(tabela.rows[linha].cells[coluna])
-    topo.width = Twips(_LARGURAS[coluna])
     _texto_celula(topo, texto, alinhamento=_ALINHAMENTO[coluna])

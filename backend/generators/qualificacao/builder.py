@@ -58,12 +58,18 @@ def habilitar_atualizacao_campos(doc):
     habilitar_atualizacao_de_campos(doc)
 
 
-def _secao_sem_numero(doc, primeira=False):
+def _secao_sem_numero(doc, primeira=False, inicio_romano=None):
+    """Seção contada em romanos, sem número visível.
+
+    A capa inicia em i. As seções seguintes herdam a contagem quando
+    `inicio_romano` fica vazio.
+    """
     section = doc.sections[0] if primeira else doc.add_section(WD_SECTION.NEW_PAGE)
     set_page_margins(section)
     section.header.is_linked_to_previous = False
     section.footer.is_linked_to_previous = False
     limpar_cabecalho(section)
+    configure_section_page_numbers(section, num_format="roman", start_at=inicio_romano)
     return section
 
 
@@ -84,6 +90,7 @@ def _secao_paisagem(doc):
     """Página isolada em paisagem, herdando cabeçalho e numeração da seção anterior."""
     section = doc.add_section(WD_SECTION.NEW_PAGE)
     set_page_margins(section)
+    section.header_distance = Cm(2.0)
     section.orientation = WD_ORIENT.LANDSCAPE
     section.page_width = Cm(29.7)
     section.page_height = Cm(21.0)
@@ -103,8 +110,20 @@ def _secao_retrato_continua(doc):
     return section
 
 
-def _paginar(section, formato, inicio):
+def _secao_textual(doc):
+    """Parte textual em arábicos, a partir de 1, com o número no cabeçalho."""
+    section = doc.add_section(WD_SECTION.NEW_PAGE)
     set_page_margins(section)
+    section.header_distance = Cm(2.0)
+    section.header.is_linked_to_previous = True
+    section.footer.is_linked_to_previous = True
+    configure_section_page_numbers(section, num_format="decimal", start_at=1)
+    return section
+
+
+def _paginar(section, formato, inicio=None):
+    set_page_margins(section)
+    section.header_distance = Cm(2.0)
     section.header.is_linked_to_previous = False
     section.footer.is_linked_to_previous = False
     limpar_cabecalho(section)
@@ -280,14 +299,14 @@ def gerar_documento_qualificacao(
     apply_base_styles(doc)
 
     # =========================================================================
-    # Capa e folha de rosto: local e ano na base da página.
-    # Folha de aprovação segue sem esse rodapé e sem número visível.
+    # Da capa até o sumário a contagem é romana (i, ii, iii…), sem número visível.
+    # O algarismo só aparece a partir da Apresentação.
     # =========================================================================
     meta = dados["metadata"]
     local = (meta.get("local") or "Belém-Pará").strip()
     ano = (meta.get("ano") or "2026").strip()
 
-    sec_capa = _secao_sem_numero(doc, primeira=True)
+    sec_capa = _secao_sem_numero(doc, primeira=True, inicio_romano=1)
     aplicar_cabecalho_institucional(sec_capa, meta, assets_dir=assets_dir, space_after=24)
     build_capa(doc, meta, assets_dir=assets_dir)
     aplicar_rodape_local_ano(sec_capa, local, ano)
@@ -309,10 +328,10 @@ def gerar_documento_qualificacao(
     build_folha_aprovacao(doc, dados["metadata"], assets_dir=assets_dir)
 
     # =========================================================================
-    # SEÇÃO 2: Listas existentes e sumário (romana, a partir de iv)
+    # Listas e sumário: romana contínua, ainda sem número visível.
     # =========================================================================
-    sec_2 = doc.add_section(WD_SECTION.NEW_PAGE)
-    _paginar(sec_2, "roman", 4)
+    sec_2 = _secao_sem_numero(doc)
+    limpar_rodape(sec_2)
 
     iniciado = False
 
@@ -349,11 +368,11 @@ def gerar_documento_qualificacao(
     )
 
     # =========================================================================
-    # SEÇÃO 3: Parte textual, a partir da Apresentação (arábica, a partir de 1).
+    # Apresentação: primeiro número visível, ainda em romano (continuação da capa).
     # O sumário já fecha com quebra de página; a seção contínua evita página em branco.
     # =========================================================================
-    sec_3 = doc.add_section(WD_SECTION.CONTINUOUS)
-    _paginar(sec_3, "decimal", 1)
+    sec_apresentacao = doc.add_section(WD_SECTION.CONTINUOUS)
+    _paginar(sec_apresentacao, "roman")
     numeros = numeracao_secoes(dados["projeto"])
 
     build_apresentacao(doc, dados["apresentacao"], dados["metadata"])
@@ -369,7 +388,7 @@ def gerar_documento_qualificacao(
         artigos=(dados.get("resultados") or {}).get("artigos") or [],
         fontes_padrao=_fontes_padrao(projeto_quadro),
     )
-    _secao_retrato_continua(doc)
+    _secao_textual(doc)
     meta = dados.get("metadata") or {}
     projeto = dados["projeto"]
     for origem in ("autor", "area_concentracao", "linha_pesquisa", "titulo", "orientador", "coorientador"):

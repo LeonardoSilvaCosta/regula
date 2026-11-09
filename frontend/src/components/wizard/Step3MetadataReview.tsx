@@ -136,9 +136,9 @@ function contarPalavras(texto: string) {
   return limpo.split(/\s+/).length;
 }
 
-function coautoriaDocente(orientador: string, coorientador: string) {
+function coautoriaDocente(orientador?: string, coorientador?: string) {
   return [orientador, coorientador]
-    .map((nome) => nome.trim())
+    .map((nome) => (nome ?? "").trim())
     .filter(Boolean)
     .map((nome) => `${nome} - Docente`)
     .join("; ");
@@ -502,7 +502,7 @@ export function Step3MetadataReview({
                   onChange={(event) => patchCoorientador(event.target.value)}
                 />
               </label>
-              {data.metadata.coorientador.trim() ? (
+              {(data.metadata.coorientador ?? "").trim() ? (
                 <label className="text-sm">
                   Instituição do coorientador(a)
                   <input
@@ -1236,12 +1236,17 @@ export function Step3MetadataReview({
             Adicionar artigo
           </button>
           <h3 className="mb-2 mt-6 text-sm font-semibold text-[#0f3d32]">Pré-visualização das linhas</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-xs">
+          <div className="w-full min-w-0">
+            <table className="w-full table-fixed border-collapse text-left text-xs">
+              <colgroup>
+                {[12, 16, 24, 22, 10, 6, 7].map((pct, index) => (
+                  <col key={index} style={{ width: `${pct}%` }} />
+                ))}
+              </colgroup>
               <thead>
                 <tr>
                   {["Título", "Objetivo Geral", "Objetivos Específicos", "Tipo de Produto", "Tipo de Estudo", "Fontes", "Status"].map((coluna) => (
-                    <th key={coluna} className="border border-[#d9d1c3] bg-[#f6f1e8] px-2 py-1 font-semibold">
+                    <th key={coluna} className="border border-[#d9d1c3] bg-[#f6f1e8] px-2 py-1 font-semibold break-words">
                       {coluna}
                     </th>
                   ))}
@@ -1257,13 +1262,13 @@ export function Step3MetadataReview({
                 ) : (
                   linhasQuadro.map((linha, index) => (
                     <tr key={`${linha.origem}-${index}`}>
-                      <td className="border border-[#d9d1c3] px-2 py-1">{data.metadata.titulo}</td>
-                      <td className="border border-[#d9d1c3] px-2 py-1">{data.sections.objetivo_geral}</td>
-                      <td className="border border-[#d9d1c3] px-2 py-1">{linha.objetivo}</td>
-                      <td className="border border-[#d9d1c3] px-2 py-1">{linha.produto}</td>
-                      <td className="border border-[#d9d1c3] px-2 py-1">{linha.estudo}</td>
-                      <td className="border border-[#d9d1c3] px-2 py-1">{linha.fontes}</td>
-                      <td className="border border-[#d9d1c3] px-2 py-1">{linha.status}</td>
+                      <td className="border border-[#d9d1c3] px-2 py-1 align-top break-words">{data.metadata.titulo}</td>
+                      <td className="border border-[#d9d1c3] px-2 py-1 align-top break-words">{data.sections.objetivo_geral}</td>
+                      <td className="border border-[#d9d1c3] px-2 py-1 align-top break-words">{linha.objetivo}</td>
+                      <td className="border border-[#d9d1c3] px-2 py-1 align-top break-words">{linha.produto}</td>
+                      <td className="border border-[#d9d1c3] px-2 py-1 align-top break-words">{linha.estudo}</td>
+                      <td className="border border-[#d9d1c3] px-2 py-1 align-top break-words">{linha.fontes}</td>
+                      <td className="border border-[#d9d1c3] px-2 py-1 align-top break-words">{linha.status}</td>
                     </tr>
                   ))
                 )}

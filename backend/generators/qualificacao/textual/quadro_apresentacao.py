@@ -3,11 +3,11 @@ Módulo granular para construção exclusiva do QUADRO 1 da Apresentação
 conforme o modelo oficial da Resolução nº 009/2025-PPGSP/UFPA (página 5).
 """
 
-from docx.shared import Cm, Pt
+from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 
-from core.xml_utils import set_cell_border
+from core.xml_utils import aplicar_autoajuste_janela, set_cell_border
 from ..formato import escrever_fonte, escrever_legenda
 
 
@@ -37,11 +37,14 @@ def build_quadro_apresentacao(doc, dados_quadro, metadata):
 
     tabela = doc.add_table(rows=total_linhas + 1, cols=len(colunas))
     tabela.alignment = WD_TABLE_ALIGNMENT.CENTER
+    aplicar_autoajuste_janela(
+        tabela,
+        [int(round(cm * 567)) for cm in larguras_cm],
+    )
 
     # Cabeçalho
     for idx_c, nome_c in enumerate(colunas):
         cell_hdr = tabela.rows[0].cells[idx_c]
-        cell_hdr.width = Cm(larguras_cm[idx_c])
         cell_hdr.text = nome_c
         cell_hdr.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         p_hdr = cell_hdr.paragraphs[0]
@@ -60,7 +63,6 @@ def build_quadro_apresentacao(doc, dados_quadro, metadata):
         row_cells = tabela.rows[r_idx].cells
         for c_idx, valor in enumerate(linha):
             cell = row_cells[c_idx]
-            cell.width = Cm(larguras_cm[c_idx])
             cell.text = str(valor)
             cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
             p_c = cell.paragraphs[0]

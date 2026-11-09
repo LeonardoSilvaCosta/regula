@@ -11,7 +11,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 
 from core.styles import set_page_margins
-from core.xml_utils import continuar_numeracao, set_cell_border
+from core.xml_utils import aplicar_autoajuste_janela, continuar_numeracao, set_cell_border
 
 from core.campos import adicionar_bookmark
 from ..formato import adicionar_lacuna, adicionar_paragrafo, escrever_fonte, escrever_legenda
@@ -57,6 +57,7 @@ def _secao_paisagem(doc):
     """A4 deitado para o quadro de 24 ou 48 meses. Cabeçalho segue a seção anterior."""
     section = doc.add_section(WD_SECTION.NEW_PAGE)
     set_page_margins(section)
+    section.header_distance = Cm(2.0)
     section.orientation = WD_ORIENT.LANDSCAPE
     section.page_width = Cm(29.7)
     section.page_height = Cm(21.0)
@@ -69,6 +70,7 @@ def _secao_paisagem(doc):
 def _secao_retrato(doc):
     section = doc.add_section(WD_SECTION.NEW_PAGE)
     set_page_margins(section)
+    section.header_distance = Cm(2.0)
     section.header.is_linked_to_previous = True
     section.footer.is_linked_to_previous = True
     continuar_numeracao(section)
@@ -187,8 +189,8 @@ def _bloco(doc, legenda, bookmark, atividades, anos):
 
     tabela = doc.add_table(rows=2 + len(atividades), cols=25)
     tabela.alignment = WD_TABLE_ALIGNMENT.LEFT
-    tabela.autofit = False
-    _grade_fixa(tabela)
+    proporcoes = [int(round(item.twips)) for item in _larguras()]
+    aplicar_autoajuste_janela(tabela, proporcoes)
     _margem_celulas(tabela)
     _bordas_tabela(tabela)
 
@@ -231,33 +233,6 @@ def colorir_celula(cell, cor_hex="BEBEBE"):
     cell._tc.get_or_add_tcPr().append(shading)
 
 
-def _grade_fixa(tabela):
-    larguras = [int(round(item.twips)) for item in _larguras()]
-    tbl = tabela._tbl
-    tbl_pr = tbl.tblPr
-    layout = tbl_pr.find(qn("w:tblLayout"))
-    if layout is None:
-        layout = OxmlElement("w:tblLayout")
-        tbl_pr.append(layout)
-    layout.set(qn("w:type"), "fixed")
-    tbl_w = tbl_pr.find(qn("w:tblW"))
-    if tbl_w is None:
-        tbl_w = OxmlElement("w:tblW")
-        tbl_pr.append(tbl_w)
-    tbl_w.set(qn("w:w"), str(sum(larguras)))
-    tbl_w.set(qn("w:type"), "dxa")
-    grade = tbl.find(qn("w:tblGrid"))
-    if grade is None:
-        grade = OxmlElement("w:tblGrid")
-        tbl_pr.addnext(grade)
-    for filho in list(grade):
-        grade.remove(filho)
-    for largura in larguras:
-        coluna = OxmlElement("w:gridCol")
-        coluna.set(qn("w:w"), str(largura))
-        grade.append(coluna)
-
-
 def _margem_celulas(tabela):
     tbl_pr = tabela._tbl.tblPr
     margem = tbl_pr.find(qn("w:tblCellMar"))
@@ -291,8 +266,6 @@ def _bordas_tabela(tabela):
 
 
 def _celula(celula, texto, coluna, centro=False, tamanho=10, negrito=False):
-    larguras = _larguras()
-    celula.width = larguras[coluna]
     celula.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     celula.text = texto
     p = celula.paragraphs[0]

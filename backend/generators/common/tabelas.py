@@ -14,6 +14,8 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Pt, RGBColor
 
+from core.xml_utils import aplicar_autoajuste_janela
+
 _FONTE = "Times New Roman"
 _CINZA_CABECALHO = "F2F2F2"
 _BORDA_PT_OITAVOS = "4"  # 0,5 pt
@@ -63,7 +65,7 @@ def inserir_tabela(
 
     tabela = doc.add_table(rows=1, cols=len(colunas))
     tabela.alignment = WD_TABLE_ALIGNMENT.CENTER
-    tabela.autofit = True
+    aplicar_autoajuste_janela(tabela)
     _marcar_cabecalho_repetivel(tabela.rows[0])
 
     for indice, nome in enumerate(colunas):

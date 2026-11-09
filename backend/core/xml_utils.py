@@ -98,6 +98,43 @@ def aplicar_estilo_tabela_ibge(tabela):
         tcPr.append(tcBorders)
 
 
+def aplicar_autoajuste_janela(tabela, proporcoes_colunas=None):
+    """Tabelas e quadros: Autoajuste à janela (largura 100% da área útil)."""
+    tabela.autofit = True
+    tbl = tabela._tbl
+    tbl_pr = tbl.tblPr
+
+    layout = tbl_pr.find(qn("w:tblLayout"))
+    if layout is None:
+        layout = OxmlElement("w:tblLayout")
+        tbl_pr.append(layout)
+    layout.set(qn("w:type"), "autofit")
+
+    tbl_w = tbl_pr.find(qn("w:tblW"))
+    if tbl_w is None:
+        tbl_w = OxmlElement("w:tblW")
+        tbl_pr.append(tbl_w)
+    tbl_w.set(qn("w:type"), "pct")
+    tbl_w.set(qn("w:w"), "5000")
+
+    if not proporcoes_colunas:
+        return
+
+    grade = tbl.find(qn("w:tblGrid"))
+    if grade is None:
+        grade = OxmlElement("w:tblGrid")
+        tbl_pr.addnext(grade)
+    for filho in list(grade):
+        grade.remove(filho)
+    for largura in proporcoes_colunas:
+        peso = int(largura)
+        if peso <= 0:
+            continue
+        coluna = OxmlElement("w:gridCol")
+        coluna.set(qn("w:w"), str(peso))
+        grade.append(coluna)
+
+
 def set_cell_border(cell, **kwargs):
     """Configura bordas finas para tabelas e quadros ABNT."""
     tcPr = cell._tc.get_or_add_tcPr()
