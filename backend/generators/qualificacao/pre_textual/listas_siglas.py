@@ -78,7 +78,7 @@ def _linha(doc, sigla, significado):
     return p
 
 
-def build_lista_siglas(doc, siglas_data, quebrar=True):
+def build_lista_siglas(doc, siglas_data, quebrar=True, encerrar=True):
     pares = normalizar_siglas(siglas_data)
     if not pares:
         return None
@@ -88,5 +88,6 @@ def build_lista_siglas(doc, siglas_data, quebrar=True):
     _titulo(doc)
     for sigla, significado in pares:
         _linha(doc, sigla, significado)
-    doc.add_page_break()
+    if encerrar:
+        doc.add_page_break()
     return ("LISTA DE ABREVIATURAS E SIGLAS", BM_LISTA_SIGLAS)
