@@ -34,7 +34,7 @@ def _paragrafo_campo(doc, rotulo, valor, italico=False, space_before=0):
     _campo(p, rotulo, valor, italico=italico)
     return p
 
-def build_folha_rosto(doc, metadata, assets_dir="assets"):
+def build_folha_rosto(doc, metadata, assets_dir="assets", texto_natureza=None, placeholder_titulo=None, complemento=None):
     """
     Renderiza a Folha de Rosto segundo a ordem e especificações do Art. 1º, I, 2.
     
@@ -85,7 +85,7 @@ def build_folha_rosto(doc, metadata, assets_dir="assets"):
     p_titulo.paragraph_format.space_after = Pt(24)
 
     if not escrever_titulo_e_subtitulo(p_titulo, titulo_raw, tamanho=14):
-        r_tit = p_titulo.add_run("[TÍTULO DO RELATÓRIO DE QUALIFICAÇÃO]")
+        r_tit = p_titulo.add_run(placeholder_titulo or "[TÍTULO DO RELATÓRIO DE QUALIFICAÇÃO]")
         r_tit.italic = True
         r_tit.font.size = Pt(14)
         r_tit.font.color.rgb = RGBColor(120, 120, 120)
@@ -100,20 +100,39 @@ def build_folha_rosto(doc, metadata, assets_dir="assets"):
     p_rec.paragraph_format.space_before = Pt(0)
     p_rec.paragraph_format.space_after = Pt(18)
 
-    r_rec = p_rec.add_run(
-        "Relatório de Qualificação apresentado ao Colegiado do Programa de Pós-Graduação em "
-        "Segurança Pública, da Universidade Federal do Pará, como requisito parcial à qualificação "
-        "ao desenvolvimento da "
-    )
-    r_rec.font.name = "Times New Roman"
-    r_rec.font.size = Pt(12)
-    r_tipo = p_rec.add_run(tipo_trabalho)
-    r_tipo.bold = True
-    r_tipo.font.name = "Times New Roman"
-    r_tipo.font.size = Pt(12)
-    r_fim = p_rec.add_run(".")
-    r_fim.font.name = "Times New Roman"
-    r_fim.font.size = Pt(12)
+    if texto_natureza:
+        r_rec = p_rec.add_run(texto_natureza)
+        r_rec.font.name = "Times New Roman"
+        r_rec.font.size = Pt(12)
+    else:
+        r_rec = p_rec.add_run(
+            "Relatório de Qualificação apresentado ao Colegiado do Programa de Pós-Graduação em "
+            "Segurança Pública, da Universidade Federal do Pará, como requisito parcial à qualificação "
+            "ao desenvolvimento da "
+        )
+        r_rec.font.name = "Times New Roman"
+        r_rec.font.size = Pt(12)
+        r_tipo = p_rec.add_run(tipo_trabalho)
+        r_tipo.bold = True
+        r_tipo.font.name = "Times New Roman"
+        r_tipo.font.size = Pt(12)
+        r_fim = p_rec.add_run(".")
+        r_fim.font.name = "Times New Roman"
+        r_fim.font.size = Pt(12)
+
+    for extra in complemento or []:
+        texto = str(extra or "").strip()
+        if not texto:
+            continue
+        p_extra = doc.add_paragraph(style="Recuo Folha de Rosto")
+        p_extra.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p_extra.paragraph_format.left_indent = Cm(8.0)
+        p_extra.paragraph_format.line_spacing = 1.0
+        p_extra.paragraph_format.space_before = Pt(12)
+        p_extra.paragraph_format.space_after = Pt(12)
+        r_extra = p_extra.add_run(texto)
+        r_extra.font.name = "Times New Roman"
+        r_extra.font.size = Pt(12)
 
     # -------------------------------------------------------------
     # (ix) e (x) Área, Linha, Orientador e Coorientador à Margem Esquerda

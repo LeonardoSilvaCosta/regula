@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Card } from "@/components/ui/Card";
 import type { ArtigoQuadro, DocumentSections, ParseResponse, PTTItem } from "@/lib/api";
+import { CAMPOS_PROTOCOLO_CEP, protocoloCepVazio } from "@/lib/protocoloCep";
 import { faixaImpacto } from "@/lib/ptt";
 import type { components } from "@/types/api";
 
@@ -34,6 +35,15 @@ const ABAS = [
 
 type Aba = (typeof ABAS)[number]["id"];
 
+function abasDoDocumento(tipo: ParseResponse["tipo_documento"]) {
+  if (tipo === "projeto_completo_cep") {
+    return ABAS.filter((item) => item.id === "gerais" || item.id === "banca" || item.id === "secoes" || item.id === "siglas").map(
+      (item) => (item.id === "banca" ? { ...item, label: "Orientação" } : item),
+    );
+  }
+  return ABAS;
+}
+
 const campo =
   "mt-1 w-full rounded-md border border-[#d9d1c3] bg-white px-3 py-2 text-sm outline-none focus:border-[#0f3d32]";
 
@@ -63,6 +73,10 @@ const TIPOS_PTT = [
 ] as const;
 
 const CAMPOS_PARAGRAFOS = [
+  "resumo",
+  "compromisso_etico",
+  "cronograma_texto",
+  "aspectos_eticos",
   "apresentacao",
   "introducao",
   "justificativa",
@@ -72,8 +86,16 @@ const CAMPOS_PARAGRAFOS = [
   "objetivos_especificos",
   "hipotese",
   "metodologia_natureza",
+  "metodologia_participantes",
   "metodologia_fontes",
   "metodologia_coleta",
+  "metodologia_criterios",
+  "metodologia_etica",
+  "metodologia_analise",
+  "riscos",
+  "beneficios",
+  "lgpd_governanca",
+  "orcamento",
   "referencias",
 ] as const satisfies readonly (keyof DocumentSections)[];
 
@@ -219,6 +241,13 @@ export function Step3MetadataReview({
 }) {
   const [aba, setAba] = useState<Aba>("gerais");
   const [aviso, setAviso] = useState<string | null>(null);
+  const ehProjetoCep = data.tipo_documento === "projeto_completo_cep";
+  const abas = abasDoDocumento(data.tipo_documento);
+
+  useEffect(() => {
+    if (abas.some((item) => item.id === aba)) return;
+    setAba("gerais");
+  }, [aba, abas]);
 
   useEffect(() => {
     if (data.metadata.area_concentracao === AREA_CONCENTRACAO_PADRAO) return;
@@ -329,6 +358,13 @@ export function Step3MetadataReview({
     }
   }, [data, onChange, sugestaoCoautoria]);
 
+  function patchProtocolo(chave: string, valor: string) {
+    onChange({
+      ...data,
+      protocolo_cep: { ...protocoloCepVazio(), ...data.protocolo_cep, [chave]: valor },
+    });
+  }
+
   function patchSection(chave: keyof DocumentSections, valor: string | string[] | boolean) {
     const sections = { ...data.sections, [chave]: valor };
     onChange({ ...data, sections });
@@ -342,7 +378,7 @@ export function Step3MetadataReview({
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap gap-2" role="tablist">
-        {ABAS.map((item) => (
+        {abas.map((item) => (
           <button
             key={item.id}
             type="button"
@@ -441,7 +477,7 @@ export function Step3MetadataReview({
       )}
 
       {aba === "banca" && (
-        <Card title="Coordenação, Orientação e Banca">
+        <Card title={ehProjetoCep ? "Coordenação e Orientação" : "Coordenação, Orientação e Banca"}>
           <section>
             <h3 className="text-sm font-semibold tracking-wide text-[#0f3d32]">Coordenação</h3>
             <label className="mt-3 block text-sm">
@@ -518,6 +554,7 @@ export function Step3MetadataReview({
             </div>
           </section>
 
+          {!ehProjetoCep && (
           <section className="mt-6 border-t border-[#efe8dc] pt-5">
             <h3 className="text-sm font-semibold tracking-wide text-[#0f3d32]">Banca</h3>
             <ul className="mt-3 flex flex-col gap-3">
@@ -586,10 +623,328 @@ export function Step3MetadataReview({
               Adicionar avaliador
             </button>
           </section>
+          )}
         </Card>
       )}
 
-      {aba === "secoes" && (
+      {aba === "secoes" && data.tipo_documento === "protocolo_cep" && (
+        <Card title="Seções do trabalho">
+          <div className="flex flex-col gap-4">
+            {CAMPOS_PROTOCOLO_CEP.map((item) => {
+              const valor = data.protocolo_cep?.[item.chave] ?? "";
+              if (item.tipo === "sim_nao" || item.tipo === "opcoes") {
+                const opcoes = item.opcoes ?? ["Sim", "Não"];
+                return (
+                  <fieldset key={item.chave} className="text-sm">
+                    <legend>{item.rotulo}</legend>
+                    <div className="mt-2 flex flex-wrap gap-4">
+                      {opcoes.map((opcao) => (
+                        <label key={opcao} className="inline-flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name={item.chave}
+                            value={opcao}
+                            checked={valor === opcao}
+                            onChange={() => patchProtocolo(item.chave, opcao)}
+                          />
+                          {opcao}
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                );
+              }
+              if (item.tipo === "texto") {
+                return (
+                  <label key={item.chave} className="text-sm">
+                    {item.rotulo}
+                    <input
+                      className={campo}
+                      value={valor}
+                      onChange={(event) => patchProtocolo(item.chave, event.target.value)}
+                    />
+                  </label>
+                );
+              }
+              return (
+                <label key={item.chave} className="text-sm">
+                  {item.rotulo}
+                  <textarea
+                    rows={item.tipo === "texto_longo" ? 6 : 3}
+                    className={campo}
+                    value={valor}
+                    onChange={(event) => patchProtocolo(item.chave, event.target.value)}
+                  />
+                </label>
+              );
+            })}
+          </div>
+        </Card>
+      )}
+
+      {aba === "secoes" && data.tipo_documento === "projeto_completo_cep" && (
+        <Card title="Seções do Projeto Completo CEP">
+          <div className="flex flex-col gap-3">
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">Folha de rosto e resumo</summary>
+              <div className="mt-3 flex flex-col gap-4">
+                <label className="text-sm">
+                  Texto da folha de rosto
+                  <textarea
+                    rows={4}
+                    className={campo}
+                    value={data.sections?.texto_folha_rosto ?? ""}
+                    onChange={(event) => patchSection("texto_folha_rosto", event.target.value)}
+                  />
+                </label>
+                <label className="text-sm">
+                  Compromisso ético e regulatório
+                  <textarea
+                    rows={4}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("compromisso_etico"))}
+                    onChange={(event) => patchSection("compromisso_etico", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+                <label className="text-sm">
+                  Resumo
+                  <textarea
+                    rows={8}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("resumo"))}
+                    onChange={(event) => patchSection("resumo", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+                <label className="text-sm">
+                  Palavras-chave
+                  <input
+                    className={campo}
+                    value={data.sections?.palavras_chave ?? ""}
+                    onChange={(event) => patchSection("palavras_chave", event.target.value)}
+                  />
+                </label>
+              </div>
+            </details>
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">
+                1. Introdução <span className="font-normal text-[#6b645a]">— Contextualização e problema de pesquisa</span>
+              </summary>
+              <div className="mt-3 flex flex-col gap-4">
+                <label className="text-sm">
+                  Contextualização
+                  <textarea
+                    rows={6}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("introducao"))}
+                    onChange={(event) => patchSection("introducao", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+                <label className="text-sm">
+                  Problema de pesquisa
+                  <textarea
+                    rows={4}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("problema"))}
+                    onChange={(event) => patchSection("problema", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+              </div>
+            </details>
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">
+                2. Justificativa <span className="font-normal text-[#6b645a]">— Relevância científica, social e institucional</span>
+              </summary>
+              <label className="mt-3 block text-sm">
+                Justificativa
+                <textarea
+                  rows={6}
+                  className={campo}
+                  value={paragrafosParaTexto(valorParagrafos("justificativa"))}
+                  onChange={(event) => patchSection("justificativa", textoParaParagrafos(event.target.value))}
+                />
+              </label>
+            </details>
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">
+                3. Hipótese e objetivos <span className="font-normal text-[#6b645a]">— Geral e específicos</span>
+              </summary>
+              <div className="mt-3 flex flex-col gap-4">
+                <label className="text-sm">
+                  Hipótese
+                  <textarea
+                    rows={4}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("hipotese"))}
+                    onChange={(event) => patchSection("hipotese", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+                <label className="text-sm">
+                  Objetivo geral
+                  <textarea
+                    rows={3}
+                    className={campo}
+                    value={data.sections?.objetivo_geral ?? ""}
+                    onChange={(event) => patchSection("objetivo_geral", event.target.value)}
+                  />
+                </label>
+                <label className="text-sm">
+                  Objetivos específicos
+                  <span className="block text-xs text-[#6b645a]">Um objetivo por parágrafo.</span>
+                  <textarea
+                    rows={6}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("objetivos_especificos"))}
+                    onChange={(event) => patchSection("objetivos_especificos", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+              </div>
+            </details>
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">
+                4. Referencial teórico <span className="font-normal text-[#6b645a]">— Fundamentação científica</span>
+              </summary>
+              <label className="mt-3 block text-sm">
+                Referencial teórico
+                <textarea
+                  rows={8}
+                  className={campo}
+                  value={paragrafosParaTexto(valorParagrafos("referencial_teorico"))}
+                  onChange={(event) => patchSection("referencial_teorico", textoParaParagrafos(event.target.value))}
+                />
+              </label>
+            </details>
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">
+                5. Metodologia{" "}
+                <span className="font-normal text-[#6b645a]">— Delineamento, população, dados, critérios e procedimentos</span>
+              </summary>
+              <div className="mt-3 flex flex-col gap-4">
+                <label className="text-sm">
+                  Delineamento
+                  <textarea
+                    rows={4}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("metodologia_natureza"))}
+                    onChange={(event) => patchSection("metodologia_natureza", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+                <label className="text-sm">
+                  População
+                  <textarea
+                    rows={6}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("metodologia_participantes"))}
+                    onChange={(event) =>
+                      patchSection("metodologia_participantes", textoParaParagrafos(event.target.value))
+                    }
+                  />
+                </label>
+                <label className="text-sm">
+                  Dados
+                  <textarea
+                    rows={4}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("metodologia_fontes"))}
+                    onChange={(event) => patchSection("metodologia_fontes", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+                <label className="text-sm">
+                  Critérios
+                  <textarea
+                    rows={4}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("metodologia_criterios"))}
+                    onChange={(event) => patchSection("metodologia_criterios", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+                <label className="text-sm">
+                  Procedimentos
+                  <textarea
+                    rows={5}
+                    className={campo}
+                    value={paragrafosParaTexto(valorParagrafos("metodologia_coleta"))}
+                    onChange={(event) => patchSection("metodologia_coleta", textoParaParagrafos(event.target.value))}
+                  />
+                </label>
+              </div>
+            </details>
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">
+                6. Análise dos dados{" "}
+                <span className="font-normal text-[#6b645a]">— Estatística, PLN, aprendizado de máquina e validação</span>
+              </summary>
+              <label className="mt-3 block text-sm">
+                Análise dos dados
+                <textarea
+                  rows={8}
+                  className={campo}
+                  value={paragrafosParaTexto(valorParagrafos("metodologia_analise"))}
+                  onChange={(event) => patchSection("metodologia_analise", textoParaParagrafos(event.target.value))}
+                />
+              </label>
+            </details>
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">
+                7. Aspectos éticos <span className="font-normal text-[#6b645a]">— Riscos, benefícios, sigilo, LGPD e governança</span>
+              </summary>
+              <label className="mt-3 block text-sm">
+                Aspectos éticos
+                <textarea
+                  rows={10}
+                  className={campo}
+                  value={paragrafosParaTexto(valorParagrafos("aspectos_eticos"))}
+                  onChange={(event) => patchSection("aspectos_eticos", textoParaParagrafos(event.target.value))}
+                />
+              </label>
+            </details>
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">
+                8. Cronograma <span className="font-normal text-[#6b645a]">— Etapas e períodos</span>
+              </summary>
+              <label className="mt-3 block text-sm">
+                Etapas e períodos
+                <textarea
+                  rows={10}
+                  className={campo}
+                  value={paragrafosParaTexto(valorParagrafos("cronograma_texto"))}
+                  onChange={(event) => patchSection("cronograma_texto", textoParaParagrafos(event.target.value))}
+                />
+              </label>
+            </details>
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">
+                9. Orçamento <span className="font-normal text-[#6b645a]">— Recursos e fontes de financiamento</span>
+              </summary>
+              <label className="mt-3 block text-sm">
+                Orçamento
+                <textarea
+                  rows={5}
+                  className={campo}
+                  value={paragrafosParaTexto(valorParagrafos("orcamento"))}
+                  onChange={(event) => patchSection("orcamento", textoParaParagrafos(event.target.value))}
+                />
+              </label>
+            </details>
+            <details open className="rounded-lg border border-[#efe8dc] p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-[#0f3d32]">
+                Referências <span className="font-normal text-[#6b645a]">— Bibliografia utilizada</span>
+              </summary>
+              <label className="mt-3 block text-sm">
+                Lista de referências em normas ABNT
+                <span className="block text-xs text-[#6b645a]">Uma referência por parágrafo.</span>
+                <textarea
+                  rows={8}
+                  className={campo}
+                  value={paragrafosParaTexto(valorParagrafos("referencias"))}
+                  onChange={(event) => patchSection("referencias", textoParaParagrafos(event.target.value))}
+                />
+              </label>
+            </details>
+          </div>
+        </Card>
+      )}
+
+      {aba === "secoes" && data.tipo_documento !== "protocolo_cep" && data.tipo_documento !== "projeto_completo_cep" && (
         <Card title="Seções do trabalho">
           <div className="flex flex-col gap-3">
             <details open className="rounded-lg border border-[#efe8dc] p-3">
@@ -1352,7 +1707,7 @@ export function Step3MetadataReview({
               setAviso("Informe o orientador.");
               return;
             }
-            const avaliadorIncompleto = data.banca.some((membro, index) => {
+            const avaliadorIncompleto = !ehProjetoCep && data.banca.some((membro, index) => {
               if (index === indiceOrientador || index === indiceCoorientador) return false;
               if (!ehAvaliador(funcaoCanonico(membro.funcao))) return false;
               return !membro.nome.trim() || !membro.instituicao.trim();
@@ -1362,7 +1717,7 @@ export function Step3MetadataReview({
               setAviso("Preencha o nome e a instituição de cada avaliador.");
               return;
             }
-            const impactoPendente = data.ptts.some((item) => !impactoSelecionado(item.impacto));
+            const impactoPendente = !ehProjetoCep && data.ptts.some((item) => !impactoSelecionado(item.impacto));
             if (impactoPendente) {
               setAba("ptts");
               setAviso("Selecione o impacto de cada produto: Alto, Médio ou Baixo.");

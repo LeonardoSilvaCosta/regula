@@ -13,6 +13,8 @@ const TIPOS: { value: DocumentType; label: string }[] = [
   { value: "qualificacao", label: "Relatório de Qualificação" },
   { value: "dissertacao", label: "Dissertação de Mestrado" },
   { value: "tese", label: "Tese de Doutorado" },
+  { value: "protocolo_cep", label: "Protocolo CEP" },
+  { value: "projeto_completo_cep", label: "Projeto Completo CEP" },
 ];
 
 export function Step1Upload({

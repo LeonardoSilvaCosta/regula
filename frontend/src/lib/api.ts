@@ -1,4 +1,5 @@
 import type { components } from "@/types/api";
+import type { ProtocoloCep } from "@/lib/protocoloCep";
 
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
@@ -10,6 +11,12 @@ export type PTTValidationResult = components["schemas"]["PTTValidationResult"];
 
 export interface DocumentSections {
   apresentacao?: string[];
+  resumo?: string[];
+  palavras_chave?: string;
+  texto_folha_rosto?: string;
+  compromisso_etico?: string[];
+  cronograma_texto?: string[];
+  aspectos_eticos?: string[];
   introducao?: string[];
   justificativa?: string[];
   problema?: string[];
@@ -25,8 +32,13 @@ export interface DocumentSections {
   metodologia_participantes?: string[];
   metodologia_fontes?: string[];
   metodologia_coleta?: string[];
+  metodologia_criterios?: string[];
   metodologia_etica?: string[];
   metodologia_analise?: string[];
+  riscos?: string[];
+  beneficios?: string[];
+  lgpd_governanca?: string[];
+  orcamento?: string[];
   tabela_1?: { linhas: string[][] };
   tabela_2?: { linhas: string[][] };
   referencias?: string[];
@@ -43,12 +55,14 @@ export type ParseResponse = Omit<SchemaParseResponse, "metadata"> & {
   };
   sections: DocumentSections;
   cronograma?: CronogramaAtividade[];
+  protocolo_cep?: ProtocoloCep;
 };
 
 export type GenerateRequest = SchemaGenerateRequest & {
   sections: DocumentSections;
   artigos?: ArtigoQuadro[];
   cronograma?: CronogramaAtividade[];
+  protocolo_cep?: ProtocoloCep;
 };
 
 export class ApiError extends Error {

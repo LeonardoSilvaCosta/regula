@@ -10,6 +10,8 @@ const TIPOS: Record<components["schemas"]["DocumentType"], string> = {
   qualificacao: "Relatório de Qualificação",
   dissertacao: "Dissertação de Mestrado",
   tese: "Tese de Doutorado",
+  protocolo_cep: "Protocolo CEP",
+  projeto_completo_cep: "Projeto Completo CEP",
 };
 
 export function Step4Export({
@@ -57,14 +59,23 @@ export function Step4Export({
             <dt className="text-[#6b645a]">Ano</dt>
             <dd className="font-medium">{data.metadata.ano || "—"}</dd>
           </div>
-          <div>
-            <dt className="text-[#6b645a]">Banca</dt>
-            <dd className="font-medium">{data.banca.length} membro(s)</dd>
-          </div>
-          <div>
-            <dt className="text-[#6b645a]">PTTs</dt>
-            <dd className="font-medium">{data.ptts.length} produto(s)</dd>
-          </div>
+          {tipoDocumento === "projeto_completo_cep" ? (
+            <div>
+              <dt className="text-[#6b645a]">Orientador(a)</dt>
+              <dd className="font-medium">{data.metadata.orientador || "—"}</dd>
+            </div>
+          ) : (
+            <>
+              <div>
+                <dt className="text-[#6b645a]">Banca</dt>
+                <dd className="font-medium">{data.banca.length} membro(s)</dd>
+              </div>
+              <div>
+                <dt className="text-[#6b645a]">PTTs</dt>
+                <dd className="font-medium">{data.ptts.length} produto(s)</dd>
+              </div>
+            </>
+          )}
         </dl>
       </Card>
 

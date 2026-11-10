@@ -18,6 +18,9 @@ import {
 } from "@/lib/api";
 import type { components } from "@/types/api";
 import mockPreenchimento from "@/fixtures/preenchimento-direto-mock.json";
+import mockProtocoloCep from "@/fixtures/protocolo-cep-mock.json";
+import mockProjetoCompletoCep from "@/fixtures/projeto-completo-cep-mock.json";
+import { protocoloCepVazio } from "@/lib/protocoloCep";
 
 type DocumentType = components["schemas"]["DocumentType"];
 type WizardStep = 1 | 2 | 3 | 4;
@@ -56,15 +59,23 @@ function criarEstadoVazio(tipo: DocumentType, nivel: AcademicLevel): ParseRespon
       metodologia_participantes: [],
       metodologia_fontes: [],
       metodologia_coleta: [],
+      metodologia_criterios: [],
       metodologia_etica: [],
       metodologia_analise: [],
+      riscos: [],
+      beneficios: [],
+      lgpd_governanca: [],
+      orcamento: [],
       referencias: [],
     },
-    banca: [
-      { nome: "", funcao: "Orientador(a)", instituicao: "Universidade Federal do Pará" },
-      { nome: "", funcao: "Avaliador(a) Interno(a)", instituicao: "Universidade Federal do Pará" },
-      { nome: "", funcao: "Avaliador(a) Externo(a)", instituicao: "" },
-    ],
+    banca:
+      tipo === "projeto_completo_cep"
+        ? [{ nome: "", funcao: "Orientador(a)", instituicao: "Universidade Federal do Pará" }]
+        : [
+            { nome: "", funcao: "Orientador(a)", instituicao: "Universidade Federal do Pará" },
+            { nome: "", funcao: "Avaliador(a) Interno(a)", instituicao: "Universidade Federal do Pará" },
+            { nome: "", funcao: "Avaliador(a) Externo(a)", instituicao: "" },
+          ],
     siglas: [
       ["UFPA", "Universidade Federal do Pará"],
       ["PPGSP", "Programa de Pós-Graduação em Segurança Pública"],
@@ -73,6 +84,7 @@ function criarEstadoVazio(tipo: DocumentType, nivel: AcademicLevel): ParseRespon
     ],
     ptts: [],
     artigos: [],
+    protocolo_cep: protocoloCepVazio(),
     lacunas: [],
     conformidade_ptt: {
       valido: false,
@@ -163,6 +175,60 @@ export default function Home() {
   function iniciarPreenchimentoDireto() {
     const exemplo = mockPreenchimento as ParseResponse;
     const base = criarEstadoVazio(tipoDocumento, nivel);
+    if (tipoDocumento === "projeto_completo_cep") {
+      const projeto = mockProjetoCompletoCep as {
+        metadata: ParseResponse["metadata"];
+        sections: ParseResponse["sections"];
+        siglas?: ParseResponse["siglas"];
+        banca?: ParseResponse["banca"];
+      };
+      const bancaOrientacao = (projeto.banca ?? exemplo.banca ?? []).filter((membro) => {
+        const papel = (membro.funcao ?? "").toLowerCase();
+        return papel.includes("orient");
+      });
+      setParsedData({
+        ...base,
+        documento_id: "",
+        tipo_documento: tipoDocumento,
+        nivel,
+        metadata: { ...base.metadata, ...projeto.metadata },
+        banca: bancaOrientacao.length ? bancaOrientacao : base.banca,
+        siglas: projeto.siglas ?? exemplo.siglas ?? base.siglas,
+        cronograma: [],
+        ptts: [],
+        artigos: [],
+        sections: { ...base.sections, ...projeto.sections },
+      });
+      setSubtitulo(exemplo.metadata.subtitulo ?? "");
+      setError(null);
+      setFileHint(null);
+      setDownloaded(false);
+      setPreenchimentoDireto(true);
+      setStep(3);
+      return;
+    }
+    if (tipoDocumento === "protocolo_cep") {
+      setParsedData({
+        ...base,
+        documento_id: "",
+        tipo_documento: tipoDocumento,
+        nivel,
+        metadata: {
+          ...base.metadata,
+          titulo: mockProtocoloCep.titulo_principal,
+          autor: "Leonardo da Silva Costa",
+          orientador: "Prof. Dr. Renato Hidaka Torres",
+        },
+        protocolo_cep: { ...protocoloCepVazio(), ...mockProtocoloCep },
+      });
+      setSubtitulo("");
+      setError(null);
+      setFileHint(null);
+      setDownloaded(false);
+      setPreenchimentoDireto(true);
+      setStep(3);
+      return;
+    }
     setParsedData({
       ...base,
       ...exemplo,
@@ -208,11 +274,15 @@ export default function Home() {
         ptts: parsedData.ptts,
         artigos: parsedData.artigos ?? [],
         cronograma: parsedData.cronograma ?? [],
+        protocolo_cep: parsedData.protocolo_cep ?? protocoloCepVazio(),
       });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "Documento_Padronizado_PPGSP.docx";
+      link.download =
+        tipoDocumento === "projeto_completo_cep"
+          ? "Projeto_Completo_CEP.docx"
+          : "Documento_Padronizado_PPGSP.docx";
       document.body.appendChild(link);
       link.click();
       link.remove();
