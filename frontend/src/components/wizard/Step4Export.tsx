@@ -12,6 +12,7 @@ const TIPOS: Record<components["schemas"]["DocumentType"], string> = {
   tese: "Tese de Doutorado",
   protocolo_cep: "Protocolo CEP",
   projeto_completo_cep: "Projeto Completo CEP",
+  codebook: "Manual de Codificação (Codebook)",
 };
 
 export function Step4Export({

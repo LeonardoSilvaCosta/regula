@@ -20,7 +20,10 @@ import type { components } from "@/types/api";
 import mockPreenchimento from "@/fixtures/preenchimento-direto-mock.json";
 import mockProtocoloCep from "@/fixtures/protocolo-cep-mock.json";
 import mockProjetoCompletoCep from "@/fixtures/projeto-completo-cep-mock.json";
+import mockCodebook from "@/fixtures/codebook-mock.json";
+import { codebookVazio } from "@/lib/codebook";
 import { protocoloCepVazio } from "@/lib/protocoloCep";
+import { Step3Codebook } from "@/components/wizard/Step3Codebook";
 
 type DocumentType = components["schemas"]["DocumentType"];
 type WizardStep = 1 | 2 | 3 | 4;
@@ -85,6 +88,7 @@ function criarEstadoVazio(tipo: DocumentType, nivel: AcademicLevel): ParseRespon
     ptts: [],
     artigos: [],
     protocolo_cep: protocoloCepVazio(),
+    codebook: codebookVazio(),
     lacunas: [],
     conformidade_ptt: {
       valido: false,
@@ -207,6 +211,31 @@ export default function Home() {
       setStep(3);
       return;
     }
+    if (tipoDocumento === "codebook") {
+      const manual = mockCodebook as {
+        metadata: ParseResponse["metadata"];
+        siglas: ParseResponse["siglas"];
+        referencias: string[];
+        codebook: NonNullable<ParseResponse["codebook"]>;
+      };
+      setParsedData({
+        ...base,
+        documento_id: "",
+        tipo_documento: tipoDocumento,
+        nivel,
+        metadata: { ...base.metadata, ...manual.metadata },
+        siglas: manual.siglas,
+        codebook: manual.codebook,
+        sections: { ...base.sections, referencias: manual.referencias },
+      });
+      setSubtitulo(manual.metadata.subtitulo ?? "");
+      setError(null);
+      setFileHint(null);
+      setDownloaded(false);
+      setPreenchimentoDireto(true);
+      setStep(3);
+      return;
+    }
     if (tipoDocumento === "protocolo_cep") {
       setParsedData({
         ...base,
@@ -275,6 +304,7 @@ export default function Home() {
         artigos: parsedData.artigos ?? [],
         cronograma: parsedData.cronograma ?? [],
         protocolo_cep: parsedData.protocolo_cep ?? protocoloCepVazio(),
+        codebook: parsedData.codebook ?? codebookVazio(),
       });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -282,7 +312,9 @@ export default function Home() {
       link.download =
         tipoDocumento === "projeto_completo_cep"
           ? "Projeto_Completo_CEP.docx"
-          : "Documento_Padronizado_PPGSP.docx";
+          : tipoDocumento === "codebook"
+            ? "Manual_de_Codificacao.docx"
+            : "Documento_Padronizado_PPGSP.docx";
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -348,7 +380,18 @@ export default function Home() {
               onNext={() => setStep(3)}
             />
           )}
-          {step === 3 && parsedData && (
+          {step === 3 && parsedData && tipoDocumento === "codebook" && (
+            <Step3Codebook
+              data={parsedData}
+              onChange={setParsedData}
+              onBack={() => setStep(preenchimentoDireto ? 1 : 2)}
+              onNext={() => {
+                setError(null);
+                setStep(4);
+              }}
+            />
+          )}
+          {step === 3 && parsedData && tipoDocumento !== "codebook" && (
             <Step3MetadataReview
               data={parsedData}
               subtitulo={subtitulo}

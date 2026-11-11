@@ -11,6 +11,7 @@ class DocumentType(str, Enum):
     tese = "tese"
     protocolo_cep = "protocolo_cep"
     projeto_completo_cep = "projeto_completo_cep"
+    codebook = "codebook"
 
 
 class AcademicLevel(str, Enum):
@@ -139,6 +140,55 @@ class DocumentMetadata(BaseModel):
     data_aprovacao: str = ""
 
 
+class CategoriaCodebook(BaseModel):
+    """Ficha de uma etiqueta do manual de codificação."""
+
+    eixo: str = ""
+    codigo: str = ""
+    nome: str = ""
+    definicao: str = ""
+    inclusao: list[str] = Field(default_factory=list)
+    exclusao: list[str] = Field(default_factory=list)
+    contraexemplos: list[str] = Field(default_factory=list)
+
+
+class MatrizFronteira(BaseModel):
+    """Quadro de desempate entre categorias ou escores vizinhos."""
+
+    titulo: str = ""
+    colunas: list[str] = Field(default_factory=list)
+    linhas: list[list[str]] = Field(default_factory=list)
+    fonte: str = "Construção do(a) autor(a)."
+
+
+class Codebook(BaseModel):
+    """Manual de Codificação Operacional e Rotulagem de Prontuários."""
+
+    versao: str = ""
+    data_versao: str = ""
+    contexto: list[str] = Field(default_factory=list)
+    autores_peritos: list[str] = Field(default_factory=list)
+    fontes_dados: list[str] = Field(default_factory=list)
+    fundamentacao: list[str] = Field(default_factory=list)
+    desidentificacao: list[str] = Field(default_factory=list)
+    aprovacao_etica: list[str] = Field(default_factory=list)
+    salvaguardas: list[str] = Field(default_factory=list)
+    polaridade: list[str] = Field(default_factory=list)
+    sujeito: list[str] = Field(default_factory=list)
+    temporalidade: list[str] = Field(default_factory=list)
+    granularidade: list[str] = Field(default_factory=list)
+    categorias: list[CategoriaCodebook] = Field(default_factory=list)
+    matrizes: list[MatrizFronteira] = Field(default_factory=list)
+    metricas: list[str] = Field(default_factory=list)
+    limiares: list[str] = Field(default_factory=list)
+    adjudicacao_piloto: list[str] = Field(default_factory=list)
+    adjudicacao_producao: list[str] = Field(default_factory=list)
+    ferramenta: str = ""
+    configuracao_interface: str = ""
+    changelog: list[str] = Field(default_factory=list)
+    simbolos: list[tuple[str, str]] = Field(default_factory=list)
+
+
 class LacunaItem(BaseModel):
     codigo: str = ""
     secao: str = ""
@@ -180,6 +230,7 @@ class GenerateRequest(BaseModel):
     artigos: list["ArtigoQuadro"] = Field(default_factory=list)
     cronograma: list[CronogramaAtividade] = Field(default_factory=list)
     protocolo_cep: ProtocoloCep = Field(default_factory=ProtocoloCep)
+    codebook: Codebook = Field(default_factory=Codebook)
 
 
 from app.schemas.ptt import ArtigoQuadro, PTTItem, PTTValidationResult  # noqa: E402

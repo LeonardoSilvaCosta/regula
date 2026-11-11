@@ -15,6 +15,7 @@ from docx.oxml.ns import qn
 from docx.shared import Pt, RGBColor
 
 from core.xml_utils import aplicar_autoajuste_janela
+from generators.common.subscrito import escrever_com_subscrito
 
 _FONTE = "Times New Roman"
 _CINZA_CABECALHO = "F2F2F2"
@@ -180,19 +181,20 @@ def _preencher_celula(celula, texto, alinhamento, negrito=False, fundo=None):
 
 
 def _run(paragrafo, texto, tamanho, negrito):
-    run = paragrafo.add_run(texto)
-    run.font.name = _FONTE
-    run.font.size = Pt(tamanho)
-    run.bold = negrito
-    run.font.color.rgb = RGBColor(0, 0, 0)
-    r_pr = run._element.get_or_add_rPr()
-    fontes = r_pr.find(qn("w:rFonts"))
-    if fontes is None:
-        fontes = OxmlElement("w:rFonts")
-        r_pr.append(fontes)
-    for atributo in ("w:ascii", "w:hAnsi", "w:cs", "w:eastAsia"):
-        fontes.set(qn(atributo), _FONTE)
-    return run
+    def estilizar(run, _subscrito):
+        run.font.name = _FONTE
+        run.font.size = Pt(tamanho)
+        run.bold = negrito
+        run.font.color.rgb = RGBColor(0, 0, 0)
+        r_pr = run._element.get_or_add_rPr()
+        fontes = r_pr.find(qn("w:rFonts"))
+        if fontes is None:
+            fontes = OxmlElement("w:rFonts")
+            r_pr.append(fontes)
+        for atributo in ("w:ascii", "w:hAnsi", "w:cs", "w:eastAsia"):
+            fontes.set(qn(atributo), _FONTE)
+
+    escrever_com_subscrito(paragrafo, texto, estilizar)
 
 
 def _sombrear(celula, preenchimento):

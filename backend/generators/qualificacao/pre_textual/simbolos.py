@@ -6,6 +6,8 @@ Só é emitida quando o documento informa ao menos um item.
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_TAB_ALIGNMENT, WD_TAB_LEADER
 from docx.shared import Inches, Pt
 
+from generators.common.subscrito import escrever_com_subscrito
+
 from core.campos import adicionar_bookmark
 from ..estrutura import BM_LISTA_SIMBOLOS
 
@@ -62,10 +64,13 @@ def _linha(doc, simbolo, significado):
         WD_TAB_ALIGNMENT.LEFT,
         WD_TAB_LEADER.SPACES,
     )
-    r = p.add_run(f"{simbolo}\t{significado}")
-    r.bold = False
-    r.font.name = "Times New Roman"
-    r.font.size = Pt(12)
+
+    def estilizar(run, _subscrito):
+        run.bold = False
+        run.font.name = "Times New Roman"
+        run.font.size = Pt(12)
+
+    escrever_com_subscrito(p, f"{simbolo}\t{significado}", estilizar)
     return p
 
 

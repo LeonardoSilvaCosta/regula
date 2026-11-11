@@ -9,12 +9,13 @@ import type { components } from "@/types/api";
 
 type DocumentType = components["schemas"]["DocumentType"];
 
-const TIPOS: { value: DocumentType; label: string }[] = [
-  { value: "qualificacao", label: "Relatório de Qualificação" },
-  { value: "dissertacao", label: "Dissertação de Mestrado" },
-  { value: "tese", label: "Tese de Doutorado" },
-  { value: "protocolo_cep", label: "Protocolo CEP" },
-  { value: "projeto_completo_cep", label: "Projeto Completo CEP" },
+const TIPOS: { value: DocumentType; label: string; disponivel: boolean }[] = [
+  { value: "qualificacao", label: "Relatório de Qualificação", disponivel: true },
+  { value: "dissertacao", label: "Dissertação de Mestrado", disponivel: false },
+  { value: "tese", label: "Tese de Doutorado", disponivel: false },
+  { value: "protocolo_cep", label: "Protocolo CEP", disponivel: true },
+  { value: "projeto_completo_cep", label: "Projeto Completo CEP", disponivel: true },
+  { value: "codebook", label: "Manual de Codificação (Codebook)", disponivel: true },
 ];
 
 export function Step1Upload({
@@ -69,20 +70,28 @@ export function Step1Upload({
             {TIPOS.map((tipo) => (
               <label
                 key={tipo.value}
-                className={`cursor-pointer rounded-lg border px-3 py-3 text-sm ${
-                  tipoDocumento === tipo.value
-                    ? "border-[#0f3d32] bg-[#eef6f3] font-medium text-[#0f3d32]"
-                    : "border-[#e4dccf]"
+                className={`rounded-lg border px-3 py-3 text-sm ${
+                  !tipo.disponivel
+                    ? "cursor-not-allowed border-[#e4dccf] bg-[#f7f4ef] text-[#8a8175]"
+                    : tipoDocumento === tipo.value
+                      ? "cursor-pointer border-[#0f3d32] bg-[#eef6f3] font-medium text-[#0f3d32]"
+                      : "cursor-pointer border-[#e4dccf]"
                 }`}
               >
                 <input
                   type="radio"
                   name="tipoDocumento"
                   className="sr-only"
-                  checked={tipoDocumento === tipo.value}
-                  onChange={() => onTipo(tipo.value)}
+                  disabled={!tipo.disponivel}
+                  checked={tipo.disponivel && tipoDocumento === tipo.value}
+                  onChange={() => {
+                    if (tipo.disponivel) onTipo(tipo.value);
+                  }}
                 />
-                {tipo.label}
+                <span className="block">{tipo.label}</span>
+                {!tipo.disponivel && (
+                  <span className="mt-1 block text-xs font-normal text-[#8a8175]">Ainda não disponível</span>
+                )}
               </label>
             ))}
           </div>

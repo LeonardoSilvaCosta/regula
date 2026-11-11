@@ -159,7 +159,7 @@ export interface components {
          * DocumentType
          * @enum {string}
          */
-        DocumentType: "qualificacao" | "dissertacao" | "tese" | "protocolo_cep" | "projeto_completo_cep";
+        DocumentType: "qualificacao" | "dissertacao" | "tese" | "protocolo_cep" | "projeto_completo_cep" | "codebook";
         /**
          * GenerateRequest
          * @description JSON completo ajustável no frontend antes da geração do DOCX.

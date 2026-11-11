@@ -9,6 +9,7 @@ from pathlib import Path
 
 from core.ptt_schema import validar_carteira_produtos
 from core.xml_utils import sanitizar_estrutura
+from generators.codebook.builder import gerar_documento_codebook
 from generators.dissertacao.builder import gerar_documento_dissertacao
 from generators.protocolo_cep.builder import gerar_documento_protocolo_cep
 from generators.projeto_completo_cep.builder import gerar_documento_projeto_completo_cep
@@ -62,6 +63,7 @@ def _revisao(pedido: GenerateRequest) -> dict:
             "artigos": [item.model_dump() for item in pedido.artigos],
             "cronograma": [item.model_dump() for item in pedido.cronograma],
             "protocolo_cep": pedido.protocolo_cep.model_dump(),
+            "codebook": pedido.codebook.model_dump(),
         }
     )
 
@@ -94,6 +96,13 @@ def gerar_buffer(pedido: GenerateRequest) -> BytesIO:
             gerar_documento_protocolo_cep(
                 saida,
                 protocolo=revisao["protocolo_cep"],
+            )
+        elif pedido.tipo_documento == DocumentType.codebook:
+            gerar_documento_codebook(
+                saida,
+                revisao=revisao,
+                nivel=pedido.nivel.value,
+                assets_dir=str(assets),
             )
         elif pedido.tipo_documento == DocumentType.projeto_completo_cep:
             gerar_documento_projeto_completo_cep(

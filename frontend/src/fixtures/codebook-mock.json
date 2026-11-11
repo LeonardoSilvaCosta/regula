@@ -1,0 +1,513 @@
+{
+  "metadata": {
+    "titulo": "Manual de Codificação Operacional e Rotulagem de Prontuários",
+    "subtitulo": "Codebook para anotação de prontuários psicossociais de policiais militares",
+    "autor": "Leonardo da Silva Costa",
+    "orientador": "Prof. Dr. Renato Hidaka Torres",
+    "coorientador": "",
+    "coordenador": "Prof. Dr. Edson Marcos Leal Soares Ramos",
+    "ano": "2026",
+    "local": "Belém-Pará",
+    "area_concentracao": "Segurança Pública, Justiça, Conflitos e Cidadania",
+    "linha_pesquisa": "Políticas, Gestão, Direitos Humanos, Criminalidade e Tecnologia da Informação",
+    "data_aprovacao": ""
+  },
+  "siglas": [
+    [
+      "CIAP",
+      "Centro Integrado de Atenção Psicossocial"
+    ],
+    [
+      "CONEP",
+      "Comissão Nacional de Ética em Pesquisa"
+    ],
+    [
+      "COREQ",
+      "Consolidated Criteria for Reporting Qualitative Research"
+    ],
+    [
+      "C-SSRS",
+      "Columbia-Suicide Severity Rating Scale"
+    ],
+    [
+      "EHR",
+      "Electronic Health Record (Registro Eletrônico de Saúde)"
+    ],
+    [
+      "EVRP",
+      "Escala de Vulnerabilidade e Risco Psicossocial"
+    ],
+    [
+      "IAA",
+      "Inter-Annotator Agreement (Concordância Interavaliadores)"
+    ],
+    [
+      "ICR",
+      "Inter-Coder Reliability (Confiabilidade Intercodificadores)"
+    ],
+    [
+      "IPM",
+      "Inquérito Policial Militar"
+    ],
+    [
+      "LGPD",
+      "Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018)"
+    ],
+    [
+      "LTS",
+      "Licença para Tratamento de Saúde"
+    ],
+    [
+      "MAMA",
+      "Model-Annotate-Model-Annotate"
+    ],
+    [
+      "MATTER",
+      "Model-Annotate-Train-Test-Evaluate-Revise"
+    ],
+    [
+      "NER",
+      "Named Entity Recognition (Reconhecimento de Entidades Nomeadas)"
+    ],
+    [
+      "PAD",
+      "Processo Administrativo Disciplinar"
+    ],
+    [
+      "PLN",
+      "Processamento de Linguagem Natural"
+    ],
+    [
+      "PMPA",
+      "Polícia Militar do Pará"
+    ],
+    [
+      "PPGSP",
+      "Programa de Pós-Graduação em Segurança Pública"
+    ],
+    [
+      "PROBAST+AI",
+      "Prediction model Risk Of Bias ASsessment Tool for Artificial Intelligence"
+    ],
+    [
+      "TRIPOD+AI",
+      "Transparent Reporting of a multivariable prediction model of individual Prognosis Or Diagnosis - Artificial Intelligence"
+    ],
+    [
+      "UFPA",
+      "Universidade Federal do Pará"
+    ],
+    [
+      "XAI",
+      "Explainable Artificial Intelligence (Inteligência Artificial Explicável)"
+    ]
+  ],
+  "referencias": [
+    "ADEKKANATTU, P. et al. Deep learning for identifying personal and family history of suicidal thoughts and behaviors from EHRs. npj Digital Medicine, London, v. 7, n. 1, art. 260, p. 1-11, 2024.",
+    "CHAPMAN, W. W. et al. A simple algorithm for identifying negated findings and diseases in discharge summaries. Journal of Biomedical Informatics, San Diego, v. 34, n. 5, p. 301-310, 2001.",
+    "COHEN, J. Weighted kappa: nominal scale agreement with provision for scaled disagreement or partial credit. Psychological Bulletin, Washington, DC, v. 70, n. 4, p. 213-220, 1968.",
+    "COLLINS, G. S. et al. Protocol for TRIPOD+AI: a reporting guideline for diagnostic and prognostic prediction models developed or validated using artificial intelligence. BMJ Open, London, v. 11, n. 7, art. e048008, p. 1-9, 2024.",
+    "DECUIR-GUNBY, J. T.; MARSHALL, P. L.; MCCULLOCH, A. W. Developing and using a codebook for the analysis of interview data: an example from a professional development research project. Field Methods, Thousand Oaks, v. 23, n. 2, p. 136-155, 2011.",
+    "FEREDAY, J.; MUIR-COCHRANE, E. Demonstrating rigor using thematic analysis: a hybrid approach of inductive and deductive coding and theme development. International Journal of Qualitative Methods, Thousand Oaks, v. 5, n. 1, p. 80-92, 2006.",
+    "HARKEMA, H. et al. ConText: an algorithm for determining negation, experiencer, and temporal status from clinical reports. Journal of Biomedical Informatics, San Diego, v. 42, n. 5, p. 839-851, 2009.",
+    "HRIPCSAK, G.; ROTHSCHILD, A. S. Agreement, the F-measure, and reliability in information retrieval. Journal of the American Medical Informatics Association, Oxford, v. 12, n. 3, p. 296-298, 2005.",
+    "KRIPPENDORFF, K. Reliability in content analysis: some common misconceptions and recommendations. Human Communication Research, Oxford, v. 30, n. 3, p. 411-433, 2004.",
+    "KRIPPENDORFF, K. Content analysis: an introduction to its methodology. 4. ed. Thousand Oaks: SAGE Publications, 2022.",
+    "MACQUEEN, K. M. et al. Codebook development for team-based qualitative analysis. CAM Journal, Thousand Oaks, v. 10, n. 2, p. 31-36, 1998.",
+    "MACQUEEN, K. M. et al. Team-based codebook development: structure, process, and agreement. In: GUEST, G.; MACQUEEN, K. M. (org.). Handbook for team-based qualitative research. New York: AltaMira Press, 2008. p. 119-134.",
+    "OLIVEIRA, L. E. S. et al. SemClinBr - a multi-institutional and multi-specialty semantically annotated corpus for Portuguese clinical NLP tasks. Journal of Biomedical Semantics, London, v. 13, n. 1, art. 13, p. 1-19, 2022.",
+    "POSNER, K. et al. The Columbia–Suicide Severity Rating Scale: initial validity and internal consistency findings from three multisite studies with adolescents and adults. American Journal of Psychiatry, Arlington, v. 168, n. 12, p. 1266-1277, 2011.",
+    "PUSTEJOVSKY, J.; STUBBS, A. Natural Language Annotation for Machine Learning: a guide to corpus-building for applications. Sebastopol: O'Reilly Media, 2012.",
+    "ROBERTS, K.; DOWELL, A.; NIE, J.-B. Attempting rigour and replicability in thematic analysis of qualitative research data: a case study of codebook development. BMC Medical Research Methodology, London, v. 19, n. 1, art. 66, p. 1-8, 2019.",
+    "SCHNEIDER, E. T. R. et al. BioBERTpt - A Portuguese Neural Language Model for Clinical Named Entity Recognition. In: CLINICAL NATURAL LANGUAGE PROCESSING WORKSHOP, 3., 2020, Online. Proceedings [...]. Stroudsburg: Association for Computational Linguistics, 2020. p. 65-72.",
+    "TONG, A.; SAINSBURY, P.; CRAIG, J. Consolidated criteria for reporting qualitative research (COREQ): a 32-item checklist for interviews and focus groups. International Journal for Quality in Health Care, Oxford, v. 19, n. 6, p. 349-357, 2007."
+  ],
+  "codebook": {
+    "versao": "1.3",
+    "data_versao": "Outubro de 2026",
+    "contexto": [
+      "O projeto desenvolve-se no âmbito do Programa de Pós-Graduação em Segurança Pública (PPGSP/UFPA) em cooperação técnica com o Centro Integrado de Atenção Psicossocial da Polícia Militar do Pará (CIAP/PMPA). O objetivo consiste na formalização conceitual e metodológica para a anotação e rotulagem supervisionada de notas narrativas e prontuários psicossociais de policiais militares, viabilizando a construção de padrão-ouro (ground truth) para modelos preditivos multimodais de aprendizado de máquina e fenotipagem clínica computacional."
+    ],
+    "autores_peritos": [
+      "Coordenação da Pesquisa: Leonardo da Silva Costa;",
+      "Perito Clínico: Henrique Moura Monteiro",
+      "Perito Clínico: Nathália Ferreira de Almeida"
+    ],
+    "fontes_dados": [
+      "Registros de atendimentos psicossociais advindos do banco de dados do sistema do CIAP/PMPA contendo dados tabulares funcionais e administrativos desidentificados do policial militar e narrativas clínicas do serviço social e da psicologia"
+    ],
+    "fundamentacao": [
+      "A estrutura repousa no modelo de desenvolvimento de codebooks de seis componentes de MacQueen et al. (1998, 2008) e DeCuir-Gunby et al. (2011), no ciclo de engenharia de corpora clínicos de Pustejovsky e Stubbs (2012) e nos avanços do corpus SemClinBr (Oliveira et al., 2022). A análise de confiabilidade ancora-se em Krippendorff (2004, 2022) e Cohen (1968), enquanto a conformidade metodológica e o relato transparente em inteligência artificial clínica seguem as diretrizes internacionais TRIPOD+AI (Collins et al., 2024), PROBAST+AI e COREQ (Tong et al., 2007)."
+    ],
+    "desidentificacao": [
+      "O tratamento dos dados atende rigorosamente à Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018 — LGPD), com foco na proteção de dados sensíveis de saúde (Art. 5º, II; Art. 11). Antes da disponibilização no ambiente de rotulagem (Label Studio), as notas passam por um pipeline automatizado de anonimização estocástica local por Reconhecimento de Entidades Nomeadas (NER). Nomes, matrículas, CPFs, designações de pelotões/batalhões, placas e logradouros são substituídos por marcadores sintéticos padronizados (ex.: [POLICIAL_HASH], [FAMILIAR_1], [BATALHAO_X]). Identificadores em tabelas são convertidos de forma irreversível por meio de algoritmo criptográfico (salted one-way hash)."
+    ],
+    "aprovacao_etica": [
+      "O protocolo de pesquisa obedece às Resoluções nº 466/2012 e nº 510/2016 do Conselho Nacional de Saúde (CNS), encontrando-se estruturado em conformidade com as diretrizes do sistema CEP/CONEP para pesquisas que utilizam registros secundários de saúde mental ocupacional."
+    ],
+    "salvaguardas": [
+      "Os escores preditivos da Escala de Vulnerabilidade e Risco Psicossocial (EVRP) e as anotações textuais destinam-se exclusivamente ao suporte à decisão clínica assistencial e à vigilância preventiva em saúde da equipe multidisciplinar do CIAP. É terminantemente e normativamente vedada a utilização de qualquer dado, escore ou classificação deste estudo para subsidiar sindicâncias administrativas, processos administrativos disciplinares (PAD), inquéritos policiais militares (IPM), critérios de promoção ou restrições punitivas na carreira policial."
+    ],
+    "polaridade": [
+      "Apenas deve ser anotado o marcador sintomatológico ou estressor afirmativamente confirmado ou relatado como fato ocorrido pelo militar ou profissional. Negações sintáticas explícitas (ex.: “nega ideação suicida”, “sem queixas de atritos”) e hipóteses clínicas formalmente descartadas não podem ser marcadas sob nenhuma hipótese, prevenindo a degradação semântica dos modelos de linguagem."
+    ],
+    "sujeito": [
+      "Situação A (Elegível): o policial militar é o sujeito avaliado presente e vivencia sofrimento decorrente de fatores próprios ou familiares; o registro é classificado na escala EVRP (0 a 3) e o estressor familiar correspondente é grifado.",
+      "Situação B (Desconsiderar): o atendimento foi prestado exclusivamente a um familiar/dependente sem a presença clínica do militar; o avaliador deve selecionar “Desconsiderar: Atendimento Exclusivo a Dependente/Familiar”, marcar o grau padrão 0 - Adaptado para fins sistêmicos e justificar no Parecer Técnico, abstendo-se de marcar sintomas no texto."
+    ],
+    "temporalidade": [
+      "A avaliação deve considerar o curso longitudinal da trajetória clínica. Eventos remotos citados apenas a título de anamnese histórica, sem repercussão ou atividade sintomatológica atual documentada, não devem ser anotados como eventos ativos."
+    ],
+    "granularidade": [
+      "A demarcação de trechos (spans) deve ocorrer no nível do sintagma contextual imediato ou oração completa com sentido clínico (ex.: “insônia crônica de manutenção após confronto”), evitando fragmentos soltos ou palavras isoladas sem predicado. Dentro do mesmo eixo prevalece o rótulo mais severo; entre eixos distintos incentiva-se a sobreposição de marcas (ex.: estressor simultâneo a um sintoma somático). Expressões ligadas à rotina tática regulamentar da caserna não devem ser confundidas com manifestações patológicas."
+    ],
+    "categorias": [
+      {
+        "eixo": "Eixo 1: Desfecho Primário Global (Escala EVRP)",
+        "codigo": "EVRP_0_ADAPTADO",
+        "nome": "Grau 0 — Assintomático / Adaptado",
+        "definicao": "Ausência de sofrimento psíquico ou desregulação emocional mensurável; integridade biopsicossocial preservada e aptidão operacional plena.",
+        "inclusao": [
+          "Humor eutímico, discurso orientado no tempo e no espaço, raciocínio lógico preservado e ausência de desespero ou lamentos associados à rotina.",
+          "Preservação explícita dos ciclos biológicos vitais (sono reparador espontâneo e padrões alimentares regulares preservados).",
+          "Atendimentos motivados estritamente por exigências protocolares, burocráticas ou normativas da corporação, sem emergência de demandas emocionais.",
+          "Cansaço pontual estritamente físico decorrente do serviço operacional que é plenamente recuperado com as folgas regulamentares, sem somatizações ou atritos relacionais."
+        ],
+        "exclusao": [
+          "Queixa de sono não reparador persistente, estresse situacional ou queixas somáticas incipientes ligadas à rotina (enquadrar em EVRP_1_VULNERABILIDADE_LEVE).",
+          "Histórico de licença psiquiátrica (LTS) recente com labilidade emocional residual, insegurança funcional ou desarmamento cautelar (enquadrar em EVRP_2_RISCO_MODERADO)."
+        ],
+        "contraexemplos": [
+          "Exemplo típico: Comparece para avaliação psicológica para fins de licenciamento a pedido. Nega sintomas de ansiedade, depressão ou estresse ocupacional. Relata excelente relacionamento com seus colegas e padrão de sono restaurador. Ao exame: humor eutímico, afeto congruente, postura colaborativa. Demanda estritamente protocolar concluída com emissão de parecer favorável.",
+          "Contraexemplo: Comparece ao acolhimento; relata que a rotina tem sido bastante pesada no destacamento e que tem acordado fatigado nos últimos dias, embora consiga cumprir a escala e não tenha problemas com os colegas de serviço.",
+          "Decisão técnica de fronteira: não é Grau 0. A presença explícita de fadiga acumulada e alteração da percepção de recuperação do sono associada à sobrecarga da escala impõe a classificação como EVRP_1_VULNERABILIDADE_LEVE."
+        ]
+      },
+      {
+        "eixo": "Eixo 1: Desfecho Primário Global (Escala EVRP)",
+        "codigo": "EVRP_1_VULNERABILIDADE_LEVE",
+        "nome": "Grau 1 — Vulnerabilidade Leve / Estresse Reativo",
+        "definicao": "Sofrimento prodrômico ou reativo; sintomas somáticos ou emocionais subclínicos incipientes decorrentes da rotina; porte de arma e serviço ativo preservados.",
+        "inclusao": [
+          "Relato de cansaço acumulado ou sobrecarga situacional associado ao cumprimento de plantões noturnos, escalas de serviço ou pressões conjunturais, sem colapso anímico.",
+          "Insônia situacional isolada (dificuldade esporádica de conciliar o sono ou despertares breves decorrentes da tensão, sem angústia incapacitante).",
+          "Manifestações somáticas reativas isoladas (cefaleia tensional ligeira, desconforto gástrico transitório, contraturas na cintura escapular).",
+          "Atritos interpessoais pontuais e moderados no quartel ou no lar contornados sem violência e sem instauração de procedimentos disciplinares."
+        ],
+        "exclusao": [
+          "Recurso habitual ao uso de bebidas alcoólicas ou automedicação para conseguir induzir o sono ou tolerar o serviço (enquadrar em EVRP_2_RISCO_MODERADO).",
+          "Estado de alerta permanente e invasivo no ambiente familiar/doméstico gerando isolamento ou desconfiança patológica (enquadrar em EVRP_2_RISCO_MODERADO).",
+          "Afastamento funcional com emissão de atestado psicológico ou psiquiátrico (enquadrar compulsoriamente em EVRP_2_RISCO_MODERADO).",
+          "Presença de ideação suicida ativa ou passiva estruturada (enquadrar em EVRP_2_RISCO_MODERADO ou EVRP_3_CRISE_AGUDA)."
+        ],
+        "contraexemplos": [
+          "Exemplo típico: Policial militar relata aumento de tensão nas últimas semanas após ter sido remanejado para escala extraordinária de eventos. Refere dores musculares constantes no pescoço e queixas esporádicas de dificuldade para adormecer nas noites que sucedem o serviço de rua. Nega sintomas de humor deprimido, desesperança ou ideação de morte. Preserva a capacidade crítica e a motivação funcional básica.",
+          "Contraexemplo: Refere que a rotina do serviço o deixa exausto; não consegue relaxar na folga e tem tomado cerveja todas as noites após o serviço para diminuir o nervosismo e tentar dormir.",
+          "Decisão técnica de fronteira: não é Grau 1. O recurso sistemático a uma estratégia de anestesia afetiva mal-adaptativa (uso diário de substância alcoólica) associado à perda da capacidade regenerativa eleva o caso para EVRP_2_RISCO_MODERADO."
+        ]
+      },
+      {
+        "eixo": "Eixo 1: Desfecho Primário Global (Escala EVRP)",
+        "codigo": "EVRP_2_RISCO_MODERADO",
+        "nome": "Grau 2 — Adoecimento Subclínico / Risco Moderado",
+        "definicao": "Sofrimento crônico, polissintomático, Burnout, hipervigilância doméstica invasiva ou afastamento laboral por atestado psicológico sem emergência de risco letal iminente.",
+        "inclusao": [
+          "Hipervigilância crônica desadaptativa no convívio civil e doméstico (incapacidade de desarmar-se em casa, checagens obsessivas de segurança, paranoia sem fundamento factual).",
+          "Sintomatologia compatível com Síndrome de Burnout (exaustão emocional profunda, atitudes de cinismo/despersonalização perante a tropa ou o público, apatia funcional).",
+          "Manifestações somatoformes e físicas persistentes sem diagnóstico orgânico causal (crises viscerais, picos hipertensivos reativos, precordialgias atípicas com exames normais).",
+          "Emissão de parecer técnico ou atestado psicológico/médico determinando afastamento laboral temporário (tem_afastamento = true) ou restrição de atividade operacional.",
+          "Consumo problemático continuado de álcool ou psicofármacos sem prescrição como modulador primário da tensão do trabalho.",
+          "Ideação suicida passiva isolada (ex.: “vontade de dormir e não acordar”, “se eu morresse seria um alívio”), desde que com crítica preservada, rejeição categórica de planos e intenção letal, e identificação de fatores protetivos."
+        ],
+        "exclusao": [
+          "Ideação suicida ativa (com estruturação de método, plano definido ou atos preparatórios de despedida) (enquadrar em EVRP_3_CRISE_AGUDA).",
+          "Manuseio ou direcionamento de armamento contra si ou terceiros em contexto de desespero (enquadrar em EVRP_3_CRISE_AGUDA).",
+          "Desarmamento cautelar de urgência ou LTS compulsória por risco iminente de auto ou heteroagressão (enquadrar em EVRP_3_CRISE_AGUDA)."
+        ],
+        "contraexemplos": [
+          "Exemplo típico: Militar atendido por solicitação da chefia da subunidade após isolamento social e recorrentes faltas ao serviço. Apresenta anedonia generalizada há três meses, insônia de manutenção e queixas gastrointestinais diárias. Relata que se sente permanentemente ameaçado, permanecendo trancado em casa com a arma de serviço engatilhada e evitando o contato com familiares. Nega expressamente qualquer plano ou intenção de tirar a própria vida, expressando desejo de obter ajuda para voltar a trabalhar sem medo. Encaminhado para psicoterapia continuada.",
+          "Contraexemplo: Policial militar em crise de choro convulsivo relata que não suporta a pressão do processo disciplinar, afirmando que já pesquisou como disparar a própria arma de forma letal sem falhar.",
+          "Decisão técnica de fronteira: não é Grau 2. A existência de ideação suicida ativa associada ao planejamento deliberado de método letal exige classificação mandatória em EVRP_3_CRISE_AGUDA."
+        ]
+      },
+      {
+        "eixo": "Eixo 1: Desfecho Primário Global (Escala EVRP)",
+        "codigo": "EVRP_3_CRISE_AGUDA",
+        "nome": "Grau 3 — Crise Psicossocial Aguda / Alto Risco",
+        "definicao": "Colapso do equilíbrio psíquico com quebra de juízo, ideação suicida ativa com planejamento/método, tentativa recente, desarmamento cautelar ou LTS psiquiátrica urgente.",
+        "inclusao": [
+          "Ideação suicida ativa documentada (verbalização de plano estruturado, seleção ou teste de meios letais, redação de bilhetes ou mensagens de despedida).",
+          "Tentativa de autoextermínio recente ou atos documentados de autolesão grave intencional.",
+          "Empunhadura, apontamento ou manuseio de arma de fogo com intento autodestrutivo no ambiente de trabalho ou doméstico.",
+          "Emissão de parecer técnico conclusivo com recolhimento cautelar imediato do armamento institucional e revogação do porte particular por risco à vida.",
+          "Afastamento psiquiátrico compulsório em caráter de urgência (LTS de emergência) decorrente de surto psicótico agudo, quebra do juízo de realidade ou crise dissociativa.",
+          "Heteroagressividade violenta e descontrolada decorrente de colapso do autocontrole emocional em ambiente de serviço ou quartel."
+        ],
+        "exclusao": [
+          "Sofrimento psíquico decorrente de luto ou término conjugal em que o policial rejeita veementemente pensamentos de morte, mantém suporte sociofamiliar ativo e preserva a crítica (enquadrar em EVRP_2_RISCO_MODERADO).",
+          "Ideação de morte estritamente passiva e situacional sem método, intenção ou desarmamento cautelar (enquadrar em EVRP_2_RISCO_MODERADO)."
+        ],
+        "contraexemplos": [
+          "Exemplo típico: Atendimento emergencial efetuado no CIAP após o militar ter sido desarmado pela guarnição de serviço no corpo da guarda. Apresenta agitação psicomotora intensa, desespero manifesto e choro incontido. Declara ter colocado o cano do revólver na boca com a intenção de efetuar o disparo, sendo contido por um sargento. Relata desespero absoluto por sobreendividamento crônico e cobranças de credores. Emitido parecer imediato para recolha de todo o material bélico individual e encaminhamento com escolta psicossocial ao Hospital das Clínicas para afastamento por LTS psiquiátrica em caráter de urgência.",
+          "Contraexemplo: Policial militar comparece relatando profunda tristeza e choro fácil após término conjugal litigioso; verbaliza que “preferia estar morto a passar por essa vergonha”, mas nega veementemente qualquer intenção ou plano de se ferir, afirmando que seus princípios éticos e a preocupação com os filhos o impedem de pensar em suicídio.",
+          "Decisão técnica de fronteira: não é Grau 3. Trata-se de ideação passiva de morte desprovida de intencionalidade ou plano, com freios inibitórios e juízo crítico preservados, enquadrando-se estritamente em EVRP_2_RISCO_MODERADO."
+        ]
+      },
+      {
+        "eixo": "Eixo 2: Marcadores Clínicos e Sintomatológicos",
+        "codigo": "SINT_SONO",
+        "nome": "Distúrbios do sono",
+        "definicao": "Distúrbios do ciclo sono-vigília, insônia persistente, pesadelos ocupacionais de conteúdo traumático.",
+        "inclusao": [
+          "Relato de insônia inicial (dificuldade persistente para adormecer), de manutenção (múltiplos despertares noturnos) ou terminal (despertar precoce sem retorno ao sono).",
+          "Presença repetida de pesadelos ou sonhos angustiantes de conteúdo operacional (revivência de ocorrências violentas, tiroteios ou emboscadas).",
+          "Queixa documentada de sono superficial, agitado e não reparador associada à impossibilidade biológica de descanso nos dias de folga."
+        ],
+        "exclusao": [
+          "Sonolência ou privação fisiológica de sono decorrente da execução normal de plantões noturnos ou escalas de guarda, sem queixas nos períodos de folga regular.",
+          "Menções explícitas de negação (ex.: “dorme bem”, “nega alterações no sono”)."
+        ],
+        "contraexemplos": [
+          "Exemplo típico: Relata insônia persistente há dois meses e pesadelos contínuos revivendo o tiroteio da ocorrência passada.",
+          "Contraexemplo: Informa que troca o dia pela noite durante os plantões de 24 horas no pelotão.",
+          "Decisão técnica de fronteira: não marcar SINT_SONO. Trata-se de descrição objetiva do regime de turnos sem sintoma nos dias de descanso; classificar a sobrecarga de turnos, se cabível, em ESTR_ORG_SOBRECARGA_ESCALA."
+        ]
+      },
+      {
+        "eixo": "Eixo 2: Marcadores Clínicos e Sintomatológicos",
+        "codigo": "SINT_HIPERVIGILANCIA",
+        "nome": "Hipervigilância",
+        "definicao": "Estado de alerta desproporcional fora de serviço, paranoia no domicílio, recusa a desarmar-se.",
+        "inclusao": [
+          "Comportamentos invasivos de varredura tática e fiscalização desproporcional em momentos de lazer, descanso e convivência familiar.",
+          "Recusa terminante a desarmar-se no interior da própria residência, dormindo com a pistola engatilhada ou em punho por desconfiança desmedida.",
+          "Suspeição persecutória generalizada no ambiente civil sem respaldo em ameaças objetivas concretas."
+        ],
+        "exclusao": [
+          "Adoção de cautelas normais de segurança preventiva e condutas de contra-vigilância exigidas pela doutrina militar em deslocamentos operacionais ou fardados."
+        ],
+        "contraexemplos": [
+          "Exemplo típico: Informa que não consegue desarmar o alerta; almoça em restaurante fiscalizando visualmente as mãos de todos os presentes e não permite que os filhos fiquem na varanda de casa.",
+          "Contraexemplo: Policial relata que toma precauções e observa veículos suspeitos no itinerário entre o quartel e a residência.",
+          "Decisão técnica de fronteira: não marcar SINT_HIPERVIGILANCIA. Condutas protocolares de autoproteção e segurança defensiva são esperadas na rotina funcional da segurança pública."
+        ]
+      },
+      {
+        "eixo": "Eixo 2: Marcadores Clínicos e Sintomatológicos",
+        "codigo": "SINT_EXAUSTAO_BURNOUT",
+        "nome": "Exaustão e Burnout",
+        "definicao": "Esgotamento emocional crônico, apatia vocacional, despersonalização e cinismo no trabalho.",
+        "inclusao": [
+          "Relato de esgotamento psicofísico extremo que não cede com repouso (sensação de vazio energético e colapso das forças anímicas).",
+          "Manifestações de cinismo, frieza despersonalizada ou distanciamento hostil no trato com o público atendido ou com colegas de equipe.",
+          "Perda substancial da motivação vocacional, desilusão profunda com os valores da carreira e apatia funcional."
+        ],
+        "exclusao": [
+          "Fadiga física muscular transitória decorrente de treinamento físico militar, formaturas ou instruções de campo que é resolvida com descanso ordinário."
+        ],
+        "contraexemplos": [
+          "Exemplo típico: Refere sensação de esgotamento total; diz que perdeu o sentido da farda, que atende as ocorrências no piloto automático e que não suporta mais o rádio da viatura.",
+          "Contraexemplo: Queixa-se de fadiga muscular após marcha de instrução de 12 km.",
+          "Decisão técnica de fronteira: não marcar SINT_EXAUSTAO_BURNOUT. Desgaste puramente musculoesquelético transitório associado à exigência física pontual."
+        ]
+      },
+      {
+        "eixo": "Eixo 2: Marcadores Clínicos e Sintomatológicos",
+        "codigo": "SINT_SOMATIZACAO",
+        "nome": "Somatização",
+        "definicao": "Expressão visceral e somática da ansiedade (gastrites reativas, precordialgias sem causa orgânica, tremores).",
+        "inclusao": [
+          "Sintomas gastrointestinais agudos (náuseas, vômitos, cólicas, dispepsia funcional) deflagrados sistematicamente na iminência de assumir a escala de serviço ou durante turnos de trabalho.",
+          "Crises de cefaleia tensional recorrente associadas a períodos de atrito na caserna.",
+          "Episódios paroxísticos de taquicardia, opressão torácica, sudorese ou tremores psicogênicos sem etiologia cardíaca ou metabólica comprovada."
+        ],
+        "exclusao": [
+          "Doenças orgânicas previamente diagnosticadas por exames subsidiários ou sequelas ortopédicas resultantes de lesões físicas em serviço."
+        ],
+        "contraexemplos": [
+          "Exemplo típico: Relata crises de vômitos e cólicas gastrointestinais intensas sempre nas horas que antecedem a assunção do serviço de rua, tendo procurado a UPA com exames laboratoriais normais.",
+          "Contraexemplo: Apresenta limitação funcional e dor no ombro direito decorrente de contusão em queda de viatura.",
+          "Decisão técnica de fronteira: não marcar SINT_SOMATIZACAO. Trata-se de traumatismo osteoarticular físico documentado decorrente de acidente em serviço."
+        ]
+      },
+      {
+        "eixo": "Eixo 2: Marcadores Clínicos e Sintomatológicos",
+        "codigo": "SINT_DESESPERANCA",
+        "nome": "Desesperança",
+        "definicao": "Anedonia acentuada, ausência de perspectiva existencial, sentimento de ruína.",
+        "inclusao": [],
+        "exclusao": [],
+        "contraexemplos": []
+      },
+      {
+        "eixo": "Eixo 2: Marcadores Clínicos e Sintomatológicos",
+        "codigo": "SINT_IRRITABILIDADE_AGRESSIVIDADE",
+        "nome": "Irritabilidade e agressividade",
+        "definicao": "Desregulação de impulsos, crises de ira súbita, hostilidade desproporcional contra pares ou familiares.",
+        "inclusao": [],
+        "exclusao": [],
+        "contraexemplos": []
+      },
+      {
+        "eixo": "Eixo 2: Marcadores Clínicos e Sintomatológicos",
+        "codigo": "SINT_RISCO_AUTODESTRUTIVO",
+        "nome": "Risco autodestrutivo",
+        "definicao": "Ideação suicida (passiva ou ativa), atos de despedida, automutilação e intenção letal com armamento.",
+        "inclusao": [],
+        "exclusao": [],
+        "contraexemplos": []
+      },
+      {
+        "eixo": "Eixo 2: Marcadores Clínicos e Sintomatológicos",
+        "codigo": "COPING_MALADAPTATIVO",
+        "nome": "Enfrentamento mal-adaptativo",
+        "definicao": "Enfrentamento nocivo através de abuso de álcool, automedicação com psicotrópicos e esquiva social.",
+        "inclusao": [],
+        "exclusao": [],
+        "contraexemplos": []
+      },
+      {
+        "eixo": "Eixo 3: Estressores Ocupacionais e Institucionais",
+        "codigo": "ESTR_OPER_INCIDENTE_CRITICO",
+        "nome": "Incidente crítico operacional",
+        "definicao": "Tiroteios com óbito, emboscadas a viaturas, morte ou ferimento grave de colega de farda.",
+        "inclusao": [],
+        "exclusao": [],
+        "contraexemplos": []
+      },
+      {
+        "eixo": "Eixo 3: Estressores Ocupacionais e Institucionais",
+        "codigo": "ESTR_ORG_SOBRECARGA_ESCALA",
+        "nome": "Sobrecarga de escala",
+        "definicao": "Jornadas ininterruptas sem gozo de folga regulamentar, sobreposição de plantões e privação de repouso.",
+        "inclusao": [],
+        "exclusao": [],
+        "contraexemplos": []
+      },
+      {
+        "eixo": "Eixo 3: Estressores Ocupacionais e Institucionais",
+        "codigo": "ESTR_ORG_DISCIPLINAR_JURIDICO",
+        "nome": "Conflito disciplinar e jurídico",
+        "definicao": "Conflitos na cadeia de comando, perseguições funcionais, tramitação de Sindicâncias, PADs ou IPMs.",
+        "inclusao": [],
+        "exclusao": [],
+        "contraexemplos": []
+      },
+      {
+        "eixo": "Eixo 3: Estressores Ocupacionais e Institucionais",
+        "codigo": "ESTR_ORG_ASSEDIO_PRECONCEITO",
+        "nome": "Assédio e preconceito",
+        "definicao": "Assédio moral corporativo, humilhações públicas na tropa, discriminação de gênero ou étnico-racial.",
+        "inclusao": [],
+        "exclusao": [],
+        "contraexemplos": []
+      },
+      {
+        "eixo": "Eixo 3: Estressores Ocupacionais e Institucionais",
+        "codigo": "ESTR_SOCIO_RUPTURA_VITAL",
+        "nome": "Ruptura vital",
+        "definicao": "Dissoluções matrimoniais contenciosas, medidas protetivas, luto de primeiro grau, superendividamento financeiro agudo.",
+        "inclusao": [],
+        "exclusao": [],
+        "contraexemplos": []
+      }
+    ],
+    "matrizes": [
+      {
+        "titulo": "Matriz decisória das transições da Escala EVRP",
+        "colunas": [
+          "Limite de transição",
+          "Gatilho decisório de elevação de nível",
+          "Regra operacional e conduta de rotulagem",
+          "Fundamentação metodológica e clínica"
+        ],
+        "linhas": [
+          [
+            "Fronteira 0 → 1",
+            "Presença de sofrimento psíquico incipiente ou estresse reativo mantendo a aptidão plena.",
+            "Se a nota registrar apenas comparecimento administrativo, avaliação para cursos/PAF ou perícia de Readaptação Funcional sem contraindicação, atribua 0. Se houver queixa expressa de cansaço acumulado por escalas, quebra de sono ou tensão muscular mantendo o serviço de rua ativo, eleve para 1.",
+            "Diferença entre higidez pericial/resiliência adaptativa e estresse ocupacional reativo prodrômico."
+          ],
+          [
+            "Fronteira 1 → 2",
+            "Afastamento laboral por atestado psicológico (tem_afastamento = true), prejuízo funcional concreto ou enfrentamento nocivo.",
+            "Se as queixas de estresse mantiverem a aptidão e o trabalho ativo, preserve o 1. Havendo emissão de atestado psicológico com afastamento, desarmamento cautelar, abuso continuado de álcool ou ideação passiva de morte, eleve compulsoriamente para 2.",
+            "O afastamento laboral por atestado psicológico constitui marcador objetivo de quebra de funcionalidade."
+          ],
+          [
+            "Fronteira 2 → 3",
+            "Risco de morte iminente (ideação suicida ativa com método/plano, tentativa recente, surto psicótico) ou desarmamento de emergência.",
+            "Se o quadro clínico for grave e incapacitante (inclusive com afastamento por atestado psicológico), mas sem intenção autodestrutiva ativa e sem quebra de juízo, preserve em 2. Se for identificada ideação suicida ativa estruturada, preparação de meio letal, tentativa recente ou surto psicótico agudo, eleve compulsoriamente para 3.",
+            "Demarcação do desfecho primário crítico de crise psiquiátrica em saúde digital."
+          ]
+        ],
+        "fonte": "Construção do(a) autor(a). Outubro de 2026."
+      }
+    ],
+    "metricas": [
+      "Para o desfecho primário global ordinal (Escala EVRP): adota-se prioritariamente o Alfa de Krippendorff com função de ponderação ordinal (α_ord) e subsidiariamente o Kappa Ponderado Quadrático de Cohen (κ_w), penalizando divergências de forma proporcional ao distanciamento dos níveis ordinais.",
+      "Para a presença de marcadores nosológicos (Eixos 2 e 3 ao nível do documento): adota-se o Kappa de Cohen (κ) binário independente para cada tag.",
+      "Para a delimitação sintagmática textual (spans): utilizam-se o Alfa de Krippendorff para delimitação de unidades (cu-α) e o Pairwise F1-Score com correspondência relaxada (IoU ≥ 0,5)."
+    ],
+    "limiares": [
+      "α_ord < 0,60 | Confiabilidade inaceitável (interrupção do processo, revisão de critérios e retreino)",
+      "0,60 ≤ α_ord < 0,75 | Confiabilidade moderada (aceitável apenas em rodadas exploratórias preliminares)",
+      "α_ord ≥ 0,75 | Confiabilidade elevada a excelente (padrão internacional para validação de IA clínica)",
+      "IoU ≥ 0,50 | Limiar de sobreposição de caracteres para aceitação de correspondência textual relaxada (relaxed match)"
+    ],
+    "adjudicacao_piloto": [
+      "Amostra piloto de calibração composta por prontuários reais desidentificados (n = 30 a 50), rotulados em duplo-cego pelos peritos. Nenhuma divergência é resolvida automaticamente. Todos os casos com ΔEVRP ≥ 1 são submetidos a reunião presencial de alinhamento para identificação das causas semânticas de dissenso e refinamento dos critérios do manual."
+    ],
+    "adjudicacao_producao": [
+      "Atingido o patamar α_ord ≥ 0,75, a coorte total é rotulada.",
+      "Divergências menores (ΔEVRP = 1): no CIAP adota-se a precaução clínica (escore superior); para o treinamento dos modelos utilizam-se rótulos suavizados (soft labels, ex.: vetor [0; 0,5; 0,5; 0]) ou ponderação reduzida da instância (w = 0,7).",
+      "Divergências críticas (ΔEVRP ≥ 2): são bloqueadas automaticamente pelo microsserviço com a tag PENDENTE_ADJUDICACAO, exigindo conciliação entre peritos e, em caso de empate persistente, desempate pela Coordenação Metodológica."
+    ],
+    "ferramenta": "Label Studio (versão open-source conteinerizada via Docker em infraestrutura local/VPS), integrada a microsserviço de gestão de dados e persistência em banco relacional.",
+    "configuracao_interface": "<View>\n  <Style>\n    .workspace-grid { display: flex; flex-direction: row; gap: 16px; padding: 12px; width: 100%; box-sizing: border-box; }\n    .main-text-panel { flex: 3; min-width: 0; border: 1px solid rgba(148, 163, 184, 0.25); border-radius: 8px; padding: 18px; background: rgba(255, 255, 255, 0.03); }\n    .sidebar-panel { flex: 2; min-width: 320px; max-width: 420px; display: flex; flex-direction: column; gap: 14px; }\n    .section-box { border: 1px solid rgba(148, 163, 184, 0.25); border-radius: 8px; padding: 14px; background: rgba(255, 255, 255, 0.03); }\n    .lsf-text { font-size: 15px !important; line-height: 1.75 !important; letter-spacing: 0.01em; }\n    .lsf-label { color: #FFFFFF !important; font-weight: 600 !important; font-size: 11.5px !important; padding: 5px 10px !important; margin: 3px !important; border-radius: 4px !important; }\n    .lsf-choice { border: 1px solid rgba(148, 163, 184, 0.3) !important; border-radius: 6px !important; padding: 8px 12px !important; margin-bottom: 6px !important; }\n  </Style>\n  <View className=\"workspace-grid\">\n    <View className=\"main-text-panel\">\n      <View style=\"border-bottom: 1px solid rgba(148, 163, 184, 0.25); padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;\">\n        <Header value=\"Evolução Clínica / Parecer Psicossocial\" size=\"5\" style=\"margin: 0; font-weight: 700;\"/>\n        <View style=\"font-size: 11px; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.5); color: #38BDF8;\">CIAP / PMPA</View>\n      </View>\n      <View style=\"font-size: 11.5px; opacity: 0.85; margin-bottom: 12px; line-height: 1.4;\">\n        Instrução: Selecione o sintagma ou oração contextual completa (ex.: \"insônia crônica após confronto\"). Evite termos soltos sem predicado.\n      </View>\n      <View style=\"margin-bottom: 16px;\">\n        <Labels name=\"rotulos_entidades\" toName=\"texto_evolucao\">\n          <Label value=\"SINT_SONO\" background=\"#1E40AF\" hotkey=\"s\" hint=\"Insônia inicial/manutenção, pesadelos táticos, sono não reparador\"/>\n          <Label value=\"SINT_HIPERVIGILANCIA\" background=\"#4338CA\" hotkey=\"h\" hint=\"Alerta fora de serviço, paranoia doméstica, checagens obsessivas\"/>\n          <Label value=\"SINT_EXAUSTAO_BURNOUT\" background=\"#6B21A8\" hotkey=\"b\" hint=\"Esgotamento emocional, despersonalização, cinismo ocupacional\"/>\n          <Label value=\"SINT_SOMATIZACAO\" background=\"#0E7490\" hotkey=\"m\" hint=\"Manifestações gástricas, cefaleias tensionais, taquicardia sem causa orgânica\"/>\n          <Label value=\"SINT_DESESPERANCA\" background=\"#9F1239\" hotkey=\"d\" hint=\"Anedonia, falta de sentido existencial, visão pessimista do futuro\"/>\n          <Label value=\"SINT_IRRITABILIDADE_AGRESSIVIDADE\" background=\"#C2410C\" hotkey=\"i\" hint=\"Crises de cólera, explosões de ira, desregulação de impulso, beligerância\"/>\n          <Label value=\"SINT_RISCO_AUTODESTRUTIVO\" background=\"#991B1B\" hotkey=\"r\" hint=\"Ideação suicida ativa, autolesão, intenção letal com armamento\"/>\n          <Label value=\"COPING_MALADAPTATIVO\" background=\"#B45309\" hotkey=\"c\" hint=\"Abuso de álcool como sedativo, automedicação clandestina, esquiva\"/>\n          <Label value=\"ESTR_OPER_INCIDENTE_CRITICO\" background=\"#854D0E\" hotkey=\"o\" hint=\"Tiroteios com óbito, emboscadas sofridas, morte de colega de farda\"/>\n          <Label value=\"ESTR_ORG_SOBRECARGA_ESCALA\" background=\"#3F6212\" hotkey=\"e\" hint=\"Jornadas ininterruptas sem folga regulamentar, plantões contínuos\"/>\n          <Label value=\"ESTR_ORG_DISCIPLINAR_JURIDICO\" background=\"#581C87\" hotkey=\"j\" hint=\"Atritos na hierarquia, sindicâncias, IPMs, processos na Justiça Militar\"/>\n          <Label value=\"ESTR_ORG_ASSEDIO_PRECONCEITO\" background=\"#065F46\" hotkey=\"a\" hint=\"Assédio moral sistemático, discriminação de gênero, humilhação pública\"/>\n          <Label value=\"ESTR_SOCIO_RUPTURA_VITAL\" background=\"#0369A1\" hotkey=\"v\" hint=\"Divórcios litigiosos, alienação parental, superendividamento agudo, luto familiar recente\"/>\n        </Labels>\n      </View>\n      <View style=\"padding: 14px; border: 1px dashed rgba(148, 163, 184, 0.4); border-radius: 6px;\">\n        <Text name=\"texto_evolucao\" value=\"$texto_desidentificado\"/>\n      </View>\n    </View>\n    <View className=\"sidebar-panel\">\n      <View className=\"section-box\" style=\"border-left: 4px solid #EAB308;\">\n        <Header value=\"Triagem: Elegibilidade do Sujeito Clínico\" size=\"5\" style=\"margin: 0 0 4px 0; font-weight: 700;\"/>\n        <View style=\"font-size: 11px; opacity: 0.8; margin-bottom: 8px;\">Selecione caso o atendimento não seja do titular:</View>\n        <Choices name=\"elegibilidade_registro\" toName=\"texto_evolucao\" choice=\"single\" showInline=\"false\">\n          <Choice value=\"Elegível (Policial Militar Avaliado)\" selected=\"true\" hint=\"Situação A: O policial militar esteve presente e é o sujeito clínico central.\"/>\n          <Choice value=\"Desconsiderar: Atendimento Exclusivo a Dependente/Familiar\" hint=\"Situação B: Atendimento prestado unicamente à esposa, filho ou terceiro, sem presença clínica do militar.\"/>\n        </Choices>\n      </View>\n      <View className=\"section-box\" style=\"border-left: 4px solid #2563EB;\">\n        <Header value=\"Eixo 1: Classificação Global (EVRP)\" size=\"5\" style=\"margin: 0 0 4px 0; font-weight: 700;\"/>\n        <View style=\"font-size: 11px; opacity: 0.8; margin-bottom: 10px;\">Atalhos de teclado: [0], [1], [2], [3] (Se Situação B, marque 0 - Adaptado)</View>\n        <Choices name=\"escala_evrp\" toName=\"texto_evolucao\" choice=\"single\" showInline=\"false\" required=\"true\">\n          <Choice value=\"0 - Adaptado\" hotkey=\"0\" hint=\"Sem evidências de desregulação psíquica clinicamente relevante; funcionalidade preservada.\"/>\n          <Choice value=\"1 - Vulnerabilidade Leve\" hotkey=\"1\" hint=\"Estresse ocupacional reativo situacional, queixas subclínicas isoladas; aptidão operacional e porte preservados.\"/>\n          <Choice value=\"2 - Risco Moderado\" hotkey=\"2\" hint=\"Adoecimento subclínico persistente, Burnout, hipervigilância doméstica ou prejuízo funcional sem emergência letal.\"/>\n          <Choice value=\"3 - Crise Aguda\" hotkey=\"3\" hint=\"Colapso psíquico agudo, ideação suicida ativa, atos preparatórios, desarmamento cautelar ou LTS emergencial.\"/>\n        </Choices>\n      </View>\n      <View className=\"section-box\">\n        <Header value=\"Parecer Técnico / Deliberação\" size=\"5\" style=\"margin: 0 0 4px 0; font-weight: 700;\"/>\n        <View style=\"font-size: 11px; opacity: 0.8; margin-bottom: 8px;\">Obrigatório em decisões limítrofes, Situação B ou sessões de consenso:</View>\n        <TextArea name=\"justificativa_perito\" toName=\"texto_evolucao\" rows=\"3\" maxSubmissions=\"1\" editable=\"true\" placeholder=\"Fundamente a decisão técnica ou registre o motivo caso tenha desconsiderado por Situação B...\"/>\n      </View>\n    </View>\n  </View>\n</View>",
+    "changelog": [
+      "Versão 1.0 (Set/2026): elaboração inicial fundamentada no modelo de seis componentes de MacQueen et al. (1998, 2008) e escala EVRP de quatro níveis ordinais.",
+      "Versão 1.1 (Set/2026): adição de diretrizes de segmentação sintagmática (unitizing), referencial estatístico de Krippendorff e segregação dos fluxos de adjudicação entre fase piloto e fase de produção.",
+      "Versão 1.2 (Out/2026): incorporação da regra do sujeito da experiência (experiencer), diferenciação de ideação passiva versus ativa na matriz de fronteira, métrica Pairwise F1-Score para spans e dupla regra de consumo (soft labels para aprendizado de máquina).",
+      "Versão 1.3 (Out/2026): formalização da triagem de familiares (Situação A/B), inclusão do afastamento por atestado psicológico como gatilho de Grau 2, adição de SINT_IRRITABILIDADE_AGRESSIVIDADE, padronização da tag ESTR_ORG_DISCIPLINAR_JURIDICO e consolidação do XML no Label Studio."
+    ],
+    "simbolos": [
+      [
+        "α",
+        "Coeficiente Alfa de Krippendorff para confiabilidade intercodificadores"
+      ],
+      [
+        "α_ord",
+        "Coeficiente Alfa de Krippendorff com função de distância ordinal"
+      ],
+      [
+        "cu-α",
+        "Coeficiente Alfa de Krippendorff para delimitação de unidades textuais (unitizing)"
+      ],
+      [
+        "κ",
+        "Coeficiente Kappa de Cohen para concordância interavaliadores nominal"
+      ],
+      [
+        "κ_w",
+        "Coeficiente Kappa Ponderado Quadrático de Cohen para variáveis ordinais"
+      ],
+      [
+        "IoU",
+        "Intersection over Union (grau de sobreposição de caracteres textuais)"
+      ],
+      [
+        "ΔEVRP",
+        "Magnitude da divergência absoluta de postos na Escala EVRP entre avaliadores"
+      ],
+      [
+        "n_g",
+        "Frequência marginal de ocorrência das categorias em intervalos discordantes"
+      ],
+      [
+        "w",
+        "Peso amostral atribuído à perda da instância no treinamento algorítmico"
+      ]
+    ]
+  }
+}

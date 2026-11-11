@@ -1,4 +1,5 @@
 import type { components } from "@/types/api";
+import type { Codebook } from "@/lib/codebook";
 import type { ProtocoloCep } from "@/lib/protocoloCep";
 
 export const API_BASE_URL =
@@ -56,6 +57,7 @@ export type ParseResponse = Omit<SchemaParseResponse, "metadata"> & {
   sections: DocumentSections;
   cronograma?: CronogramaAtividade[];
   protocolo_cep?: ProtocoloCep;
+  codebook?: Codebook;
 };
 
 export type GenerateRequest = SchemaGenerateRequest & {
@@ -63,6 +65,7 @@ export type GenerateRequest = SchemaGenerateRequest & {
   artigos?: ArtigoQuadro[];
   cronograma?: CronogramaAtividade[];
   protocolo_cep?: ProtocoloCep;
+  codebook?: Codebook;
 };
 
 export class ApiError extends Error {
