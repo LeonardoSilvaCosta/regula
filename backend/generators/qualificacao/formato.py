@@ -5,14 +5,22 @@ from docx.shared import Cm, Pt, RGBColor, Twips
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from core.campos import adicionar_bookmark, ancorar_paragrafo, aplicar_tabulacao_coluna
+from generators.common.siglas_texto import texto_com_sigla
 
 
-def adicionar_titulo(doc, texto, bookmark=None, primario=True, marcar=True):
-    """Título justificado, sem negrito, com uma linha em branco antes do texto."""
-    p = doc.add_paragraph(style="Heading 1" if primario else "Heading 2")
+def adicionar_titulo(doc, texto, bookmark=None, primario=True, marcar=True, nivel=None):
+    """Título justificado, sem negrito, com uma linha em branco antes do texto.
+
+    `nivel` 1, 2 ou 3 define o estilo e o nível de estrutura. Sem ele, o título
+    primário fica no nível 1 e o secundário no nível 2.
+    """
+    if nivel is None:
+        nivel = 1 if primario else 2
+    nivel = max(1, min(int(nivel), 3))
+    p = doc.add_paragraph(style=f"Heading {nivel}")
     p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    p.paragraph_format.space_before = Pt(18 if primario else 12)
-    p.paragraph_format.space_after = Pt(18)
+    p.paragraph_format.space_before = Pt(18 if nivel == 1 else 12)
+    p.paragraph_format.space_after = Pt(12 if nivel == 3 else 18)
     p.paragraph_format.line_spacing = 1.5
     r = p.add_run(texto)
     r.bold = False
@@ -195,7 +203,7 @@ def adicionar_paragrafo(doc, texto):
     p.paragraph_format.line_spacing = 1.5
     p.paragraph_format.space_before = Pt(0)
     p.paragraph_format.space_after = Pt(0)
-    r = p.add_run(texto)
+    r = p.add_run(texto_com_sigla(doc, texto))
     r.font.name = "Times New Roman"
     r.font.size = Pt(12)
     return p

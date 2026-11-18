@@ -71,6 +71,20 @@ export function Step3Codebook({
             />
           </label>
           <label className="text-sm">
+            Pronome
+            <select
+              className={campo}
+              value={data.metadata.pronome || ""}
+              onChange={(event) =>
+                onChange({ ...data, metadata: { ...data.metadata, pronome: event.target.value } })
+              }
+            >
+              <option value="">Selecione</option>
+              <option value="ele">Ele/dele</option>
+              <option value="ela">Ela/dela</option>
+            </select>
+          </label>
+          <label className="text-sm">
             Ano
             <input
               className={campo}
@@ -130,7 +144,8 @@ export function Step3Codebook({
                 <input className={campo} value={categoria.nome} onChange={(event) => atualizarCategoria(indice, { nome: event.target.value })} />
               </label>
             </div>
-            <Area label="Definição" value={categoria.definicao} onChange={(valor) => atualizarCategoria(indice, { definicao: valor })} />
+            <Area label="Definição breve" value={categoria.definicao} onChange={(valor) => atualizarCategoria(indice, { definicao: valor })} />
+            <Area label="Definição detalhada" value={categoria.definicao_detalhada || ""} onChange={(valor) => atualizarCategoria(indice, { definicao_detalhada: valor })} />
             <Area label="Inclusão (uma por linha)" value={texto(categoria.inclusao)} onChange={(valor) => atualizarCategoria(indice, { inclusao: linhas(valor) })} />
             <Area label="Exclusão (uma por linha)" value={texto(categoria.exclusao)} onChange={(valor) => atualizarCategoria(indice, { exclusao: linhas(valor) })} />
             <Area label="Contraexemplos (um por linha)" value={texto(categoria.contraexemplos)} onChange={(valor) => atualizarCategoria(indice, { contraexemplos: linhas(valor) })} />
@@ -143,7 +158,7 @@ export function Step3Codebook({
             atualizar({
               categorias: [
                 ...manual.categorias,
-                { eixo: "", codigo: "", nome: "", definicao: "", inclusao: [], exclusao: [], contraexemplos: [] },
+                { eixo: "", codigo: "", nome: "", definicao: "", definicao_detalhada: "", inclusao: [], exclusao: [], contraexemplos: [] },
               ],
             })
           }

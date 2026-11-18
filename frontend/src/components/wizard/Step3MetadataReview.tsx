@@ -138,6 +138,7 @@ const PTT_VAZIO: PTTItem = {
   abrangencia: "Local",
   publico_usuario: "Estado, Município, Comunidade",
   objetivo_especifico: "",
+  objetivos: [],
   tipo_estudo: TIPO_ESTUDO_PADRAO,
   fontes: "",
   status: "Em produção",
@@ -146,6 +147,7 @@ const PTT_VAZIO: PTTItem = {
 const ARTIGO_VAZIO: ArtigoQuadro = {
   titulo: "",
   objetivo_especifico: "",
+  objetivos: [],
   tipo_estudo: TIPO_ESTUDO_PADRAO,
   fontes: "",
   status: "Em produção",
@@ -221,6 +223,43 @@ function Justificativa({
         {estourou ? " — acima do limite da Resolução 007/2025" : ""}
       </span>
     </label>
+  );
+}
+
+function VinculosObjetivos({
+  objetivos,
+  selecionados,
+  onToggle,
+}: {
+  objetivos: string[];
+  selecionados: number[];
+  onToggle: (numero: number) => void;
+}) {
+  if (objetivos.length === 0) {
+    return <p className="text-xs text-[#6b645a]">Cadastre os objetivos específicos na seção 2.2 para vinculá-los.</p>;
+  }
+  return (
+    <ul className="mt-1 flex flex-col gap-1">
+      {objetivos.map((texto, index) => {
+        const numero = index + 1;
+        const marcado = selecionados.includes(numero);
+        return (
+          <li key={numero}>
+            <label className="flex items-start gap-2 text-xs text-[#3f3a33]">
+              <input
+                type="checkbox"
+                className="mt-0.5"
+                checked={marcado}
+                onChange={() => onToggle(numero)}
+              />
+              <span>
+                ({ROMANOS[index] ?? numero}) {texto}
+              </span>
+            </label>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -318,32 +357,73 @@ export function Step3MetadataReview({
     .map((item) => item.replace(/^\s*\(?\s*(?:i{1,3}|iv|vi{0,3}|ix|x|\d+)\s*[\).\]]\s*/i, "").trim())
     .filter(Boolean);
   const artigosQuadro = data.artigos ?? [];
-  const linhasQuadro = [
+  const entregasQuadro = [
     ...artigosQuadro.map((item, index) => ({
       origem: `Artigo ${index + 1}`,
-      objetivo: objetivosLista[index]
-        ? `(${ROMANOS[index] ?? index + 1}) ${objetivosLista[index]}`
-        : `(${ROMANOS[index] ?? index + 1}) ${item.objetivo_especifico}`,
       produto: `Artigo ${index + 1}: ${item.titulo}`,
       estudo: item.tipo_estudo || TIPO_ESTUDO_PADRAO,
       fontes: item.fontes || fontesPadrao,
       status: item.status || "Em produção",
+      objetivos: item.objetivos ?? [],
+      texto: item.objetivo_especifico,
     })),
     ...data.ptts.map((item, index) => {
-      const ordem = artigosQuadro.length + index;
       const num = item.num || String(index + 1);
       return {
         origem: item.num || `PTT ${index + 1}`,
-        objetivo: objetivosLista[ordem]
-          ? `(${ROMANOS[ordem] ?? ordem + 1}) ${objetivosLista[ordem]}`
-          : `(${ROMANOS[ordem] ?? ordem + 1}) ${item.objetivo_especifico || ""}`,
         produto: `${item.subtipo || item.tipo || "PTT"} ${num} – ${item.titulo || item.nome}`,
         estudo: item.tipo_estudo || TIPO_ESTUDO_PADRAO,
         fontes: item.fontes || fontesPadrao,
         status: item.status || "Em produção",
+        objetivos: item.objetivos ?? [],
+        texto: item.objetivo_especifico || "",
       };
     }),
   ];
+  const temVinculo = entregasQuadro.some((item) => item.objetivos.length > 0);
+  const textoObjetivo = (numero: number) => {
+    const texto = objetivosLista[numero - 1];
+    if (!texto) return "";
+    return `(${ROMANOS[numero - 1] ?? numero}) ${texto}`;
+  };
+  const linhasQuadro = temVinculo
+    ? [
+        ...entregasQuadro
+          .filter((item) => item.objetivos.some((numero) => textoObjetivo(numero)))
+          .map((item) => ({
+            item,
+            primeiro: Math.min(...item.objetivos.filter((numero) => textoObjetivo(numero))),
+          }))
+          .sort((a, b) => a.primeiro - b.primeiro)
+          .map(({ item }) => ({
+            origem: item.origem,
+            objetivo: [...item.objetivos]
+              .sort((a, b) => a - b)
+              .map((numero) => textoObjetivo(numero))
+              .filter(Boolean)
+              .join("; "),
+            produto: item.produto,
+            estudo: item.estudo,
+            fontes: item.fontes,
+            status: item.status,
+          })),
+        ...objetivosLista.flatMap((texto, index) => {
+          const numero = index + 1;
+          const coberto = entregasQuadro.some((item) => item.objetivos.includes(numero));
+          if (coberto) return [];
+          return [{ origem: "pendente", objetivo: `(${ROMANOS[index] ?? numero}) ${texto}`, produto: "", estudo: "", fontes: "", status: "" }];
+        }),
+      ]
+    : entregasQuadro.map((item, index) => ({
+        origem: item.origem,
+        objetivo: objetivosLista[index]
+          ? `(${ROMANOS[index] ?? index + 1}) ${objetivosLista[index]}`
+          : `(${ROMANOS[index] ?? index + 1}) ${item.texto}`,
+        produto: item.produto,
+        estudo: item.estudo,
+        fontes: item.fontes,
+        status: item.status,
+      }));
 
   const sugestaoCoautoria = coautoriaDocente(data.metadata.orientador, data.metadata.coorientador);
 
@@ -425,6 +505,19 @@ export function Step3MetadataReview({
                 value={data.metadata.autor}
                 onChange={(event) => patchMetadata({ autor: event.target.value })}
               />
+            </label>
+            <label className="text-sm">
+              Pronome <span className="text-red-800">*</span>
+              <select
+                required
+                className={campo}
+                value={data.metadata.pronome || ""}
+                onChange={(event) => patchMetadata({ pronome: event.target.value })}
+              >
+                <option value="">Selecione</option>
+                <option value="ele">Ele/dele</option>
+                <option value="ela">Ela/dela</option>
+              </select>
             </label>
             <label className="text-sm">
               Local <span className="text-red-800">*</span>
@@ -1043,7 +1136,7 @@ export function Step3MetadataReview({
                 </label>
                 <label className="text-sm">
                   Objetivos específicos
-                  <span className="block text-xs text-[#6b645a]">Um objetivo por parágrafo. A lista numerada preenche a seção 2.2 e a coluna do Quadro 1, na mesma ordem dos artigos e produtos.</span>
+                  <span className="block text-xs text-[#6b645a]">Um objetivo por parágrafo. A lista numerada preenche a seção 2.2. No Quadro 1, cada artigo ou produto ocupa uma linha; objetivos do mesmo entregável aparecem separados por ponto e vírgula.</span>
                   <textarea
                     rows={5}
                     className={campo}
@@ -1217,15 +1310,20 @@ export function Step3MetadataReview({
                               onChange={(event) => patchPtt(index, { titulo: event.target.value, nome: event.target.value })}
                             />
                           </label>
-                          <label className="text-xs text-[#6b645a] sm:col-span-2">
-                            Objetivo específico vinculado
-                            <textarea
-                              rows={2}
-                              className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
-                              value={item.objetivo_especifico || ""}
-                              onChange={(event) => patchPtt(index, { objetivo_especifico: event.target.value })}
+                          <div className="text-xs text-[#6b645a] sm:col-span-2">
+                            Objetivos específicos vinculados
+                            <VinculosObjetivos
+                              objetivos={objetivosLista}
+                              selecionados={item.objetivos ?? []}
+                              onToggle={(numero) => {
+                                const atuais = item.objetivos ?? [];
+                                const objetivos = atuais.includes(numero)
+                                  ? atuais.filter((valor) => valor !== numero)
+                                  : [...atuais, numero].sort((a, b) => a - b);
+                                patchPtt(index, { objetivos });
+                              }}
                             />
-                          </label>
+                          </div>
                           <label className="text-xs text-[#6b645a]">
                             Tipo de estudo
                             <input
@@ -1514,7 +1612,7 @@ export function Step3MetadataReview({
       {aba === "quadro" && (
         <Card title="Estrutura / Quadro 1">
           <p className="mb-3 text-sm text-[#5c564c]">
-            Cada artigo e cada produto técnico vira uma linha. Título e objetivo geral se repetem e serão mesclados no Word.
+            Cada artigo ou produto técnico vira uma linha. Se ele atender a mais de um objetivo específico, os objetivos entram na mesma célula, separados por ponto e vírgula. Título e objetivo geral se repetem e serão mesclados no Word.
             Fontes em branco herdam {fontesPadrao}.
           </p>
           <ul className="mb-4 flex flex-col gap-3">
@@ -1539,15 +1637,20 @@ export function Step3MetadataReview({
                       onChange={(event) => patchArtigo(index, { titulo: event.target.value })}
                     />
                   </label>
-                  <label className="text-xs text-[#6b645a] sm:col-span-2">
-                    Objetivo específico
-                    <textarea
-                      rows={2}
-                      className="mt-1 w-full rounded-md border border-[#d9d1c3] px-2 py-1.5 text-sm"
-                      value={item.objetivo_especifico}
-                      onChange={(event) => patchArtigo(index, { objetivo_especifico: event.target.value })}
+                  <div className="text-xs text-[#6b645a] sm:col-span-2">
+                    Objetivos específicos vinculados
+                    <VinculosObjetivos
+                      objetivos={objetivosLista}
+                      selecionados={item.objetivos ?? []}
+                      onToggle={(numero) => {
+                        const atuais = item.objetivos ?? [];
+                        const objetivos = atuais.includes(numero)
+                          ? atuais.filter((valor) => valor !== numero)
+                          : [...atuais, numero].sort((a, b) => a - b);
+                        patchArtigo(index, { objetivos });
+                      }}
                     />
-                  </label>
+                  </div>
                   <label className="text-xs text-[#6b645a]">
                     Tipo de estudo
                     <input
@@ -1620,7 +1723,9 @@ export function Step3MetadataReview({
                       <td className="border border-[#d9d1c3] px-2 py-1 align-top break-words">{data.metadata.titulo}</td>
                       <td className="border border-[#d9d1c3] px-2 py-1 align-top break-words">{data.sections.objetivo_geral}</td>
                       <td className="border border-[#d9d1c3] px-2 py-1 align-top break-words">{linha.objetivo}</td>
-                      <td className="border border-[#d9d1c3] px-2 py-1 align-top break-words">{linha.produto}</td>
+                      <td className={`border border-[#d9d1c3] px-2 py-1 align-top break-words ${linha.produto ? "" : "text-red-800"}`}>
+                        {linha.produto || "Sem artigo ou produto vinculado"}
+                      </td>
                       <td className="border border-[#d9d1c3] px-2 py-1 align-top break-words">{linha.estudo}</td>
                       <td className="border border-[#d9d1c3] px-2 py-1 align-top break-words">{linha.fontes}</td>
                       <td className="border border-[#d9d1c3] px-2 py-1 align-top break-words">{linha.status}</td>
@@ -1692,9 +1797,9 @@ export function Step3MetadataReview({
         <button
           type="button"
           onClick={() => {
-            if (!data.metadata.titulo.trim() || !data.metadata.autor.trim() || !data.metadata.ano.trim() || !data.metadata.local.trim()) {
+            if (!data.metadata.titulo.trim() || !data.metadata.autor.trim() || !data.metadata.pronome?.trim() || !data.metadata.ano.trim() || !data.metadata.local.trim()) {
               setAba("gerais");
-              setAviso("Informe título, autor, ano e local.");
+              setAviso("Informe título, autor, pronome, ano e local.");
               return;
             }
             if (!linhaOficial(data.metadata.linha_pesquisa)) {

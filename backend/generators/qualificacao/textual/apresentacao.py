@@ -17,6 +17,7 @@ from ..formato import (
     escrever_fonte,
     escrever_legenda_quadro_1,
 )
+from generators.common.pronome import fonte_construcao
 from ..legendas import BM_QUADRO_1, legenda_quadro_1
 from ..pre_textual.sumario import registrar_entrada
 
@@ -79,59 +80,137 @@ def _texto_item(item, chave):
     return str(getattr(item, chave, "") or "").strip()
 
 
-def _aplicar_lista_objetivos(linhas, objetivos):
-    """A coluna de objetivos específicos repete a lista numerada da seção 2.2."""
-    itens = []
-    for item in objetivos or []:
-        texto = re.sub(
-            r"^\s*\(?\s*(?:i{1,3}|iv|vi{0,3}|ix|x|\d+)\s*[\).\]]\s*",
-            "",
-            str(item or "").strip(),
-            flags=re.IGNORECASE,
-        ).strip()
-        if texto:
-            itens.append(texto)
-    for indice, linha in enumerate(linhas):
-        if indice >= len(itens):
-            break
-        linha[2] = f"({_romano(indice + 1)}) {itens[indice]}"
-    return linhas
+def _limpar_objetivo(item):
+    return re.sub(
+        r"^\s*\(?\s*(?:i{1,3}|iv|vi{0,3}|ix|x|\d+)\s*[\).\]]\s*",
+        "",
+        str(item or "").strip(),
+        flags=re.IGNORECASE,
+    ).strip()
 
 
-def _linhas_produtos(metadata, objetivo_geral, artigos, ptts, fontes_padrao):
+def _lista_objetivos(objetivos):
+    return [texto for texto in (_limpar_objetivo(item) for item in objetivos or []) if texto]
+
+
+def _indices_vinculo(item):
+    """Números (1 = i) dos objetivos específicos atendidos pelo artigo ou produto."""
+    bruto = item.get("objetivos") if isinstance(item, dict) else getattr(item, "objetivos", None)
+    indices = []
+    for valor in bruto or []:
+        texto = str(valor).strip().lower().rstrip(".)")
+        if texto.isdigit():
+            numero = int(texto)
+        elif texto in _ROMANOS:
+            numero = _ROMANOS.index(texto) + 1
+        else:
+            continue
+        if numero > 0 and numero not in indices:
+            indices.append(numero)
+    return indices
+
+
+def _rotulo_artigo(ordem, artigo):
+    return f"Artigo {ordem}: {_texto_item(artigo, 'titulo')}"
+
+
+def _rotulo_ptt(item, numero):
+    titulo_item = _texto_item(item, "titulo") or _texto_item(item, "nome")
+    subtipo = _texto_item(item, "subtipo") or _texto_item(item, "tipo") or "PTT"
+    num = _texto_item(item, "num") or str(numero)
+    return f"{subtipo} {num} – {titulo_item}"
+
+
+def _ficha(item, rotulo, fontes_base):
+    return {
+        "rotulo": rotulo,
+        "estudo": _texto_item(item, "tipo_estudo") or _TIPO_ESTUDO,
+        "fontes": _texto_item(item, "fontes") or fontes_base,
+        "status": _texto_item(item, "status") or _STATUS,
+        "indices": _indices_vinculo(item),
+        "texto": _limpar_objetivo(_texto_item(item, "objetivo_especifico")),
+    }
+
+
+def _linhas_produtos(metadata, objetivo_geral, artigos, ptts, fontes_padrao, objetivos=None):
+    """Uma linha por artigo ou produto técnico.
+
+    Quando o entregável reúne vários objetivos específicos, eles entram na
+    mesma célula, separados por ponto e vírgula, na ordem da seção 2.2.
+    """
     titulo = str((metadata or {}).get("titulo") or (metadata or {}).get("titulo_curto") or "").strip()
     objetivo = str(objetivo_geral or "").strip()
     fontes_base = str(fontes_padrao or "").strip() or "SIAC"
+    fichas = []
+    for ordem, artigo in enumerate(artigos or [], start=1):
+        fichas.append(_ficha(artigo, _rotulo_artigo(ordem, artigo), fontes_base))
+    for numero, item in enumerate(ptts or [], start=1):
+        fichas.append(_ficha(item, _rotulo_ptt(item, numero), fontes_base))
+
+    itens = _lista_objetivos(objetivos)
+    if any(ficha["indices"] for ficha in fichas) and itens:
+        return _linhas_por_vinculo(titulo, objetivo, fichas, itens)
+    return _linhas_por_ordem(titulo, objetivo, fichas, itens)
+
+
+def _linha(titulo, objetivo, texto_objetivo, ficha):
+    return [
+        titulo,
+        objetivo,
+        texto_objetivo,
+        ficha["rotulo"],
+        ficha["estudo"],
+        ficha["fontes"],
+        ficha["status"],
+    ]
+
+
+def _texto_objetivos(ficha, itens):
+    partes = []
+    for indice in sorted(ficha["indices"]):
+        if 1 <= indice <= len(itens):
+            partes.append(f"({_romano(indice)}) {itens[indice - 1]}")
+    return "; ".join(partes)
+
+
+def _linhas_por_vinculo(titulo, objetivo, fichas, itens):
+    vinculadas = [ficha for ficha in fichas if ficha["indices"] and _texto_objetivos(ficha, itens)]
+    vinculadas.sort(key=lambda ficha: min(ficha["indices"]))
+    linhas = [
+        _linha(titulo, objetivo, _texto_objetivos(ficha, itens), ficha)
+        for ficha in vinculadas
+    ]
+    cobertos = {indice for ficha in vinculadas for indice in ficha["indices"]}
+    for indice, texto in enumerate(itens, start=1):
+        if indice in cobertos:
+            continue
+        linhas.append(_linha(titulo, objetivo, f"({_romano(indice)}) {texto}", {
+            "rotulo": "",
+            "estudo": _TIPO_ESTUDO,
+            "fontes": "",
+            "status": _STATUS,
+        }))
+    return linhas
+
+
+def _linhas_por_ordem(titulo, objetivo, fichas, itens):
+    """Sem vínculo explícito, cada entregável recebe o objetivo da mesma posição."""
     linhas = []
-    ordem = 1
-    for artigo in artigos or []:
-        titulo_item = _texto_item(artigo, "titulo")
-        linhas.append([
-            titulo,
-            objetivo,
-            f"({_romano(ordem)}) {_texto_item(artigo, 'objetivo_especifico')}",
-            f"Artigo {ordem}: {titulo_item}",
-            _texto_item(artigo, "tipo_estudo") or _TIPO_ESTUDO,
-            _texto_item(artigo, "fontes") or fontes_base,
-            _texto_item(artigo, "status") or _STATUS,
-        ])
-        ordem += 1
-    numero_ptt = 1
-    for item in ptts or []:
-        titulo_item = _texto_item(item, "titulo") or _texto_item(item, "nome")
-        subtipo = _texto_item(item, "subtipo") or _texto_item(item, "tipo") or "PTT"
-        num = _texto_item(item, "num") or str(numero_ptt)
-        linhas.append([
-            titulo,
-            objetivo,
-            f"({_romano(ordem)}) {_texto_item(item, 'objetivo_especifico')}",
-            f"{subtipo} {num} – {titulo_item}",
-            _texto_item(item, "tipo_estudo") or _TIPO_ESTUDO,
-            _texto_item(item, "fontes") or fontes_base,
-            _texto_item(item, "status") or _STATUS,
-        ])
-        ordem += 1
-        numero_ptt += 1
+    for indice, ficha in enumerate(fichas):
+        if indice < len(itens):
+            texto = f"({_romano(indice + 1)}) {itens[indice]}"
+        elif ficha["texto"]:
+            texto = f"({_romano(indice + 1)}) {ficha['texto']}"
+        else:
+            texto = f"({_romano(indice + 1)})"
+        linhas.append(_linha(titulo, objetivo, texto, ficha))
+    for indice in range(len(fichas), len(itens)):
+        linhas.append(_linha(titulo, objetivo, f"({_romano(indice + 1)}) {itens[indice]}", {
+            "rotulo": "",
+            "estudo": _TIPO_ESTUDO,
+            "fontes": "",
+            "status": _STATUS,
+        }))
     return linhas
 
 
@@ -153,7 +232,14 @@ def build_quadro_estrutura(
     escrever_legenda_quadro_1(p_qtit, legenda_quadro_1(metadata))
     adicionar_bookmark(p_qtit, BM_QUADRO_1)
 
-    linhas = _linhas_produtos(metadata, objetivo_geral, artigos, ptts, fontes_padrao)
+    linhas = _linhas_produtos(
+        metadata,
+        objetivo_geral,
+        artigos,
+        ptts,
+        fontes_padrao,
+        objetivos_especificos,
+    )
     if not linhas:
         linhas = _preparar_linhas(
             (dados_apresentacao or {}).get("quadro_1") or [],
@@ -163,7 +249,6 @@ def build_quadro_estrutura(
     if not linhas:
         adicionar_lacuna(doc, "[Quadro 1 não informado no projeto.]")
         return
-    _aplicar_lista_objetivos(linhas, objetivos_especificos)
 
     _montar_quadro(doc, linhas)
     mes_ano = str((metadata or {}).get("mes_ano") or (metadata or {}).get("ano") or "2026").strip()
@@ -172,7 +257,7 @@ def build_quadro_estrutura(
     p_fonte.paragraph_format.space_before = Pt(2)
     p_fonte.paragraph_format.space_after = Pt(18)
     p_fonte.paragraph_format.line_spacing = 1.0
-    escrever_fonte(p_fonte, f"Fonte: Construção do(a) Autor(a). {mes_ano}.")
+    escrever_fonte(p_fonte, fonte_construcao(metadata, mes_ano))
 
 
 def _preparar_linhas(linhas, metadata, objetivo_geral=""):
@@ -199,6 +284,10 @@ def _preparar_linhas(linhas, metadata, objetivo_geral=""):
 
 
 def _texto_celula(celula, texto, negrito=False, alinhamento=WD_ALIGN_PARAGRAPH.LEFT):
+    from generators.common.siglas_texto import texto_com_sigla
+
+    if not negrito:
+        texto = texto_com_sigla(celula.part.document, texto)
     celula.text = texto
     celula.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
     p = celula.paragraphs[0]
@@ -232,6 +321,28 @@ def _montar_quadro(doc, linhas):
         _mesclar(tabela, 0, linhas[0][0])
         objetivo = next((linha[1] for linha in linhas if linha[1]), "")
         _mesclar(tabela, 1, objetivo)
+        _mesclar_repetidos(tabela, linhas)
+
+
+def _mesclar_repetidos(tabela, linhas):
+    """Entregável compartilhado por objetivos seguidos ocupa uma célula só."""
+    inicio = 0
+    while inicio < len(linhas):
+        rotulo = linhas[inicio][3]
+        fim = inicio
+        while fim + 1 < len(linhas) and linhas[fim + 1][3] == rotulo and rotulo:
+            fim += 1
+        if fim > inicio:
+            for coluna in (3, 4, 5, 6):
+                _mesclar_faixa(tabela, coluna, inicio + 1, fim + 1, linhas[inicio][coluna])
+        inicio = fim + 1
+
+
+def _mesclar_faixa(tabela, coluna, inicio, fim, texto):
+    topo = tabela.rows[inicio].cells[coluna]
+    for linha in range(inicio + 1, fim + 1):
+        topo.merge(tabela.rows[linha].cells[coluna])
+    _texto_celula(topo, texto, alinhamento=_ALINHAMENTO[coluna])
 
 
 def _mesclar(tabela, coluna, texto):

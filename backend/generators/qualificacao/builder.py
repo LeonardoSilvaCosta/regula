@@ -41,6 +41,7 @@ from .pre_textual.capa import build_capa
 from .pre_textual.folha_rosto import build_folha_rosto
 from .pre_textual.folha_aprovacao import build_folha_aprovacao
 from .pre_textual.listas_ilustracoes import build_lista_ilustracoes
+from generators.common.siglas_texto import ativar_siglas
 from .pre_textual.listas_siglas import build_lista_siglas, normalizar_siglas
 from .pre_textual.simbolos import build_lista_simbolos, normalizar_simbolos
 from .pre_textual.sumario import build_sumario, preencher_sumario
@@ -297,6 +298,7 @@ def gerar_documento_qualificacao(
 
     doc = docx.Document()
     apply_base_styles(doc)
+    ativar_siglas(doc, normalizar_siglas(siglas))
 
     # =========================================================================
     # Da capa até o sumário a contagem é romana (i, ii, iii…), sem número visível.
@@ -396,6 +398,7 @@ def gerar_documento_qualificacao(
             projeto[origem] = meta.get(origem) or ""
     if str(meta.get("ano") or "").strip():
         projeto["ano"] = meta["ano"]
+    projeto["pronome"] = meta.get("pronome") or ""
     build_projeto_secoes(doc, projeto, nivel=nivel, numeros=numeros)
     build_resultados_preliminares(
         doc,

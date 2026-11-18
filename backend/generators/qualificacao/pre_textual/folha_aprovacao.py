@@ -9,6 +9,7 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import parse_xml
 from docx.oxml.ns import nsdecls
 
+from generators.common.pronome import do_autor
 from ..titulo import escrever_titulo_e_subtitulo, nome_discente, separar_titulacao
 
 
@@ -142,7 +143,7 @@ def build_folha_aprovacao(doc, metadata, assets_dir="assets"):
     p_ap.paragraph_format.space_after = Pt(0)
     r_ap = p_ap.add_run(
         "Relatório de qualificação submetido à avaliação, como requisito parcial para qualificação "
-        f"do(a) autor(a) ao desenvolvimento da {tipo_trabalho} "
+        f"{do_autor(metadata)} ao desenvolvimento da {tipo_trabalho} "
         "no Programa de Pós-graduação em Segurança Pública, "
         "do Instituto de Ciências Exatas e Naturais, "
         "da Universidade Federal do Pará, "

@@ -16,26 +16,40 @@ from core.xml_utils import aplicar_autoajuste_janela, continuar_numeracao, set_c
 from core.campos import adicionar_bookmark
 from ..formato import adicionar_lacuna, adicionar_paragrafo, escrever_fonte, escrever_legenda
 from ..pre_textual.sumario import registrar_entrada
+from generators.common.pronome import fonte_elaborado
 from ..legendas import BM_QUADRO_2, legenda_quadro_2
 
 
-_LARGURA_ATIVIDADE = Inches(1.9)
-_LARGURA_MES = Inches(0.18)
+_LARGURA_ATIVIDADE = Inches(2.4)
+_LARGURA_MES = Inches(0.28)
 _N_MESES = 24
 _CINZA_MES = "BEBEBE"
+# O mês 1 do curso é maio. Abril fecha o ciclo, no mês 12.
+_NOMES_MESES = (
+    "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez", "Jan", "Fev", "Mar", "Abr",
+)
 
-# Nove atividades do mestrado. Só os meses fixados no modelo oficial
-# (pesquisa ao longo do curso, qualificação no mês 12 e defesa no mês 24).
+# Mestrado: períodos indicados para o relatório, com o mês 1 em maio.
 ATIVIDADES_MESTRADO = [
-    ("Pesquisa Bibliográfica", list(range(1, 25))),
-    ("Redação Preliminar", []),
-    ("Qualificação", [12]),
-    ("Coleta", []),
-    ("Análise", []),
-    ("Discussão", []),
-    ("Redação da Dissertação", []),
-    ("Revisão", []),
-    ("Defesa", [24]),
+    ("Cumprimento de Disciplinas do PPGSP", list(range(1, 9))),
+    ("Aprofundamento do Referencial Teórico", [2, 3, 4, 5]),
+    ("Construção do Codebook com Peritos do CIAP", [5, 6]),
+    ("Tramitação Ética no CEP/ICS/UFPA", [5, 6, 7]),
+    ("Desenvolvimento do Relatório de Qualificação", [9, 10, 11]),
+    ("Extração, Higienização e Anonimização", [10]),
+    ("Rotulagem Pericial e Cálculo de Concordância", [10, 11]),
+    (
+        "Redação do Artigo 1 e desenvolvimento do PRODUTO 1. Infográfico Analítico – "
+        "Panorama Epidemiológico-Institucional dos Atendimentos Psicossociais na PMPA",
+        [12],
+    ),
+    ("Exame de Qualificação do Projeto", [13]),
+    ("Engenharia de Features e Modelagem Multimodal", [13, 14]),
+    ("Treinamento, Calibração e Análise SHAP", [15, 16, 17]),
+    ("Desenvolvimento dos demais Produtos Tecnológicos e do Artigo 2", [15, 16, 17]),
+    ("Desenvolvimento da Dissertação", [18, 19, 20]),
+    ("Revisão Final e Depósito da Dissertação", [21]),
+    ("Defesa Final da Dissertação de Mestrado", [22]),
 ]
 
 NOMES_DOUTORADO = [
@@ -121,7 +135,7 @@ def build_cronograma(doc, dados_projeto, nivel="mestrado", ano_referencia="2026"
     p_f.paragraph_format.space_before = Pt(3)
     p_f.paragraph_format.space_after = Pt(12)
     p_f.paragraph_format.line_spacing = 1.0
-    escrever_fonte(p_f, f"Fonte: Elaborado pelo(a) autor(a), {ano_referencia}.")
+    escrever_fonte(p_f, fonte_elaborado(ano_referencia, dados_projeto))
     _secao_retrato(doc)
 
 
@@ -170,6 +184,11 @@ def _meses(valor):
     return meses
 
 
+def _rotulo_mes(numero):
+    nome = _NOMES_MESES[(numero - 1) % 12]
+    return f"{numero} - {nome}"
+
+
 def _larguras():
     return [_LARGURA_ATIVIDADE] + [_LARGURA_MES] * _N_MESES
 
@@ -198,22 +217,27 @@ def _bloco(doc, legenda, bookmark, atividades, anos):
     _celula(tabela.rows[0].cells[0], "Atividades", 0, centro=True, tamanho=9, negrito=True)
 
     inicio_ano = [1, 13]
-    for indice, (rotulo, _) in enumerate(anos):
+    for indice, (rotulo, inicio) in enumerate(anos):
         primeira = inicio_ano[indice]
         tabela.rows[0].cells[primeira].merge(tabela.rows[0].cells[primeira + 11])
         _celula(tabela.rows[0].cells[primeira], rotulo, primeira, centro=True, tamanho=9, negrito=True)
         for mes in range(12):
+            absoluto = inicio + mes
             _celula(
                 tabela.rows[1].cells[primeira + mes],
-                str(mes + 1),
+                _rotulo_mes(absoluto),
                 primeira + mes,
                 centro=True,
-                tamanho=8,
+                tamanho=7,
                 negrito=True,
+                vertical=True,
             )
+    _altura_linha(tabela.rows[1], 1400)
 
     for r_idx, (nome, meses) in enumerate(atividades, start=2):
-        _celula(tabela.rows[r_idx].cells[0], nome, 0, centro=False, tamanho=9)
+        from generators.common.siglas_texto import texto_com_sigla
+
+        _celula(tabela.rows[r_idx].cells[0], texto_com_sigla(doc, nome), 0, centro=False, tamanho=9)
         presentes = set(meses)
         for indice, (_, inicio) in enumerate(anos):
             primeira = inicio_ano[indice]
@@ -265,8 +289,21 @@ def _bordas_tabela(tabela):
         atual.set(qn("w:color"), "000000")
 
 
-def _celula(celula, texto, coluna, centro=False, tamanho=10, negrito=False):
+def _altura_linha(linha, twips):
+    tr_pr = linha._tr.get_or_add_trPr()
+    altura = OxmlElement("w:trHeight")
+    altura.set(qn("w:val"), str(twips))
+    altura.set(qn("w:hRule"), "atLeast")
+    tr_pr.append(altura)
+
+
+def _celula(celula, texto, coluna, centro=False, tamanho=10, negrito=False, vertical=False):
     celula.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    if vertical:
+        tc_pr = celula._tc.get_or_add_tcPr()
+        direcao = OxmlElement("w:textDirection")
+        direcao.set(qn("w:val"), "btLr")
+        tc_pr.append(direcao)
     celula.text = texto
     p = celula.paragraphs[0]
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER if centro else WD_ALIGN_PARAGRAPH.LEFT

@@ -23,13 +23,19 @@ def atualizar_campos_word(caminho):
         word.Visible = False
         word.DisplayAlerts = 0
         doc = word.Documents.Open(caminho, ReadOnly=False, AddToRecentFiles=False)
-        doc.Fields.Update()
-        for secao in doc.Sections:
-            for idx in (1, 2, 3):
-                secao.Headers(idx).Range.Fields.Update()
-                secao.Footers(idx).Range.Fields.Update()
+
+        def recalcular():
+            doc.Fields.Update()
+            for indice in range(1, doc.TablesOfContents.Count + 1):
+                doc.TablesOfContents(indice).Update()
+            for secao in doc.Sections:
+                for idx in (1, 2, 3):
+                    secao.Headers(idx).Range.Fields.Update()
+                    secao.Footers(idx).Range.Fields.Update()
+
+        recalcular()
         doc.Repaginate()
-        doc.Fields.Update()
+        recalcular()
         wd_portugues_brasil = 1046
         doc.Content.LanguageID = wd_portugues_brasil
         for secao in doc.Sections:

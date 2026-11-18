@@ -38,6 +38,7 @@ class PTTItem(BaseModel):
     abrangencia: str = "Local"
     publico_usuario: str = "Estado, Município, Comunidade"
     objetivo_especifico: str = ""
+    objetivos: list[int] = Field(default_factory=list)
     tipo_estudo: str = "Qualitativo/Quantitativo Exploratório Descritivo"
     fontes: str = ""
     status: str = "Em produção"
@@ -73,6 +74,7 @@ class ArtigoQuadro(BaseModel):
 
     titulo: str = ""
     objetivo_especifico: str = ""
+    objetivos: list[int] = Field(default_factory=list)
     tipo_estudo: str = "Qualitativo/Quantitativo Exploratório Descritivo"
     fontes: str = ""
     status: str = "Em produção"

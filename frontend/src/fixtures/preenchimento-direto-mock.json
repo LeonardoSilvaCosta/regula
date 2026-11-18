@@ -512,9 +512,28 @@
       "Extreme Gradient Boosting"
     ]
   ],
+  "artigos": [
+    {
+      "titulo": "Epidemiologia descritiva e padrões léxicos de sofrimento psíquico em prontuários do CIAP/PMPA",
+      "objetivos": [1, 3],
+      "tipo_estudo": "Qualitativo/Quantitativo Exploratório Descritivo",
+      "fontes": "",
+      "status": "Em produção",
+      "subtipo": "Artigo"
+    },
+    {
+      "titulo": "Predição multimodal de desfechos de saúde mental em policiais militares do Pará",
+      "objetivos": [5, 6, 7],
+      "tipo_estudo": "Qualitativo/Quantitativo Exploratório Descritivo",
+      "fontes": "",
+      "status": "Em produção",
+      "subtipo": "Artigo"
+    }
+  ],
   "ptts": [
     {
       "num": "1",
+      "objetivos": [4],
       "nome": "Infográfico Epidemiológico-Institucional dos Atendimentos do CIAP",
       "autoria": "Leonardo da Silva Costa",
       "tipo": "Material Didático e Instrucional",
@@ -539,6 +558,7 @@
     },
     {
       "num": "2",
+      "objetivos": [4],
       "nome": "Infográfico Clínico-Léxico de Marcadores de Sofrimento Psíquico",
       "autoria": "Leonardo da Silva Costa",
       "tipo": "Material Didático e Instrucional",
@@ -563,6 +583,7 @@
     },
     {
       "num": "3",
+      "objetivos": [8],
       "nome": "Software / API de Predição Multimodal e Suporte à Decisão Clínica",
       "autoria": "Leonardo da Silva Costa",
       "tipo": "Tecnologia/Software Aplicado",
@@ -587,6 +608,7 @@
     },
     {
       "num": "4",
+      "objetivos": [9],
       "nome": "Base de Dados Sintética de Prontuários Psicossociais Militares",
       "autoria": "Leonardo da Silva Costa",
       "tipo": "Base de Dados Técnico-Científica",
@@ -611,6 +633,7 @@
     },
     {
       "num": "5",
+      "objetivos": [2],
       "nome": "Codebook Operacional Consolidado de Risco Psicossocial",
       "autoria": "Leonardo da Silva Costa",
       "tipo": "Manual, Protocolo ou Norma Técnica",
@@ -635,6 +658,7 @@
     },
     {
       "num": "6",
+      "objetivos": [10],
       "nome": "Modelo de LLM Local para Grifagem Clínica Assistida (Clinical Highlighting)",
       "autoria": "Leonardo da Silva Costa",
       "tipo": "Tecnologia/Software Aplicado",
@@ -661,116 +685,63 @@
   "cronograma": [
     {
       "nome": "Cumprimento de Disciplinas do PPGSP",
-      "meses": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10
-      ]
+      "meses": [1, 2, 3, 4, 5, 6, 7, 8]
     },
     {
       "nome": "Aprofundamento do Referencial Teórico",
-      "meses": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8
-      ]
+      "meses": [2, 3, 4, 5]
     },
     {
       "nome": "Construção do Codebook com Peritos do CIAP",
-      "meses": [
-        4,
-        5
-      ]
+      "meses": [5, 6]
     },
     {
       "nome": "Tramitação Ética no CEP/ICS/UFPA",
-      "meses": [
-        5,
-        6,
-        7
-      ]
+      "meses": [5, 6, 7]
     },
     {
-      "nome": "Exame de Qualificação do Projeto",
-      "meses": [
-        8
-      ]
+      "nome": "Desenvolvimento do Relatório de Qualificação",
+      "meses": [9, 10, 11]
     },
     {
       "nome": "Extração, Higienização e Anonimização",
-      "meses": [
-        9,
-        10
-      ]
+      "meses": [10]
     },
     {
       "nome": "Rotulagem Pericial e Cálculo de Concordância",
-      "meses": [
-        10,
-        11
-      ]
+      "meses": [10, 11]
+    },
+    {
+      "nome": "Redação do Artigo 1 e desenvolvimento do PRODUTO 1. Infográfico Analítico – Panorama Epidemiológico-Institucional dos Atendimentos Psicossociais na PMPA",
+      "meses": [12]
+    },
+    {
+      "nome": "Exame de Qualificação do Projeto",
+      "meses": [13]
     },
     {
       "nome": "Engenharia de Features e Modelagem Multimodal",
-      "meses": [
-        12,
-        13,
-        14,
-        15
-      ]
+      "meses": [13, 14]
     },
     {
       "nome": "Treinamento, Calibração e Análise SHAP",
-      "meses": [
-        14,
-        15,
-        16
-      ]
+      "meses": [15, 16, 17]
     },
     {
-      "nome": "Desenvolvimento dos Produtos Tecnológicos",
-      "meses": [
-        15,
-        16,
-        17,
-        18
-      ]
+      "nome": "Desenvolvimento dos demais Produtos Tecnológicos e do Artigo 2",
+      "meses": [15, 16, 17]
     },
     {
-      "nome": "Redação dos Artigos 1 e 2 da Dissertação",
-      "meses": [
-        16,
-        17,
-        18,
-        19,
-        20
-      ]
+      "nome": "Desenvolvimento da Dissertação",
+      "meses": [18, 19, 20]
     },
     {
       "nome": "Revisão Final e Depósito da Dissertação",
-      "meses": [
-        21,
-        22
-      ]
+      "meses": [21]
     },
     {
       "nome": "Defesa Final da Dissertação de Mestrado",
-      "meses": [
-        23,
-        24
-      ]
+      "meses": [22]
     }
   ],
   "lacunas": [],

@@ -38,7 +38,7 @@ def inserir_tabela(
 ):
     """Insere título, grade IBGE e fonte.
 
-    ``numero`` entra em ``Tabela {numero} – {titulo}``.
+    ``numero`` entra em ``Tabela {numero}. {titulo}``, com negrito só até o ponto.
     ``fonte`` é o crédito, sem o prefixo ``Fonte:``.
     ``alinhamentos`` é opcional; se omitido, a primeira coluna fica à
     esquerda e colunas numéricas à direita.
@@ -48,7 +48,9 @@ def inserir_tabela(
     paragrafo_titulo.paragraph_format.space_before = Pt(12)
     paragrafo_titulo.paragraph_format.space_after = Pt(3)
     paragrafo_titulo.paragraph_format.line_spacing = 1.0
-    _run(paragrafo_titulo, f"Tabela {numero} – {titulo}", tamanho=12, negrito=False)
+    from generators.qualificacao.formato import escrever_legenda
+
+    escrever_legenda(paragrafo_titulo, f"Tabela {numero}. {titulo}")
     catalogo = getattr(doc, "_catalogo", None)
     if catalogo is not None:
         catalogo.registrar_ilustracao("Tabela", numero, titulo, "Tabela", "Metodologia")

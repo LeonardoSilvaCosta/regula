@@ -41,7 +41,9 @@ def build_metodologia(doc, dados_projeto, numero=4):
         p.paragraph_format.line_spacing = 1.5
         p.paragraph_format.space_before = Pt(0)
         p.paragraph_format.space_after = Pt(0)
-        r = p.add_run(txt)
+        from generators.common.siglas_texto import texto_com_sigla
+
+        r = p.add_run(texto_com_sigla(doc, txt))
         r.font.name = "Times New Roman"
         r.font.size = Pt(12)
 

@@ -8,6 +8,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 
 from core.xml_utils import aplicar_autoajuste_janela, set_cell_border
+from generators.common.pronome import fonte_construcao
 from ..formato import escrever_fonte, escrever_legenda
 
 
@@ -117,4 +118,4 @@ def build_quadro_apresentacao(doc, dados_quadro, metadata):
     p_fonte.paragraph_format.space_before = Pt(3)
     p_fonte.paragraph_format.space_after = Pt(18)
     p_fonte.paragraph_format.line_spacing = 1.0
-    escrever_fonte(p_fonte, f"Fonte: Construção do autor ({metadata.get('ano', '2026')}).")
+    escrever_fonte(p_fonte, fonte_construcao(metadata, metadata.get("ano", "2026")))

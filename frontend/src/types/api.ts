@@ -119,6 +119,8 @@ export interface components {
              * @default
              */
             autor: string;
+            /** Pronome de tratamento do autor: ele ou ela. */
+            pronome?: string;
             /**
              * Orientador
              * @default
@@ -343,6 +345,8 @@ export interface components {
             publico_usuario: string;
             /** @default */
             objetivo_especifico: string;
+            /** Índices 1-based dos objetivos específicos (1 = i) atendidos pelo produto. */
+            objetivos: number[];
             /** @default Qualitativo/Quantitativo Exploratório Descritivo */
             tipo_estudo: string;
             /** @default */
@@ -356,6 +360,8 @@ export interface components {
             titulo: string;
             /** @default */
             objetivo_especifico: string;
+            /** Índices 1-based dos objetivos específicos (1 = i) atendidos pelo artigo. */
+            objetivos: number[];
             /** @default Qualitativo/Quantitativo Exploratório Descritivo */
             tipo_estudo: string;
             /** @default */

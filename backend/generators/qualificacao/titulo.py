@@ -78,7 +78,12 @@ def _token_subtitulo(token, inicio):
 
 def escrever_titulo_e_subtitulo(paragraph, titulo_completo, tamanho=14):
     """Escreve título e subtítulo no parágrafo, ambos em negrito."""
+    from generators.common.siglas_texto import texto_com_sigla
+
+    documento = paragraph.part.document
     tit, sub = separar_titulo_subtitulo(titulo_completo)
+    tit = texto_com_sigla(documento, tit)
+    sub = texto_com_sigla(documento, sub)
     if not tit and not sub:
         return False
     r_tit = paragraph.add_run(tit)

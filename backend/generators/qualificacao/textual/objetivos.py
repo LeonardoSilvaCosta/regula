@@ -50,7 +50,9 @@ def build_objetivos(doc, dados_projeto):
         p.paragraph_format.line_spacing = 1.5
         p.paragraph_format.space_before = Pt(0)
         p.paragraph_format.space_after = Pt(0)
-        r = p.add_run(txt)
+        from generators.common.siglas_texto import texto_com_sigla
+
+        r = p.add_run(texto_com_sigla(doc, txt))
         r.font.name = "Times New Roman"
         r.font.size = Pt(12)
 
@@ -134,6 +136,8 @@ def _item_numerado(doc, indice, texto):
     p.paragraph_format.line_spacing = 1.5
     p.paragraph_format.space_before = Pt(0)
     p.paragraph_format.space_after = Pt(0)
-    r = p.add_run(f"({_romano(indice)}) {texto}")
+    from generators.common.siglas_texto import texto_com_sigla
+
+    r = p.add_run(f"({_romano(indice)}) {texto_com_sigla(doc, texto)}")
     r.font.name = "Times New Roman"
     r.font.size = Pt(12)

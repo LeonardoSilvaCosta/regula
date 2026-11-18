@@ -34,16 +34,26 @@ _CHAVES_LISTA = (
 )
 
 
-def build_lista_ilustracoes(doc, ilustracoes_data, quebrar=False):
-    """Renderiza a lista contínua. `quebrar` permanece na assinatura e não abre página antes."""
+def build_lista_ilustracoes(doc, ilustracoes_data, quebrar=False, titulo_mestre=True):
+    """Renderiza a lista contínua. `quebrar` permanece na assinatura e não abre página antes.
+
+    Sem figuras, `titulo_mestre=False` omite a seção LISTA DE ILUSTRAÇÕES e
+    publica só as listas que têm itens, como quadros e tabelas.
+    """
     del quebrar
     grupos = _agrupar(_extrair_entradas(ilustracoes_data))
     if not grupos:
         return []
 
-    _titulo_mestre(doc, "LISTA DE ILUSTRAÇÕES", BM_LISTA_ILUSTRACOES)
-    for titulo, entradas in grupos:
-        _subtitulo_categoria(doc, titulo)
+    if titulo_mestre:
+        _titulo_mestre(doc, "LISTA DE ILUSTRAÇÕES", BM_LISTA_ILUSTRACOES)
+    for indice, (titulo, entradas) in enumerate(grupos):
+        if titulo_mestre:
+            _subtitulo_categoria(doc, titulo)
+        else:
+            cabecalho = _titulo_mestre(doc, titulo, None)
+            if indice:
+                cabecalho.paragraph_format.space_before = Pt(18)
         origem_anterior = None
         for item in entradas:
             origem = item.get("origem") or ""

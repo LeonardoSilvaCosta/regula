@@ -38,6 +38,7 @@ function criarEstadoVazio(tipo: DocumentType, nivel: AcademicLevel): ParseRespon
       titulo: "",
       subtitulo: "",
       autor: "",
+      pronome: "",
       orientador: "",
       coorientador: "",
       coordenador: "Prof. Dr. Edson Marcos Leal Soares Ramos",

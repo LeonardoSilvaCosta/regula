@@ -66,7 +66,9 @@ def build_produtos(doc, dados_projeto, numero=5):
         p.paragraph_format.line_spacing = 1.5
         p.paragraph_format.space_before = Pt(0)
         p.paragraph_format.space_after = Pt(0)
-        r = p.add_run(txt)
+        from generators.common.siglas_texto import texto_com_sigla
+
+        r = p.add_run(texto_com_sigla(doc, txt))
         r.font.name = "Times New Roman"
         r.font.size = Pt(12)
 
@@ -110,6 +112,9 @@ def build_produtos(doc, dados_projeto, numero=5):
             p_titulo.paragraph_format.space_after = Pt(6)
             p_titulo.paragraph_format.line_spacing = 1.0
             p_titulo.paragraph_format.first_line_indent = Pt(0)
+            from generators.common.siglas_texto import texto_com_sigla
+
+            cabecalho = texto_com_sigla(doc, cabecalho)
             _run_times(p_titulo.add_run(cabecalho), True)
             ancorar_paragrafo(p_titulo, cabecalho, bookmark=f"sec_prod_{idx_p}")
 
@@ -131,7 +136,7 @@ def build_produtos(doc, dados_projeto, numero=5):
                     p_texto.paragraph_format.space_after = Pt(6)
                     p_texto.paragraph_format.line_spacing = 1.5
                     p_texto.paragraph_format.first_line_indent = Cm(1.27)
-                    _run_times(p_texto.add_run(str(valor)), False)
+                    _run_times(p_texto.add_run(texto_com_sigla(doc, str(valor))), False)
                     continue
 
                 p = doc.add_paragraph()
@@ -144,7 +149,7 @@ def build_produtos(doc, dados_projeto, numero=5):
                 run_label = p.add_run(campo + " ")
                 _run_times(run_label, True)
 
-                run_val = p.add_run(str(valor))
+                run_val = p.add_run(texto_com_sigla(doc, str(valor)))
                 _run_times(run_val, False)
     else:
         add_placeholder(

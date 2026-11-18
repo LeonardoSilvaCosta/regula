@@ -93,7 +93,9 @@ def _titulo_secao(doc, texto, bookmark=None):
 
 def _titulo_produto(doc, texto, bookmark=None):
     from core.campos import ancorar_paragrafo
+    from generators.common.siglas_texto import texto_com_sigla
 
+    texto = texto_com_sigla(doc, texto)
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
     p.paragraph_format.space_before = Pt(6)
@@ -301,20 +303,24 @@ def _rotulo_e_texto(doc, rotulo, texto):
     r1.italic = False
     r1.font.name = "Times New Roman"
     r1.font.size = Pt(12)
-    r2 = p.add_run(str(texto))
+    from generators.common.siglas_texto import texto_com_sigla
+
+    r2 = p.add_run(texto_com_sigla(doc, str(texto)))
     r2.bold = False
     r2.font.name = "Times New Roman"
     r2.font.size = Pt(12)
 
 
 def _paragrafo_simples(doc, texto):
+    from generators.common.siglas_texto import texto_com_sigla
+
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     p.paragraph_format.first_line_indent = Pt(0)
     p.paragraph_format.line_spacing = 1.0
     p.paragraph_format.space_before = Pt(0)
     p.paragraph_format.space_after = Pt(0)
-    r = p.add_run(str(texto))
+    r = p.add_run(texto_com_sigla(doc, str(texto)))
     r.font.name = "Times New Roman"
     r.font.size = Pt(12)
 
@@ -364,10 +370,12 @@ def _nota_submissao(paragrafo, artigo):
     revista = _primeiro(artigo.get("revista_pretendida"), artigo.get("revista")) or "[revista não informada]"
     qualis = _primeiro(artigo.get("qualis_capes"), artigo.get("qualis")) or "[Qualis não informado]"
     status = _primeiro(artigo.get("status"), artigo.get("status_submissao")) or "[status não informado]"
+    from generators.common.siglas_texto import texto_com_sigla
+
     texto = (
         f"Artigo elaborado para submissão à revista {revista} (Qualis {qualis}). Status: {status}."
     )
-    _adicionar_nota(paragrafo, texto)
+    _adicionar_nota(paragrafo, texto_com_sigla(paragrafo.part.document, texto))
 
 
 def _adicionar_nota(paragrafo, texto):

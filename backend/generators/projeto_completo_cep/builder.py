@@ -15,7 +15,7 @@ from core.styles import (
     aplicar_rodape_local_ano,
     limpar_rodape,
 )
-from core.xml_utils import aplicar_autoajuste_janela, set_cell_border
+from generators.common.pronome import fonte_elaborado
 from generators.common.referencias import renderizar_referencias
 from generators.qualificacao.builder import (
     _paginar,
@@ -31,6 +31,7 @@ from generators.qualificacao.formato import (
 )
 from generators.qualificacao.pre_textual.capa import build_capa
 from generators.qualificacao.pre_textual.folha_rosto import build_folha_rosto
+from generators.common.siglas_texto import normalizar_siglas_texto
 from generators.qualificacao.pre_textual.listas_siglas import build_lista_siglas, normalizar_siglas
 from generators.qualificacao.pre_textual.sumario import build_sumario
 from generators.qualificacao.textual.cronograma import build_cronograma
@@ -86,7 +87,7 @@ def _celula(celula, texto, negrito=False, centro=False):
     set_cell_border(celula, top={"sz": 4}, bottom={"sz": 4}, left={"sz": 4}, right={"sz": 4})
 
 
-def _quadro(doc, numero, titulo, colunas, linhas, proporcoes, ano):
+def _quadro(doc, numero, titulo, colunas, linhas, proporcoes, ano, meta=None):
     p_tit = doc.add_paragraph()
     p_tit.alignment = WD_ALIGN_PARAGRAPH.LEFT
     p_tit.paragraph_format.space_before = Pt(18)
@@ -108,7 +109,7 @@ def _quadro(doc, numero, titulo, colunas, linhas, proporcoes, ano):
     p_fonte.paragraph_format.space_before = Pt(2)
     p_fonte.paragraph_format.space_after = Pt(18)
     p_fonte.paragraph_format.line_spacing = 1.0
-    escrever_fonte(p_fonte, f"Fonte: Elaborado pelo(a) autor(a), {ano}.")
+    escrever_fonte(p_fonte, fonte_elaborado(ano, meta))
 
 
 def _linha_cronograma(texto):
@@ -123,7 +124,7 @@ def _linha_cronograma(texto):
     return [corpo.strip(), "", status]
 
 
-def _quadro_cronograma(doc, paragrafos, ano):
+def _quadro_cronograma(doc, paragrafos, ano, meta=None):
     linhas = [_linha_cronograma(item) for item in paragrafos]
     _quadro(
         doc,
@@ -133,6 +134,7 @@ def _quadro_cronograma(doc, paragrafos, ano):
         linhas,
         [1800, 6200, 1400],
         ano,
+        meta,
     )
 
 
@@ -162,7 +164,7 @@ def _itens_orcamento(paragrafos):
     return intro, itens
 
 
-def _quadro_orcamento(doc, paragrafos, ano):
+def _quadro_orcamento(doc, paragrafos, ano, meta=None):
     intro, itens = _itens_orcamento(paragrafos)
     for paragrafo in intro:
         if not paragrafo.lower().startswith("total"):
@@ -178,95 +180,8 @@ def _quadro_orcamento(doc, paragrafos, ano):
         itens,
         [6200, 1800, 1400],
         ano,
+        meta,
     )
-
-
-def _limite_sigla(sigla):
-    return (
-        r"(?<![A-Za-zÀ-ÿ0-9/])"
-        + re.escape(sigla)
-        + r"(?![A-Za-zÀ-ÿ0-9/])"
-    )
-
-
-def _ocorrencias(texto, sigla, significado, inicio):
-    """Forma expandida, sigla isolada e nome por extenso, a partir de `inicio`."""
-    expandidos = list(
-        re.finditer(
-            re.escape(significado) + r"\s*\(\s*" + re.escape(sigla) + r"\s*\)",
-            texto[inicio:],
-            flags=re.IGNORECASE,
-        )
-    )
-    siglas = list(re.finditer(_limite_sigla(sigla), texto[inicio:]))
-    nomes = list(
-        re.finditer(
-            r"(?<![A-Za-zÀ-ÿ])" + re.escape(significado) + r"(?![A-Za-zÀ-ÿ])",
-            texto[inicio:],
-            flags=re.IGNORECASE,
-        )
-    )
-    achados = []
-    for match in expandidos:
-        achados.append((inicio + match.start(), inicio + match.end(), "expandida", match.group(0)))
-    for match in siglas:
-        achados.append((inicio + match.start(), inicio + match.end(), "sigla", match.group(0)))
-    for match in nomes:
-        achados.append((inicio + match.start(), inicio + match.end(), "nome", match.group(0)))
-    return achados
-
-
-def _normalizar_siglas_texto(texto, pares, introduzidas):
-    if not texto or not pares:
-        return texto
-    ordenados = sorted(pares, key=lambda par: len(par[1]), reverse=True)
-    cursor = 0
-    partes = []
-    while cursor < len(texto):
-        escolhido = None
-        for sigla, significado in ordenados:
-            if not significado:
-                continue
-            for inicio, fim, tipo, trecho in _ocorrencias(texto, sigla, significado, cursor):
-                if escolhido is None or inicio < escolhido[0] or (
-                    inicio == escolhido[0] and fim - inicio > escolhido[1] - escolhido[0]
-                ):
-                    escolhido = (inicio, fim, tipo, trecho, sigla, significado)
-        if escolhido is None:
-            partes.append(texto[cursor:])
-            break
-        inicio, fim, tipo, trecho, sigla, significado = escolhido
-        chave = sigla.upper()
-        ja_introduzida = bool(introduzidas.get(chave))
-        parentese = re.match(r"\s*\(([^)]*)\)", texto[fim:])
-        sigla_no_parentese = bool(
-            parentese
-            and re.search(
-                r"(?<![A-Za-zÀ-ÿ0-9])" + re.escape(sigla) + r"(?![A-Za-zÀ-ÿ0-9])",
-                parentese.group(1),
-            )
-        )
-        if tipo == "nome" and sigla_no_parentese:
-            fim += parentese.end()
-            tipo = "expandida"
-            trecho = texto[inicio:fim]
-        partes.append(texto[cursor:inicio])
-        composto = parentese.group(1).strip() if parentese and "/" in parentese.group(1) else ""
-        if tipo == "expandida" and ja_introduzida:
-            partes.append(composto or sigla)
-        elif tipo == "expandida":
-            partes.append(trecho)
-        elif tipo == "sigla" and not ja_introduzida:
-            partes.append(f"{significado} ({sigla})")
-        elif tipo == "sigla":
-            partes.append(trecho)
-        elif not ja_introduzida:
-            partes.append(f"{trecho} ({sigla})")
-        else:
-            partes.append(sigla)
-        introduzidas[chave] = True
-        cursor = fim
-    return "".join(partes)
 
 
 def _aplicar_siglas(secoes, pares):
@@ -277,7 +192,7 @@ def _aplicar_siglas(secoes, pares):
 
     def converter(valor):
         if isinstance(valor, str):
-            return _normalizar_siglas_texto(valor, pares, introduzidas)
+            return normalizar_siglas_texto(valor, pares, introduzidas)
         if isinstance(valor, (list, tuple)):
             return [converter(item) for item in valor]
         return valor
@@ -451,18 +366,19 @@ def gerar_documento_projeto_completo_cep(
     cronograma_texto = _lista(secoes.get("cronograma_texto"))
     if cronograma_texto:
         adicionar_titulo(doc, "8. CRONOGRAMA")
-        _quadro_cronograma(doc, cronograma_texto, ano)
+        _quadro_cronograma(doc, cronograma_texto, ano, meta)
     else:
         projeto = {
             "cronograma": dados.get("cronograma") or [],
             "ano": ano,
+            "pronome": meta.get("pronome") or "",
         }
         build_cronograma(doc, projeto, nivel=meta["nivel"], ano_referencia=ano, numero=8)
 
     adicionar_titulo(doc, "9. ORÇAMENTO")
     orcamento = _lista(secoes.get("orcamento"))
     if orcamento:
-        _quadro_orcamento(doc, orcamento, ano)
+        _quadro_orcamento(doc, orcamento, ano, meta)
     else:
         adicionar_lacuna(doc, "[Preencher]")
 

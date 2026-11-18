@@ -130,6 +130,7 @@ class DocumentMetadata(BaseModel):
     titulo: str = ""
     subtitulo: str = ""
     autor: str = ""
+    pronome: str = ""
     orientador: str = ""
     coorientador: str = ""
     coordenador: str = "Prof. Dr. Edson Marcos Leal Soares Ramos"
@@ -147,6 +148,7 @@ class CategoriaCodebook(BaseModel):
     codigo: str = ""
     nome: str = ""
     definicao: str = ""
+    definicao_detalhada: str = ""
     inclusao: list[str] = Field(default_factory=list)
     exclusao: list[str] = Field(default_factory=list)
     contraexemplos: list[str] = Field(default_factory=list)

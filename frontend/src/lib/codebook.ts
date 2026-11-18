@@ -3,6 +3,7 @@ export interface CategoriaCodebook {
   codigo: string;
   nome: string;
   definicao: string;
+  definicao_detalhada?: string;
   inclusao: string[];
   exclusao: string[];
   contraexemplos: string[];
